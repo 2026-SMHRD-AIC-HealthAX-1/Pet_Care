@@ -1,32 +1,24 @@
 package com.smhrd.myapp.domain.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
+import java.time.LocalDateTime;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/users")
 public class UserController {
-
     private final UserService userService;
 
-    @GetMapping("/login")
-    public String loginPage() {
-        return "login"; // templates/login.html
-    }
-
-    @GetMapping("/join")
-    public String joinPage() {
-        return "join"; // templates/join.html
-    }
-
     @PostMapping("/join")
-    public String join(@RequestParam String email, 
-                       @RequestParam String password, 
-                       @RequestParam String name) {
-        userService.join(email, password, name);
-        return "redirect:/login";
+    public String join(
+            @RequestParam String id,
+            @RequestParam String pw,
+            @RequestParam String name,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime birth,
+            @RequestParam char isReceiveAlarm
+    ) {
+        return userService.join(id, pw, name, birth, isReceiveAlarm);
     }
 }

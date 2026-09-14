@@ -9,21 +9,15 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PetService {
-
     private final PetRepository petRepository;
 
     @Transactional
-    public Long register(Long userId, String name, String species, Integer age) {
-        PetEntity pet = PetEntity.builder()
-                .userId(userId)
-                .name(name)
-                .species(species)
-                .age(age)
-                .build();
-        return petRepository.save(pet).getId();
+    public PetEntity savePet(String pName, char pGender, String pSpecies, Byte pAge, Integer pWeight,
+                             String pSpec, char isMule, char isVaccin, String pBeforeInfo) {
+        return petRepository.save(new PetEntity(pName, pGender, pSpecies, pAge, pWeight, pSpec, isMule, isVaccin, pBeforeInfo));
     }
 
-    public List getPetsByUserId(Long userId) {
-        return petRepository.findByUserId(userId);
+    public List getAllPets() {
+        return petRepository.findAll();
     }
 }

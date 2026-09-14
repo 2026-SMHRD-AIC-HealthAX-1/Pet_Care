@@ -1,19 +1,36 @@
 package com.smhrd.myapp.domain.analysis;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "PET_ACT_CHANGE")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
-@Table(name = "analysis")
+@NoArgsConstructor
 public class AnalysisEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private Long petId;
-    @Column(columnDefinition = "TEXT")
-    private String resultJson;
+    @Column(name = "SEQ")
+    private Integer seq;
+
+    @Column(name = "PET_SEQ", nullable = false)
+    private Integer petSeq;
+
+    @Column(name = "DTTM", nullable = false)
+    private LocalDateTime dttm;
+
+    @Column(name = "GIJUN_ACT_TIME")
+    private Integer gijunActTime;
+
+    @Column(name = "CHANGE_ACT_TIME")
+    private Integer changeActTime;
+
+    @Column(name = "GIJUN_ACT_LEVEL")
+    private Integer gijunActLevel;
+
+    @Column(name = "CHANGE_ACT_LEVEL")
+    private Integer changeActLevel;
 }

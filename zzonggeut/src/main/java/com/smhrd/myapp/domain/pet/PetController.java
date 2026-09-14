@@ -1,28 +1,30 @@
 package com.smhrd.myapp.domain.pet;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/pets")
 public class PetController {
-
     private final PetService petService;
 
-    @GetMapping("/pet/register")
-    public String petRegisterPage() {
-        return "petRegister"; // templates/petRegister.html
+    @PostMapping
+    public PetEntity createPet(@RequestParam String pName,
+                               @RequestParam char pGender,
+                               @RequestParam String pSpecies,
+                               @RequestParam Byte pAge,
+                               @RequestParam Integer pWeight,
+                               @RequestParam String pSpec,
+                               @RequestParam char isMule,
+                               @RequestParam char isVaccin,
+                               @RequestParam String pBeforeInfo) {
+        return petService.savePet(pName, pGender, pSpecies, pAge, pWeight, pSpec, isMule, isVaccin, pBeforeInfo);
     }
 
-    @PostMapping("/pet/register")
-    public String registerPet(@RequestParam Long userId,
-                              @RequestParam String name,
-                              @RequestParam String species,
-                              @RequestParam Integer age) {
-        petService.register(userId, name, species, age);
-        return "redirect:/main";
+    @GetMapping
+    public List listPets() {
+        return petService.getAllPets();
     }
 }

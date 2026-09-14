@@ -1,19 +1,35 @@
 package com.smhrd.myapp.domain.monitoring;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "PET_ACT_RECORD")
+@IdClass(PetActRecordId.class)
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
-@Table(name = "monitoring")
+@NoArgsConstructor
 public class MonitoringEntity {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private Long petId;
-    private String status;
-    private String timestamp;
+    @Column(name = "DTTM")
+    private LocalDateTime dttm;
+
+    @Id
+    @Column(name = "PET_SEQ")
+    private Integer petSeq;
+
+    @Column(name = "ACT_NAME", length = 10)
+    String actName;
+
+    @Column(name = "ACT_TIME")
+    private Integer actTime;
+
+    public MonitoringEntity(LocalDateTime dttm, Integer petSeq, String actName, Integer actTime) {
+        this.dttm = dttm;
+        this.petSeq = petSeq;
+        this.actName = actName;
+        this.actTime = actTime;
+    }
 }

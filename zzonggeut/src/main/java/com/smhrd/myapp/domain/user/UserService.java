@@ -3,6 +3,7 @@ package com.smhrd.myapp.domain.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -12,11 +13,13 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Long join(String email, String password, String name) {
+    public String join(String id, String pw, String name, LocalDateTime birth, char isReceiveAlarm) {
         UserEntity user = UserEntity.builder()
-                .email(email)
-                .password(password)
+                .id(id)
+                .pw(pw)
                 .name(name)
+                .birth(birth)
+                .isReceiveAlarm(isReceiveAlarm)
                 .build();
         return userRepository.save(user).getId();
     }

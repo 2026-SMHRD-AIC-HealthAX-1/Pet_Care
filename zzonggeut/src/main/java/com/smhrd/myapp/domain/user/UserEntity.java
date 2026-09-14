@@ -1,26 +1,32 @@
 package com.smhrd.myapp.domain.user;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "USER")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "user")
 public class UserEntity {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "ID", length = 10, nullable = false)
+    private String id;
 
-    @Column(nullable = false, unique = true, length = 50)
-    private String email;
+    @Column(name = "PW", length = 10)
+    private String pw;
 
-    @Column(nullable = false, length = 100)
-    private String password;
-
-    @Column(nullable = false, length = 50)
+    @Column(name = "NAME", length = 10)
     private String name;
+
+    @Column(name = "BIRTH")
+    private LocalDateTime birth;
+
+    @Column(name = "isReceiveAlarm", length = 1)
+    private char isReceiveAlarm;
 }

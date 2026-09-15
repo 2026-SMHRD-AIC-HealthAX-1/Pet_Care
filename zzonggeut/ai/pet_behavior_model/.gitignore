@@ -1,0 +1,45 @@
+# Python 가상환경
+.venv/
+venv/
+
+# Python 실행 캐시
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# 편집기 설정
+.vscode/
+.idea/
+
+# 환경변수 및 비밀 설정
+.env
+.env.*
+!.env.example
+
+# API 임시 업로드 영상
+data/inputs/api_uploads/
+
+# 임시 파일
+*.tmp
+*.temp
+*.log
+
+# 대용량 모델 가중치
+*.pt
+
+# 테스트 영상
+data/videos/*
+!data/videos/README.txt
+
+# 생성된 미리보기 영상
+data/outputs/previews/
+
+
+# Old backup source files
+backup/
+
+# Runtime-generated baseline histories
+data/inputs/*.json
+
+# Runtime-generated analysis outputs
+data/outputs/

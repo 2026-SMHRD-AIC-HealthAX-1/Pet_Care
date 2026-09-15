@@ -1,0 +1,391 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Pretendard', sans-serif;
+}
+
+body {
+  background-color: #f7faf9;
+  color: #333;
+}
+
+/* 1. Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 40px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.logo-img {
+  height: 36px;
+  width: auto;
+  display: block;
+}
+
+.nav-links a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #555;
+  font-weight: 500;
+}
+
+.nav-links a.active {
+  color: #0b8484;
+  font-weight: bold;
+}
+
+.nav-utils {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.pet-select {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #0b8484;
+  color: #0b8484;
+  font-weight: bold;
+  outline: none;
+}
+
+/* Layout Main Container */
+.dashboard-container {
+  padding: 30px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* SECTION 1: KPI Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.kpi-label {
+  font-size: 13px;
+  color: #777;
+  font-weight: 600;
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 8px 0 4px;
+}
+
+.kpi-sub {
+  font-size: 12px;
+  color: #888;
+}
+
+/* 음수(마이너스): 빨간색 */
+.negative-text {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+/* 양수(플러스): 파란색 */
+.positive-text {
+  color: #1976d2;
+  font-weight: bold;
+}
+
+.status-online { color: #2e7d32; }
+.warning-text { color: #d32f2f; }
+.primary-text { color: #0b8484; }
+.accent-text { color: #e65100; }
+.font-bold { font-weight: bold; }
+
+/* Cards Common */
+.dash-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.card-header h3 {
+  font-size: 18px;
+  color: #222;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.small-select, .date-input {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #555;
+  outline: none;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.live-badge {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* SECTION 2: Main Grid */
+.main-grid {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.video-container {
+  width: 100%;
+  height: 280px;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.video-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #aaa;
+}
+
+.play-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.card-footer-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Buttons */
+.btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.primary-btn {
+  background-color: #0b8484;
+  color: white;
+  border: none;
+}
+
+.outline-btn {
+  border: 1px solid #0b8484;
+  color: #0b8484;
+  background: white;
+}
+
+/* Bar Chart Mockup */
+.bar-chart-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 130px;
+  padding: 10px 10px 0;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 16px;
+}
+
+.bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  justify-content: flex-end;
+  width: 10%;
+}
+
+.bar {
+  width: 100%;
+  background-color: #0b8484;
+  border-radius: 4px 4px 0 0;
+  opacity: 0.85;
+}
+
+.bar-group span {
+  font-size: 12px;
+  color: #777;
+}
+
+.sub-title {
+  font-size: 14px;
+  margin-bottom: 12px;
+  color: #444;
+}
+
+/* Progress Bars */
+.time-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.time-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.time-item span {
+  width: 30px;
+  color: #666;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar .fill {
+  height: 100%;
+  background: #0b8484;
+}
+
+.time-item .percent {
+  width: 35px;
+  text-align: right;
+  font-weight: bold;
+  color: #333;
+}
+
+/* SECTION 3: Bottom Grid */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Data Table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.data-table th {
+  padding: 10px 12px;
+  color: #777;
+  border-bottom: 1px solid #eee;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.data-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f7f7f7;
+  color: #333;
+}
+
+.tag {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.tag-ok {
+  background-color: #eef7f6;
+  color: #0b8484;
+}
+
+.badge-action {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.badge-action.act {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.badge-action.rest {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* Footer */
+.footer {
+  margin-top: 40px;
+  padding: 20px 40px;
+  background: #fff;
+  border-top: 1px solid #eee;
+  text-align: center;
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* 테이블 셀 전용 색상 규정 (우선순위 강화) */
+.data-table td.negative-text {
+  color: #d32f2f !important;
+  font-weight: bold;
+}
+
+.data-table td.positive-text {
+  color: #1976d2 !important;
+  font-weight: bold;
+}

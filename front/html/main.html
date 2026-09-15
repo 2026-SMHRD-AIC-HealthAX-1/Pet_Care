@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쫑긋 - AI 기반 반려동물 케어</title>
+  <link rel="stylesheet" href="../css/mainStyle.css">
+</head>
+
+<body>
+
+  <!-- 1. 상단 네비게이션 바 -->
+  <header class="navbar">
+    <!-- 기존 텍스트 로고를 이미지 로고로 변경 -->
+    <div class="logo">
+      <a href="main.html">
+        <img src="../assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      </a>
+    </div>
+    <nav class="nav-links">
+      <a href="dashboard.html">대시보드</a>
+      <a href="live-view.html">실시간 모니터링</a>
+      <a href="behavior-log.html">행동 분석</a>
+      <a href="notifications.html">변화 알림</a>
+      <a href="activity-report.html">리포트</a>
+    </nav>
+    <div class="nav-utils">
+      <button class="icon-btn" id="alarmBtn">🔔</button>
+      <!-- button 태그를 a 태그로 변경하고 href 경로 추가 -->
+      <a href="myPage.html" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+      <a href="petManagement.html" class="btn primary-btn">내 반려동물</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- 2. 히어로(메인 비주얼) 섹션 -->
+    <section class="hero-section">
+      <div class="hero-text">
+        <h1>작은 변화에도<br><span class="highlight">귀 기울여</span> 알려드릴게요.</h1>
+        <p>쫑긋은 반려동물의 평소 행동 패턴을 이해하고,<br>평소와 다른 변화를 보호자에게 알려줍니다.</p>
+        <div class="hero-buttons">
+          <a href="dashboard.html" class="btn primary-btn">대시보드 바로가기</a>
+          <a href="petManagement.html" class="btn outline-btn">반려동물 추가하기</a>
+        </div>
+      </div>
+
+      <!-- 메인 메인 동물 이미지 영역 (추후 실제 이미지로 교체) -->
+      <div class="hero-media">
+        <div class="image-placeholder">
+          <span>[동물 메인 이미지 영역]</span>
+        </div>
+        <!-- 우측 상단 변화 감지 플로팅 카드 -->
+        <div class="floating-card">
+          <div class="card-status">변화 감지 🟢</div>
+          <h4>평소보다 활동량이<br><span class="alert-text">23% 감소했어요</span></h4>
+          <div class="mini-chart-placeholder">[미니 그래프]</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 핵심 기능 4가지 요약 카드 -->
+    <section class="features-grid">
+      <div class="feature-card">
+        <div class="icon">📷</div>
+        <div class="info">
+          <h3>실시간 모니터링</h3>
+          <p>언제 어디서나 실시간으로 확인</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📈</div>
+        <div class="info">
+          <h3>행동 분석</h3>
+          <p>AI가 반려동물의 행동을 분석</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🔔</div>
+        <div class="info">
+          <h3>변화 감지 알림</h3>
+          <p>평소와 다른 변화는 즉시 알림</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📋</div>
+        <div class="info">
+          <h3>리포트 제공</h3>
+          <p>일/주/월 단위로 상세 리포트 확인</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 데이터 대시보드 3개 카드 영역 -->
+    <section class="dashboard-preview">
+      <!-- 4-1. 활동량 그래프 카드 -->
+      <div class="dash-card">
+        <h3>활동량 <small>(평소 대비)</small></h3>
+        <div class="stat-value negative">-23%</div>
+        <p class="stat-sub">평소보다 활동량이 감소했어요</p>
+        <div class="chart-area-placeholder">
+          [메인 차트/그래프 영역]
+        </div>
+      </div>
+
+      <!-- 4-2. 주요 행동 TOP 3 카드 -->
+      <div class="dash-card">
+        <h3>주요 행동 TOP 3</h3>
+        <ul class="rank-list">
+          <li>
+            <span class="rank">1</span>
+            <span class="label">휴식</span>
+            <div class="progress-bar">
+              <div class="fill" style="width: 62%;"></div>
+            </div>
+            <span class="percent">62%</span>
+          </li>
+          <li>
+            <span class="rank">2</span>
+            <span class="label">탐색</span>
+            <div class="progress-bar">
+              <div class="fill" style="width: 23%;"></div>
+            </div>
+            <span class="percent">23%</span>
+          </li>
+          <li>
+            <span class="rank">3</span>
+            <span class="label">식사</span>
+            <div class="progress-bar">
+              <div class="fill" style="width: 8%;"></div>
+            </div>
+            <span class="percent">8%</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 4-3. 실시간 감지/영상 썸네일 카드 (가로 비율 확장 및 2단 배치 적용) -->
+      <div class="dash-card wide-card">
+        <h3>변화 감지</h3>
+        <div class="detection-content">
+          <!-- 좌측: 텍스트 정보 -->
+          <div class="detection-info">
+            <div class="alert-count">
+              <span class="highlight-num">1</span>건
+            </div>
+            <p class="stat-sub">오늘 14:23 · 활동량 감소 감지</p>
+          </div>
+          <!-- 우측: 영상 썸네일 -->
+          <div class="video-thumbnail-placeholder">
+            <div class="play-btn">▶</div>
+            <span>[감지 영상 썸네일]</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 앱 다운로드 안내 배너 -->
+    <section class="banner-section">
+      <div class="banner-text">
+        <span class="banner-icon">📱</span>
+        <div>
+          <h3>사랑하는 반려동물을 더 건강하고 행복하게</h3>
+          <p>평소를 이해하고, 작은 변화를 빠르게 알아차려 더 나은 일상을 함께 만들어요.</p>
+        </div>
+      </div>
+      <div class="app-download-buttons">
+        <button class="app-btn">App Store</button>
+        <button class="app-btn">Google Play</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- 6. 하단 푸터 영역 -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <!-- 기존 <h2>🐾 쫑긋</h2> 대신 이미지 로고 삽입 -->
+        <a href="main.html">
+          <img src="../assets/logo.png" alt="쫑긋 로고" class="footer-logo-img">
+        </a>
+        <p>평소를 알고, 변화를 알려주는 펫케어 서비스</p>
+      </div>
+      <div class="footer-links">
+        <div class="col">
+          <h4>서비스</h4>
+          <a href="#">기능 소개</a>
+          <a href="#">이용 방법</a>
+          <a href="#">요금 안내</a>
+        </div>
+        <div class="col">
+          <h4>고객센터</h4>
+          <a href="notice.html">공지사항</a>
+          <a href="#">자주 묻는 질문</a>
+          <a href="#">문의하기</a>
+        </div>
+        <div class="col">
+          <h4>회사</h4>
+          <a href="#">회사 소개</a>
+          <a href="#">개인정보처리방침</a>
+          <a href="#">이용약관</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 쫑긋. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+
+</html>

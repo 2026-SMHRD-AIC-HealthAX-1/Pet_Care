@@ -1,0 +1,848 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PET analysis result v1.0",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "analysis_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pet_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "video_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "species": {
+      "enum": [
+        "DOG",
+        "CAT",
+        "UNKNOWN"
+      ]
+    },
+    "analysis_status": {
+      "enum": [
+        "COMPLETED",
+        "COMPLETED_WITH_WARNING",
+        "FAILED"
+      ]
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "recorded_at_source": {
+      "enum": [
+        "CAMERA",
+        "FILE_METADATA",
+        "REQUEST_TIME"
+      ]
+    },
+    "aggregation_sec": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "time_slot": {
+      "type": "string",
+      "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]-(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "video_info": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "file_name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "duration_sec": {
+              "type": "number",
+              "minimum": 0
+            },
+            "fps": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "total_frames": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "file_name",
+            "duration_sec",
+            "fps",
+            "width",
+            "height",
+            "total_frames"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "tracking_quality": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "raw_detected_frames": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "interpolated_frames": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "jump_filtered_frames": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "valid_tracking_frames": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "missing_frames": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "tracking_success_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "quality_status": {
+              "enum": [
+                "GOOD",
+                "WARNING",
+                "INSUFFICIENT"
+              ]
+            }
+          },
+          "required": [
+            "raw_detected_frames",
+            "interpolated_frames",
+            "jump_filtered_frames",
+            "valid_tracking_frames",
+            "missing_frames",
+            "tracking_success_rate",
+            "quality_status"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "features_overall": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "activity_level": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "stationary_ratio": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "normalized_travel_distance": {
+              "type": "number",
+              "minimum": 0
+            },
+            "normalized_moving_speed": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "activity_level",
+            "stationary_ratio",
+            "normalized_travel_distance",
+            "normalized_moving_speed"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "features_by_interval": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "start_sec": {
+            "type": "number",
+            "minimum": 0
+          },
+          "end_sec": {
+            "type": "number",
+            "minimum": 0
+          },
+          "valid_tracking_frames": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "activity_level": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "stationary_ratio": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "normalized_travel_distance": {
+            "type": "number",
+            "minimum": 0
+          },
+          "normalized_moving_speed": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "start_sec",
+          "end_sec",
+          "valid_tracking_frames",
+          "activity_level",
+          "stationary_ratio",
+          "normalized_travel_distance",
+          "normalized_moving_speed"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "baseline_comparison": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "feature": {
+            "enum": [
+              "activity_level",
+              "stationary_ratio",
+              "normalized_travel_distance",
+              "normalized_moving_speed"
+            ]
+          },
+          "comparison_status": {
+            "enum": [
+              "EVALUATED",
+              "NOT_EVALUATED"
+            ]
+          },
+          "current_value": {
+            "type": "number",
+            "minimum": 0
+          },
+          "baseline_mean": {
+            "type": "number",
+            "minimum": 0
+          },
+          "baseline_std": {
+            "type": "number",
+            "minimum": 0
+          },
+          "z_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "direction": {
+            "anyOf": [
+              {
+                "enum": [
+                  "INCREASE",
+                  "DECREASE",
+                  "STABLE"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "level": {
+            "anyOf": [
+              {
+                "enum": [
+                  "NORMAL",
+                  "SLIGHT",
+                  "STRONG"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "threshold_exceeded": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "feature",
+          "comparison_status",
+          "current_value",
+          "baseline_mean",
+          "baseline_std",
+          "z_score",
+          "direction",
+          "level",
+          "threshold_exceeded"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "comparison_status": {
+                  "const": "NOT_EVALUATED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "z_score": {
+                  "type": "null"
+                },
+                "direction": {
+                  "type": "null"
+                },
+                "level": {
+                  "type": "null"
+                },
+                "threshold_exceeded": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "baseline_std": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "z_score": {
+                  "type": "number"
+                },
+                "direction": {
+                  "enum": [
+                    "INCREASE",
+                    "DECREASE",
+                    "STABLE"
+                  ]
+                },
+                "level": {
+                  "enum": [
+                    "NORMAL",
+                    "SLIGHT",
+                    "STRONG"
+                  ]
+                },
+                "threshold_exceeded": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "baseline_std": {
+                  "const": 0
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "comparison_status": {
+                  "const": "NOT_EVALUATED"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "feature": {
+                  "enum": [
+                    "activity_level",
+                    "stationary_ratio"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "current_value": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "baseline_mean": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            }
+          }
+        ]
+      },
+      "maxItems": 4
+    },
+    "change_detection": {
+      "type": "object",
+      "properties": {
+        "baseline_status": {
+          "enum": [
+            "READY",
+            "NOT_READY"
+          ]
+        },
+        "change_score": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "change_status": {
+          "enum": [
+            "NORMAL",
+            "SLIGHT_CHANGE",
+            "STRONG_CHANGE",
+            "BASELINE_NOT_READY",
+            "NOT_EVALUATED"
+          ]
+        },
+        "evaluated_feature_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "threshold_exceeded_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "contributing_factors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "feature": {
+                "enum": [
+                  "activity_level",
+                  "stationary_ratio",
+                  "normalized_travel_distance",
+                  "normalized_moving_speed"
+                ]
+              },
+              "direction": {
+                "enum": [
+                  "INCREASE",
+                  "DECREASE",
+                  "STABLE"
+                ]
+              },
+              "z_score": {
+                "type": "number"
+              },
+              "level": {
+                "enum": [
+                  "SLIGHT",
+                  "STRONG"
+                ]
+              }
+            },
+            "required": [
+              "feature",
+              "direction",
+              "z_score",
+              "level"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 4
+        }
+      },
+      "required": [
+        "baseline_status",
+        "change_score",
+        "change_status",
+        "evaluated_feature_count",
+        "threshold_exceeded_count",
+        "contributing_factors"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "change_status": {
+                "enum": [
+                  "BASELINE_NOT_READY",
+                  "NOT_EVALUATED"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "change_score": {
+                "type": "null"
+              },
+              "evaluated_feature_count": {
+                "const": 0
+              },
+              "threshold_exceeded_count": {
+                "const": 0
+              },
+              "contributing_factors": {
+                "maxItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "baseline_status": {
+                "const": "READY"
+              },
+              "change_score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "evaluated_feature_count": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "change_status": {
+                "const": "BASELINE_NOT_READY"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "baseline_status": {
+                "const": "NOT_READY"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "space_analysis": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Optional ROI extension; internal structure is not defined in v1.0."
+    },
+    "model_info": {
+      "type": "object",
+      "properties": {
+        "pipeline_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "detector": {
+          "type": "string",
+          "minLength": 1
+        },
+        "movement_window_sec": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "movement_threshold": {
+          "type": "number",
+          "minimum": 0
+        },
+        "aggregation_sec": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "std_zero_policy": {
+          "const": "EXCLUDE_FEATURE"
+        }
+      },
+      "required": [
+        "pipeline_version",
+        "detector",
+        "movement_window_sec",
+        "movement_threshold",
+        "aggregation_sec",
+        "std_zero_policy"
+      ],
+      "additionalProperties": false
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "enum": [
+              "LOW_TRACKING_QUALITY",
+              "SPECIES_MISMATCH_WARNING",
+              "SHORT_VIDEO_WARNING"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "error": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "code": {
+              "enum": [
+                "INVALID_REQUEST",
+                "UNSUPPORTED_VIDEO_FORMAT",
+                "VIDEO_NOT_FOUND",
+                "VIDEO_READ_ERROR",
+                "PET_NOT_DETECTED",
+                "SPECIES_MISMATCH",
+                "INSUFFICIENT_TRACKING",
+                "BASELINE_INSUFFICIENT_DATA",
+                "ANALYSIS_ERROR"
+              ]
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "analysis_id",
+    "pet_id",
+    "video_id",
+    "species",
+    "analysis_status",
+    "recorded_at",
+    "recorded_at_source",
+    "aggregation_sec",
+    "time_slot",
+    "started_at",
+    "completed_at",
+    "video_info",
+    "tracking_quality",
+    "features_overall",
+    "features_by_interval",
+    "baseline_comparison",
+    "change_detection",
+    "model_info",
+    "warnings",
+    "error"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "analysis_status": {
+            "const": "FAILED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "enum": [
+                  "INVALID_REQUEST",
+                  "UNSUPPORTED_VIDEO_FORMAT",
+                  "VIDEO_NOT_FOUND",
+                  "VIDEO_READ_ERROR",
+                  "PET_NOT_DETECTED",
+                  "SPECIES_MISMATCH",
+                  "INSUFFICIENT_TRACKING",
+                  "BASELINE_INSUFFICIENT_DATA",
+                  "ANALYSIS_ERROR"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          },
+          "change_detection": {
+            "properties": {
+              "change_status": {
+                "const": "NOT_EVALUATED"
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "error": {
+            "type": "null"
+          },
+          "video_info": {
+            "type": "object"
+          },
+          "tracking_quality": {
+            "type": "object"
+          },
+          "features_overall": {
+            "type": "object"
+          },
+          "features_by_interval": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "analysis_status": {
+            "const": "COMPLETED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "warnings": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "analysis_status": {
+            "const": "COMPLETED_WITH_WARNING"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "warnings": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "analysis_status": {
+            "enum": [
+              "COMPLETED",
+              "COMPLETED_WITH_WARNING"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "species": {
+            "enum": [
+              "DOG",
+              "CAT"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

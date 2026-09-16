@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입 - 쫑긋</title>
+  <link rel="stylesheet" href="../css/signUpStyle.css">
+</head>
+
+<body>
+
+  <!-- 1. 상단 네비게이션 바 -->
+  <header class="navbar">
+    <div class="logo">
+      <a href="main.html">
+        <img src="../assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      </a>
+    </div>
+  </header>
+
+  <!-- 2. 회원가입 폼 섹션 -->
+  <main class="signup-container">
+    <div class="signup-card">
+      <div class="signup-header">
+        <h2>회원가입</h2>
+        <p>쫑긋과 함께 반려견/반려묘를 더 스마트하게 케어해보세요.</p>
+      </div>
+
+      <form class="signup-form">
+        <!-- 아이디 -->
+        <div class="form-group">
+          <label for="userId">아이디</label>
+          <input type="text" id="userId" placeholder="아이디를 입력하세요" required>
+        </div>
+
+        <!-- 비밀번호 -->
+        <div class="form-group">
+          <label for="userPw">비밀번호</label>
+          <input type="password" id="userPw" placeholder="비밀번호를 입력하세요" required>
+        </div>
+
+        <!-- 이름 -->
+        <div class="form-group">
+          <label for="userName">이름</label>
+          <input type="text" id="userName" placeholder="이름을 입력하세요" required>
+        </div>
+
+        <!-- 생년월일 -->
+        <div class="form-group">
+          <label for="userBirth">생년월일</label>
+          <input type="date" id="userBirth" required>
+        </div>
+
+        <!-- 가입하기 버튼 -->
+        <button type="submit" class="submit-btn">가입하기</button>
+      </form>
+    </div>
+  </main>
+
+</body>
+
+</html>

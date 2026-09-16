@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쫑긋 - 개인정보처리방침</title>
+  <link rel="stylesheet" href="../css/mainStyle.css">
+  <style>
+    .legal-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 40px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    .legal-header {
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    .legal-header h1 {
+      font-size: 28px;
+      color: #222;
+      margin-bottom: 8px;
+    }
+    .legal-header .effective-date {
+      font-size: 14px;
+      color: #666;
+    }
+    .legal-section {
+      margin-bottom: 30px;
+    }
+    .legal-section h2 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 12px;
+      padding-left: 10px;
+      border-left: 4px solid #3b82f6;
+    }
+    .legal-section p, .legal-section ul {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #444;
+      margin-bottom: 10px;
+    }
+    .legal-section ul {
+      list-style-type: disc;
+      padding-left: 20px;
+    }
+    .legal-section li {
+      margin-bottom: 6px;
+    }
+    .highlight-box {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 1. 상단 네비게이션 바 -->
+  <header class="navbar">
+    <div class="logo">
+      <a href="main.html">
+        <img src="../assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      </a>
+    </div>
+    <nav class="nav-links">
+      <a href="dashboard.html">대시보드</a>
+      <a href="activity-report.html">리포트</a>
+    </nav>
+    <div class="nav-utils">
+      <button class="icon-btn" id="alarmBtn">🔔</button>
+      <a href="myPage.html" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+      <a href="petManagement.html" class="btn primary-btn">내 반려동물</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="legal-container">
+      <div class="legal-header">
+        <h1>개인정보처리방침</h1>
+        <p class="effective-date">시행일자: 2026년 9월 15일</p>
+      </div>
+
+      <div class="legal-section">
+        <p>주식회사 쫑긋(이하 "회사")은 「개인정보 보호법」 등 관련 법령에 따라 이용자의 개인정보 및 영상 데이터를 안전하게 보호하고, 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 다음과 같이 개인정보처리방침을 수립·공개합니다.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>제1조 (개인정보의 수집 및 이용 목적)</h2>
+        <p>회사는 AI 기반 반려동물 분석 서비스 제공을 위해 다음의 목적으로 최소한의 개인정보 및 영상 데이터를 처리합니다.</p>
+        <ul>
+          <li><strong>회원 관리:</strong> 회원 가입 의사 확인, 본인 확인, 서비스 이용에 따른 본인 식별 및 회원 자격 유지</li>
+          <li><strong>AI 서비스 제공 및 성능 개선:</strong> 반려동물 개체 식별, 실시간 행동/활동량 분석, 이상 감지 알림 발송, AI 탐지 모델의 정밀도 향상 학습</li>
+          <li><strong>고객 문의 대응:</strong> 문의사항 접수, 원인 파악 및 처리 결과 통보</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>제2조 (수집하는 개인정보의 항목)</h2>
+        <p>회사는 서비스 제공을 위해 다음과 같은 개인정보를 수집합니다.</p>
+        <ul>
+          <li><strong>회원 가입 및 관리:</strong> 이름, 이메일 주소, 비밀번호, 휴대폰 번호</li>
+          <li><strong>반려동물 정보:</strong> 반려동물 이름, 종(분류), 성별, 나이, 몸무게, 중성화 여부, 예방접종 이력(1~3차), 특이사항, 평소 생활환경 정보</li>
+          <li><strong>영상 데이터 (AI 탐지 및 분석용):</strong>
+            <ul>
+              <li>영상기기를 통해 수집되는 실시간 실내 영상 및 음성 데이터</li>
+              <li>탐지된 반려동물의 행동 추출 데이터(활동량, 위치 좌표, 대표 행동 프레임)</li>
+            </ul>
+          </li>
+          <li><strong>자동 수집 정보:</strong> IP 주소, 쿠키, 방문 일시, 기기 식별자, 서비스 이용 기록</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>제3조 (영상 데이터 처리 및 보안 특약)</h2>
+        <ul>
+          <li>회사는 반려동물 행동 분석을 위해 실시간 스트리밍 영상을 수집·분석합니다.</li>
+          <li>영상 데이터 중 사람의 얼굴 등 사생활 보호가 필요한 영역에 대해서는 비식별화(모자이크) 기술을 우선적으로 적용합니다.</li>
+          <li>분석을 위해 서버로 전송되는 모든 영상 데이터는 암호화(SSL/TLS)되어 안전하게 전송 및 저장됩니다.</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>제4조 (개인정보 및 영상 데이터의 보유 및 이용 기간)</h2>
+        <ul>
+          <li>회원의 개인정보는 회원 탈퇴 시까지 보유 및 이용하며, 탈퇴 시 지체 없이 파기합니다.</li>
+          <li><strong>실시간 원본 영상 데이터:</strong> AI 행동 분석 및 이상 감지 검증을 위해 <strong>최소 7일에서 최대 30일 이내에 자동 파기</strong>합니다.</li>
+          <li><strong>행동 분석 결과 데이터(리포트/통계):</strong> 회원이 서비스를 이용하는 기간 동안 통계 목적 데이터를 보관합니다.</li>
+          <li>관계 법령에 따라 보존할 필요가 있는 경우 관련 법령이 정한 기간 동안 보관합니다.
+            <ul>
+              <li>계약 또는 청약철회 등에 관한 기록: 5년</li>
+              <li>소비자 불만 또는 분쟁처리에 관한 기록: 3년</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>제5조 (개인정보의 제3자 제공 및 위탁)</h2>
+        <ul>
+          <li>회사는 원칙적으로 회원의 동의 없이 개인정보 및 영상 데이터를 외부에 제공하지 않습니다.</li>
+          <li>서비스 운용 및 클라우드 인프라 관리를 위해 수탁업체에 최소한의 범위 내에서 위탁 처리할 수 있습니다.</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>제6조 (이용자의 권리와 행사 방법)</h2>
+        <ul>
+          <li>회원은 언제든지 자신의 개인정보를 조회, 수정, 삭제 요청할 수 있습니다.</li>
+          <li>회원은 영상 수집 및 AI 분석에 대한 동의를 철회할 수 있으며, 동의 철회 시 관련 서비스 제공이 제한될 수 있습니다.</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>제7조 (개인정보 보호책임자 및 문의처)</h2>
+        <div class="highlight-box">
+          <p><strong>개인정보 보호책임자:</strong> 쫑긋 개인정보 보호팀</p>
+          <p><strong>이메일:</strong> support@jjonggeut.com</p>
+          <p><strong>문의 페이지:</strong> <a href="contact.html" style="color: #3b82f6; text-decoration: underline;">개발자에게 문의하기 (Contact)</a></p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 4. 하단 푸터 영역 -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="main.html">
+          <img src="../assets/logo.png" alt="쫑긋 로고" class="footer-logo-img">
+        </a>
+        <p>평소를 알고, 변화를 알려주는 펫케어 서비스</p>
+      </div>
+      <div class="footer-links">
+        <div class="col">
+          <h4>서비스</h4>
+          <a href="#">서비스 소개</a>
+          <a href="#">서비스 가입</a>
+          <a href="#">요금 안내</a>
+        </div>
+        <div class="col">
+          <h4>고객센터</h4>
+          <a href="notice.html">공지사항</a>
+          <a href="#">자주 묻는 질문</a>
+          <a href="contact.html">문의하기</a>
+        </div>
+        <div class="col">
+          <h4>기타</h4>
+          <a href="privacy.html">개인정보처리방침</a>
+          <a href="terms.html">이용약관</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 쫑긋. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+
+</html>

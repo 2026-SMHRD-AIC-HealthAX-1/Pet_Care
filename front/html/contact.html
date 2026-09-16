@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>개발자에게 문의하기 - 쫑긋</title>
+  <link rel="stylesheet" href="../css/contactStyle.css">
+</head>
+
+<body>
+
+  <!-- 상단 네비게이션 바 -->
+  <header class="navbar">
+    <div class="logo">
+      <a href="main.html">
+        <img src="../assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      </a>
+    </div>
+    <nav class="nav-links">
+      <a href="dashboard.html">대시보드</a>
+      <a href="activity-report.html">리포트</a>
+    </nav>
+    <div class="nav-utils">
+      <button class="icon-btn" id="alarmBtn">🔔</button>
+      <a href="myPage.html" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+      <a href="petManagement.html" class="btn primary-btn">내 반려동물</a>
+    </div>
+  </header>
+
+  <!-- 메인 문의하기 영역 -->
+  <main class="contact-container">
+    <div class="contact-card">
+      <div class="contact-header">
+        <h2>개발자에게 문의하기 💬</h2>
+        <p>서비스 이용 중 궁금하신 점이나 개선 의견을 남겨주시면 빠르게 답변드리겠습니다.</p>
+      </div>
+
+      <form id="contactForm">
+        <!-- 이름 -->
+        <div class="form-group">
+          <label for="userName">이름 <span class="required">*</span></label>
+          <input type="text" id="userName" name="userName" class="form-control" placeholder="홍길동" required>
+        </div>
+
+        <!-- 이메일 주소 -->
+        <div class="form-group">
+          <label for="userEmail">이메일 주소 <span class="required">*</span></label>
+          <input type="email" id="userEmail" name="userEmail" class="form-control" placeholder="example@email.com" required>
+        </div>
+
+        <!-- 휴대폰 번호 -->
+        <div class="form-group">
+          <label for="userPhone">휴대폰 번호 <span class="required">*</span></label>
+          <input type="tel" id="userPhone" name="userPhone" class="form-control" placeholder="010-1234-5678" pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}" required>
+        </div>
+
+        <!-- 문의 내용 -->
+        <div class="form-group">
+          <label for="userMessage">문의 내용 <span class="required">*</span></label>
+          <textarea id="userMessage" name="userMessage" class="form-control" placeholder="문의하실 내용을 자세히 작성해주세요." required></textarea>
+        </div>
+
+        <!-- 개인정보 수집 동의 -->
+        <div class="form-agree">
+          <label class="checkbox-label">
+            <input type="checkbox" id="agreeTerms" required>
+            <span>[필수] 개인정보 수집 및 이용에 동의합니다.</span>
+          </label>
+        </div>
+
+        <!-- 버튼 영역 -->
+        <div class="form-actions">
+          <a href="main.html" class="btn outline-btn">취소</a>
+          <button type="submit" class="btn primary-btn">문의 보내기</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- 하단 푸터 -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p>© 2026 쫑긋. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- 전송 완료 안내 스크립트 예시 -->
+  <script>
+    document.getElementById('contactForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      alert('문의가 성공적으로 접수되었습니다. 빠르게 확인 후 답변해 드리겠습니다!');
+      window.location.href = 'main.html';
+    });
+  </script>
+
+</body>
+
+</html>

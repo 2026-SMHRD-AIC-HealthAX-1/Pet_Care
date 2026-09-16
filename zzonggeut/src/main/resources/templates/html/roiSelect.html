@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>쫑긋 반려동물 공간 이용 분석 ROI 설정</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, "Noto Sans KR", sans-serif;
+            background: #f4faf7;
+            color: #183b36;
+        }
+
+        .top-header {
+            height: 72px;
+            background: white;
+            display: flex;
+            align-items: center;
+            padding: 0 52px;
+            border-bottom: 1px solid #e1ebe7;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            color: #087f76;
+            margin-right: 70px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 38px;
+            font-size: 15px;
+            color: #59716c;
+        }
+
+        .nav .active {
+            color: #087f76;
+            font-weight: 700;
+        }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+
+        .pet-button {
+            background: #087f76;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 22px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .page {
+            padding: 30px 25px 40px;
+        }
+
+        .back {
+            color: #58736d;
+            font-size: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .title-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .title {
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .camera-badge {
+            background: #c9f5e8;
+            color: #087f76;
+            border-radius: 20px;
+            padding: 9px 15px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: minmax(500px, 1.4fr) minmax(420px, 1fr);
+            gap: 28px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 22px;
+            padding: 28px;
+            box-shadow: 0 3px 15px rgba(30, 80, 70, 0.05);
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #303030;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+            background: #303030;
+        }
+
+        #roiCanvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        .instruction {
+            margin-top: 14px;
+            background: #effdf7;
+            border: 1px solid #a9f0d0;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 14px;
+            color: #23756a;
+            line-height: 1.6;
+        }
+
+        .section {
+            margin-bottom: 28px;
+        }
+
+        .label {
+            display: block;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"],
+        select {
+            width: 100%;
+            height: 48px;
+            border: 1px solid #cbdad6;
+            border-radius: 12px;
+            background: white;
+            padding: 0 14px;
+            font-size: 15px;
+            color: #264943;
+        }
+
+        .roi-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        #roiList {
+            min-height: 80px;
+        }
+
+        .empty {
+            color: #9aa9a5;
+            font-size: 14px;
+            padding: 15px 0;
+        }
+
+        .roi-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 14px;
+            border: 1px solid #dce8e4;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .roi-item:hover {
+            background: #f2fbf8;
+        }
+
+        .roi-item.selected {
+            border-color: #0a8c82;
+            background: #effaf7;
+        }
+
+        .roi-name {
+            font-weight: 600;
+        }
+
+        .roi-coordinate {
+            font-size: 11px;
+            color: #78908b;
+            margin-top: 5px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        button {
+            height: 56px;
+            border-radius: 13px;
+            border: none;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .delete-button {
+            background: #f1f5f4;
+            color: #55716b;
+        }
+
+        .save-button {
+            background: #087f76;
+            color: white;
+        }
+
+        .save-button:hover {
+            background: #066c65;
+        }
+
+        @media (max-width: 900px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .nav {
+                display: none;
+            }
+
+            .title-row {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="top-header">
+
+        <div class="logo">
+            🐾 쫑긋
+        </div>
+
+        <nav class="nav">
+            <span>대시보드</span>
+            <span class="active">실시간 모니터링</span>
+            <span>행동 분석</span>
+            <span>변화 알림</span>
+            <span>리포트</span>
+        </nav>
+
+        <div class="header-right">
+            <span>♧</span>
+            <span>♙</span>
+            <button class="pet-button">내 반려동물</button>
+        </div>
+
+    </header>
+
+
+    <main class="page">
+
+        <div class="back">
+            ← 실시간 모니터링으로 돌아가기
+        </div>
+
+        <div class="title-row">
+
+            <div class="title">
+                관심영역(ROI) 설정
+            </div>
+
+            <div class="camera-badge">
+                카메라: CAM-001
+            </div>
+
+        </div>
+
+
+        <div class="content">
+
+
+            <section class="card">
+
+                <div class="video-wrapper">
+
+                    <video
+                        id="video"
+                        controls
+                        muted>
+                    </video>
+
+                    <canvas id="roiCanvas"></canvas>
+
+                </div>
+
+                <div class="instruction">
+                    💡 영상 위에서 마우스로 드래그하여 영역을 지정하세요.
+                    기존 영역을 클릭하면 선택할 수 있습니다.
+                </div>
+
+            </section>
+
+
+            <section class="card">
+
+                <div class="section">
+
+                    <label class="label">
+                        영상 소스 선택/업로드
+                    </label>
+
+                    <input
+                        type="file"
+                        id="videoInput"
+                        accept="video/*">
+
+                </div>
+
+
+                <div class="section">
+
+                    <label class="label">
+                        지정할 영역 이름
+                    </label>
+
+                    <select id="roiType">
+
+                        <option value="WATER_BOWL">
+                            물그릇 (WATER_BOWL)
+                        </option>
+
+                        <option value="FOOD_BOWL">
+                            밥그릇 (FOOD_BOWL)
+                        </option>
+
+                        <option value="BED">
+                            침대 (BED)
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="section">
+
+                    <div class="roi-title">
+                        지정된 영역 목록
+                        (<span id="roiCount">0</span>개)
+                    </div>
+
+                    <div id="roiList">
+                        <div class="empty">
+                            아직 지정된 영역이 없습니다.
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="buttons">
+
+                    <button
+                        class="delete-button"
+                        id="deleteButton">
+                        선택 삭제
+                    </button>
+
+                    <button
+                        class="save-button"
+                        id="saveButton">
+                        설정 저장하기
+                    </button>
+
+                </div>
+
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <script>
+
+        const video = document.getElementById("video");
+        const videoInput = document.getElementById("videoInput");
+        const canvas = document.getElementById("roiCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const roiType = document.getElementById("roiType");
+        const roiList = document.getElementById("roiList");
+        const roiCount = document.getElementById("roiCount");
+
+        const deleteButton = document.getElementById("deleteButton");
+        const saveButton = document.getElementById("saveButton");
+
+        let rois = [];
+        let selectedROI = null;
+
+        let drawing = false;
+
+        let startX = 0;
+        let startY = 0;
+
+
+        videoInput.addEventListener("change", function () {
+
+            const file = this.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            const url = URL.createObjectURL(file);
+
+            video.src = url;
+            video.load();
+
+        });
+
+
+        function resizeCanvas() {
+
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+
+            drawROI();
+
+        }
+
+
+        window.addEventListener("resize", resizeCanvas);
+
+        video.addEventListener("loadedmetadata", resizeCanvas);
+
+
+        function getMousePosition(event) {
+
+            const rect = canvas.getBoundingClientRect();
+
+            return {
+                x: (event.clientX - rect.left) * canvas.width / rect.width,
+                y: (event.clientY - rect.top) * canvas.height / rect.height
+            };
+
+        }
+
+
+        canvas.addEventListener("mousedown", function (event) {
+
+            const pos = getMousePosition(event);
+
+            const clickedROI = findROI(pos.x, pos.y);
+
+            if (clickedROI) {
+
+                selectedROI = clickedROI;
+
+                updateROIList();
+                drawROI();
+
+                return;
+
+            }
+
+            drawing = true;
+
+            startX = pos.x;
+            startY = pos.y;
+
+        });
+
+
+        canvas.addEventListener("mousemove", function (event) {
+
+            if (!drawing) {
+                return;
+            }
+
+            const pos = getMousePosition(event);
+
+            drawROI();
+
+            ctx.strokeStyle = "#00a88f";
+            ctx.lineWidth = 3;
+            ctx.setLineDash([6, 4]);
+
+            ctx.strokeRect(
+                startX,
+                startY,
+                pos.x - startX,
+                pos.y - startY
+            );
+
+            ctx.setLineDash([]);
+
+        });
+
+
+        canvas.addEventListener("mouseup", function (event) {
+
+            if (!drawing) {
+                return;
+            }
+
+            drawing = false;
+
+            const pos = getMousePosition(event);
+
+            const x = Math.min(startX, pos.x);
+            const y = Math.min(startY, pos.y);
+
+            const width = Math.abs(pos.x - startX);
+            const height = Math.abs(pos.y - startY);
+
+            if (width < 10 || height < 10) {
+
+                drawROI();
+
+                return;
+
+            }
+
+            const selectedOption =
+                roiType.options[roiType.selectedIndex];
+
+            const roi = {
+
+                id: Date.now(),
+
+                name: roiType.value,
+
+                label: selectedOption.text,
+
+                x: x,
+
+                y: y,
+
+                width: width,
+
+                height: height
+
+            };
+
+            rois.push(roi);
+
+            selectedROI = roi;
+
+            updateROIList();
+            drawROI();
+
+        });
+
+
+        function findROI(x, y) {
+
+            for (let i = rois.length - 1; i >= 0; i--) {
+
+                const roi = rois[i];
+
+                if (
+                    x >= roi.x &&
+                    x <= roi.x + roi.width &&
+                    y >= roi.y &&
+                    y <= roi.y + roi.height
+                ) {
+                    return roi;
+                }
+
+            }
+
+            return null;
+
+        }
+
+
+        function drawROI() {
+
+            ctx.clearRect(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+
+            rois.forEach(function (roi) {
+
+                if (roi === selectedROI) {
+
+                    ctx.strokeStyle = "#087f76";
+                    ctx.fillStyle = "rgba(8, 127, 118, 0.18)";
+
+                } else {
+
+                    ctx.strokeStyle = "#4bc9aa";
+                    ctx.fillStyle = "rgba(75, 201, 170, 0.12)";
+
+                }
+
+                ctx.lineWidth = 3;
+
+                ctx.fillRect(
+                    roi.x,
+                    roi.y,
+                    roi.width,
+                    roi.height
+                );
+
+                ctx.strokeRect(
+                    roi.x,
+                    roi.y,
+                    roi.width,
+                    roi.height
+                );
+
+                ctx.fillStyle = "#087f76";
+                ctx.font = "bold 14px Arial";
+
+                ctx.fillText(
+                    roi.label,
+                    roi.x + 6,
+                    roi.y + 20
+                );
+
+            });
+
+        }
+
+
+        function updateROIList() {
+
+            roiCount.textContent = rois.length;
+
+            roiList.innerHTML = "";
+
+
+            if (rois.length === 0) {
+
+                roiList.innerHTML =
+                    '<div class="empty">아직 지정된 영역이 없습니다.</div>';
+
+                return;
+
+            }
+
+
+            rois.forEach(function (roi) {
+
+                const item = document.createElement("div");
+
+                item.className = "roi-item";
+
+
+                if (roi === selectedROI) {
+                    item.classList.add("selected");
+                }
+
+
+                const ratio = convertToRatio(roi);
+
+
+                item.innerHTML = `
+                    <div>
+                        <div class="roi-name">
+                            ${roi.label}
+                        </div>
+
+                        <div class="roi-coordinate">
+                            x: ${ratio.x}
+                            · y: ${ratio.y}
+                            · w: ${ratio.width}
+                            · h: ${ratio.height}
+                        </div>
+                    </div>
+                `;
+
+
+                item.addEventListener("click", function () {
+
+                    selectedROI = roi;
+
+                    updateROIList();
+                    drawROI();
+
+                });
+
+
+                roiList.appendChild(item);
+
+            });
+
+        }
+
+
+        function convertToRatio(roi) {
+
+            return {
+
+                x: Number(
+                    (roi.x / canvas.width).toFixed(6)
+                ),
+
+                y: Number(
+                    (roi.y / canvas.height).toFixed(6)
+                ),
+
+                width: Number(
+                    (roi.width / canvas.width).toFixed(6)
+                ),
+
+                height: Number(
+                    (roi.height / canvas.height).toFixed(6)
+                )
+
+            };
+
+        }
+
+
+        deleteButton.addEventListener("click", function () {
+
+            if (!selectedROI) {
+
+                alert("삭제할 영역을 먼저 선택해주세요.");
+
+                return;
+
+            }
+
+
+            rois = rois.filter(function (roi) {
+
+                return roi !== selectedROI;
+
+            });
+
+
+            selectedROI = null;
+
+            updateROIList();
+            drawROI();
+
+        });
+
+
+        function createJSON() {
+
+            return {
+
+                camera_id: "CAM-001",
+
+                video:
+                    videoInput.files[0]
+                        ? videoInput.files[0].name
+                        : null,
+
+                rois: rois.map(function (roi) {
+
+                    const ratio = convertToRatio(roi);
+
+                    return {
+
+                        id: roi.id,
+
+                        name: roi.name,
+
+                        x: ratio.x,
+
+                        y: ratio.y,
+
+                        width: ratio.width,
+
+                        height: ratio.height
+
+                    };
+
+                })
+
+            };
+
+        }
+
+
+        saveButton.addEventListener("click", function () {
+
+            const data = createJSON();
+
+            console.log(
+                "ROI JSON:",
+                JSON.stringify(data, null, 4)
+            );
+
+
+            jsonBox.textContent =
+                JSON.stringify(data, null, 4);
+
+            jsonBox.style.display = "block";
+
+
+            alert(
+                "ROI 설정이 저장되었습니다."
+            );
+
+        });
+
+
+        resizeCanvas();
+
+    </script>
+
+</body>
+</html>

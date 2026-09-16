@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주간 반려동물 행동 분석 리포트 - 쫑긋</title>
+    <link rel="stylesheet" href="../css/dashboardStyle.css">
+    <style>
+        /* 리포트 서류(A4 문서) 전용 스타일 */
+        .report-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px 48px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+
+        /* 헤더 섹션 */
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #0b8484;
+            margin-bottom: 24px;
+        }
+
+        .report-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 6px;
+        }
+
+        .report-title p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .report-meta {
+            text-align: right;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* 섹션 공통 스타일 */
+        .report-section {
+            margin-bottom: 32px;
+        }
+
+        .report-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0b8484;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 6px;
+        }
+
+        /* 1. 요약 메트릭 그리드 (4개 카드) */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px 16px;
+            text-align: center;
+        }
+
+        .summary-card .label {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .summary-card .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .summary-card .value.negative {
+            color: #d97706;
+        }
+
+        .summary-card .value.accent {
+            color: #dc2626;
+        }
+
+        .summary-card .subtext {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        /* AI 종합 소견 상자 */
+        .ai-opinion-box {
+            background-color: #eef7f6;
+            border-left: 4px solid #0b8484;
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+
+        /* 2단 분석 그리드 (차트 + 시간대 비율) */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .analysis-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            background: #fff;
+        }
+
+        .analysis-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #334155;
+        }
+
+        /* 시간대별 비율 프로그레스 바 */
+        .time-ratio-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .time-ratio-item {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            gap: 10px;
+        }
+
+        .time-ratio-item .time-label {
+            width: 40px;
+            color: #475569;
+        }
+
+        .time-ratio-item .bar-container {
+            flex: 1;
+            height: 8px;
+            background-color: #f1f5f9;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .time-ratio-item .bar-fill {
+            height: 100%;
+            background-color: #0b8484;
+            border-radius: 4px;
+        }
+
+        .time-ratio-item .time-percent {
+            width: 35px;
+            text-align: right;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        /* 테이블 기본 스타일 */
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .report-table th,
+        .report-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .report-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .report-table td {
+            color: #334155;
+        }
+
+        /* 권장 가이드 리스트 */
+        .guide-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .guide-list li {
+            position: relative;
+            padding-left: 18px;
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: #334155;
+        }
+
+        .guide-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #0b8484;
+            font-weight: bold;
+        }
+
+        /* 푸터 영역 */
+        .report-footer {
+            margin-top: 40px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        /* 인쇄 시 버튼 숨김 설정 */
+        @media print {
+            .navbar, .footer, .no-print {
+                display: none !important;
+            }
+            .dashboard-container {
+                padding: 0;
+            }
+            .report-wrapper {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 상단 네비게이션 바 -->
+    <header class="navbar">
+        <div class="logo">
+            <a href="main.html">
+                <img src="../assets/logo.png" alt="쫑긋 로고" class="logo-img">
+            </a>
+        </div>
+        <nav class="nav-links">
+            <a href="dashboard.html">대시보드</a>
+            <a href="live-view.html">실시간 모니터링</a>
+            <a href="behavior-log.html">행동 분석</a>
+            <a href="notifications.html">변화 알림</a>
+            <a href="activity-report.html" class="active">리포트</a>
+        </nav>
+        <div class="nav-utils">
+            <button class="icon-btn" id="alarmBtn">🔔</button>
+            <a href="myPage.html" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+            <a href="petManagement.html" class="btn primary-btn" style="text-decoration: none; padding: 8px 16px; font-size: 14px;">내 반려동물</a>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <main class="dashboard-container">
+        
+        <!-- 상단 액션 버튼 (인쇄/다운로드) -->
+        <div class="no-print" style="max-width: 900px; margin: 0 auto 16px; display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn outline-btn" onclick="window.print();">🖨️ 리포트 인쇄 / PDF 저장</button>
+        </div>
+
+        <div class="report-wrapper">
+
+            <!-- 서류 상단 헤더 -->
+            <header class="report-header">
+                <div class="report-title">
+                    <h1>📋 [주간] 반려동물 행동 분석 리포트</h1>
+                    <p>쫑긋 AI 알고리즘 기반 종합 분석 보고서</p>
+                </div>
+                <div class="report-meta">
+                    <div><strong>발행일자:</strong> 2026년 09월 02일</div>
+                    <div><strong>분석 기간:</strong> 2026.08.26 ~ 2026.09.01</div>
+                    <div><strong>대상:</strong> 우리 강아지 (푸들, 3세)</div>
+                </div>
+            </header>
+
+            <!-- 1. 주간 주요 요약 -->
+            <section class="report-section">
+                <h3 class="report-section-title">1. 주간 주요 요약 (Summary)</h3>
+                
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="label">카메라 상태</div>
+                        <div class="value" style="color: #10b981;">연결됨</div>
+                        <div class="subtext">거실 카메라 (HD)</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">변화 감지 (7일)</div>
+                        <div class="value accent">3 건</div>
+                        <div class="subtext">최근: 09/01 12:40</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">활동량 (평소 대비)</div>
+                        <div class="value negative">-12%</div>
+                        <div class="subtext">평소 대비 소폭 감소</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">주요 체류 장소</div>
+                        <div class="value">거실 48%</div>
+                        <div class="subtext">침실 31% · 기타 21%</div>
+                    </div>
+                </div>
+
+                <div class="ai-opinion-box">
+                    <strong>💡 AI 종합 소견:</strong><br>
+                    분석 기간 동안 대상 반려동물은 거실을 주요 활동 공간으로 활용했습니다. 전체 주간 활동량은 평소 대비 <strong>-12% 소폭 감소</strong>하였으며, 9월 1일 14:20경 활동량이 -30% 급감한 이력이 감지되었습니다. 일시적인 무기력 증상인지 보호자의 관찰을 권장합니다.
+                </div>
+            </section>
+
+            <!-- 2. 활동 패턴 상세 분석 -->
+            <section class="report-section">
+                <h3 class="report-section-title">2. 주간 활동 패턴 분석</h3>
+                
+                <div class="analysis-grid">
+                    <div class="analysis-card">
+                        <h4>일별 활동량 추이</h4>
+                        <p style="font-size: 13px; color: #64748b; line-height: 1.6;">
+                            • <strong>월~수:</strong> 평균 수준의 평탄한 활동 지수 유지<br>
+                            • <strong>목~토:</strong> 주간 최고 활동량 기록 (상승세)<br>
+                            • <strong>일요일:</strong> 휴식 비율 증가로 활동량 감소
+                        </p>
+                    </div>
+
+                    <div class="analysis-card">
+                        <h4>시간대별 활동 비율</h4>
+                        <div class="time-ratio-list">
+                            <div class="time-ratio-item">
+                                <span class="time-label">오전</span>
+                                <div class="bar-container"><div class="bar-fill" style="width: 40%;"></div></div>
+                                <span class="time-percent">40%</span>
+                            </div>
+                            <div class="time-ratio-item">
+                                <span class="time-label">새벽</span>
+                                <div class="bar-container"><div class="bar-fill" style="width: 30%;"></div></div>
+                                <span class="time-percent">30%</span>
+                            </div>
+                            <div class="time-ratio-item">
+                                <span class="time-label">오후</span>
+                                <div class="bar-container"><div class="bar-fill" style="width: 20%;"></div></div>
+                                <span class="time-percent">20%</span>
+                            </div>
+                            <div class="time-ratio-item">
+                                <span class="time-label">야간</span>
+                                <div class="bar-container"><div class="bar-fill" style="width: 10%;"></div></div>
+                                <span class="time-percent">10%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. 변화 감지 이력 -->
+            <section class="report-section">
+                <h3 class="report-section-title">3. 변화 감지 이력 (최근 7일)</h3>
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>발생 일시</th>
+                            <th>변화 내용</th>
+                            <th>평소 대비</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>09/01 14:20</td>
+                            <td>활동량 감소</td>
+                            <td style="color: #dc2626; font-weight: 600;">-30%</td>
+                            <td>확인 완료</td>
+                        </tr>
+                        <tr>
+                            <td>08/30 11:05</td>
+                            <td>활동량 증가</td>
+                            <td style="color: #2563eb; font-weight: 600;">+25%</td>
+                            <td>확인 완료</td>
+                        </tr>
+                        <tr>
+                            <td>08/28 18:40</td>
+                            <td>체류시간 증가</td>
+                            <td style="color: #2563eb; font-weight: 600;">+35%</td>
+                            <td>확인 완료</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 4. 최근 행동 기록 목록 -->
+            <section class="report-section">
+                <h3 class="report-section-title">4. 주요 상세 행동 기록</h3>
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>날짜 / 시간</th>
+                            <th>행동 유형</th>
+                            <th>지속 시간</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>09/01 14:25</td>
+                            <td><span style="background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-size: 11px;">활동</span></td>
+                            <td>15분 32초</td>
+                            <td>식사 후 소폭 이동</td>
+                        </tr>
+                        <tr>
+                            <td>09/01 13:40</td>
+                            <td><span style="background: #fef3c7; color: #b45309; padding: 2px 8px; border-radius: 4px; font-size: 11px;">휴식</span></td>
+                            <td>1시간 12분</td>
+                            <td>거실 방석 수면</td>
+                        </tr>
+                        <tr>
+                            <td>09/01 12:10</td>
+                            <td><span style="background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-size: 11px;">활동</span></td>
+                            <td>8분 45초</td>
+                            <td>실내 장난감 놀이</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 5. 보호자 권장 가이드 -->
+            <section class="report-section">
+                <h3 class="report-section-title">5. 보호자 가이드 및 제안</h3>
+                <ul class="guide-list">
+                    <li><strong>오후 시간대 컨디션 체크:</strong> 9월 1일 오후(14:20 경) 활동량이 -30% 감소한 기록이 감지되었습니다. 일시적인 휴식인지 무기력증인지 관찰이 필요합니다.</li>
+                    <li><strong>새벽 수면 환경 점검:</strong> 새벽 시간대 활동 비율이 30%로 다소 높은 편입니다. 야간 수면 환경(실내 온도, 소음 등)을 체크해 주시기 바랍니다.</li>
+                </ul>
+            </section>
+
+            <!-- 푸터 영역 -->
+            <footer class="report-footer">
+                <div>발행기관: 쫑긋 AI 펫케어 센터</div>
+                <div>© 2026 쫑긋. All rights reserved.</div>
+            </footer>
+
+        </div>
+
+    </main>
+
+    <!-- 하단 푸터 -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            <p>© 2026 쫑긋. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

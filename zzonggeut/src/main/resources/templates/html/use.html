@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쫑긋 - 이용약관</title>
+  <link rel="stylesheet" href="../css/mainStyle.css">
+  <style>
+    .legal-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 40px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    .legal-header {
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    .legal-header h1 {
+      font-size: 28px;
+      color: #222;
+      margin-bottom: 8px;
+    }
+    .legal-header .effective-date {
+      font-size: 14px;
+      color: #666;
+    }
+    .legal-section {
+      margin-bottom: 30px;
+    }
+    .legal-section h2 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 12px;
+      padding-left: 10px;
+      border-left: 4px solid #3b82f6;
+    }
+    .legal-section p, .legal-section ul {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #444;
+      margin-bottom: 10px;
+    }
+    .legal-section ul {
+      list-style-type: disc;
+      padding-left: 20px;
+    }
+    .legal-section li {
+      margin-bottom: 6px;
+    }
+    .warning-box {
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 1. 상단 네비게이션 바 -->
+  <header class="navbar">
+    <div class="logo">
+      <a href="main.html">
+        <img src="../assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      </a>
+    </div>
+    <nav class="nav-links">
+      <a href="dashboard.html">대시보드</a>
+      <a href="activity-report.html">리포트</a>
+    </nav>
+    <div class="nav-utils">
+      <button class="icon-btn" id="alarmBtn">🔔</button>
+      <a href="myPage.html" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+      <a href="petManagement.html" class="btn primary-btn">내 반려동물</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="legal-container">
+      <div class="legal-header">
+        <h1>이용약관</h1>
+        <p class="effective-date">시행일자: 2026년 9월 15일</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>제1조 (목적)</h2>
+        <p>본 약관은 주식회사 쫑긋(이하 "회사"라 합니다)이 제공하는 AI 기반 반려동물 탐지 및 행동 분석 서비스(이하 "서비스"라 합니다)의 이용과 관련하여 회사와 회원의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>제2조 (정의)</h2>
+        <ul>
+          <li><strong>"서비스"</strong>라 함은 회사가 제공하는 AI 영상 기반 반려동물 위치/행동 탐지, 실시간 모니터링, 이상행동 분석 리포트, 보호자 알림 등 관련 제반 서비스를 의미합니다.</li>
+          <li><strong>"회원"</strong>이라 함은 회사의 서비스에 접속하여 본 약관에 따라 회사와 이용계약을 체결하고 회사가 제공하는 서비스를 이용하는 고객을 말합니다.</li>
+          <li><strong>"영상기기"</strong>라 함은 서비스 이용을 위해 회원의 거주 공간 등에 설치되어 반려동물의 영상을 촬영 및 전송하는 IP카메라, 모바일 기기 카메라 등의 장치를 의미합니다.</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>제3조 (약관의 게시와 개정)</h2>
+        <ul>
+          <li>회사는 본 약관의 내용을 회원이 쉽게 알 수 있도록 서비스 화면 내에 게시합니다.</li>
+          <li>회사는 「약관의 규제에 관한 법률」, 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 등 관련 법령을 위배하지 않는 범위에서 본 약관을 개정할 수 있습니다.</li>
+          <li>약관이 개정되는 경우 회사는 적용일자 및 개정사유를 명시하여 최소 7일 전부터 서비스 내 공지사항을 통해 고지합니다.</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>제4조 (서비스의 제공 및 변경)</h2>
+        <p>회사는 회원에게 다음과 같은 서비스를 제공합니다.</p>
+        <ul>
+          <li>AI 기반 반려동물 실시간 위치 탐지 및 행동 분석 기능</li>
+          <li>반려동물 일일/주간/월간 행동 분석 및 리포트 생성</li>
+          <li>특이 행동(활동량 급증/급감, 경계 등) 감지 시 실시간 푸시 알림</li>
+          <li>반려동물 프로필 및 건강/백신 접종 이력 관리</li>
+        </ul>
+        <p>회사는 서비스 개선, 영상 분석 모델 업데이트, 시스템 점검 등의 필요가 있는 경우 서비스의 전부 또는 일부를 변경하거나 중단할 수 있습니다.</p>
+      </div>
+
+      <div class="legal-section">
+        <h2>제5조 (영상기기 설치 및 회원 의무)</h2>
+        <ul>
+          <li>회원은 서비스 이용 시 촬영 범위 내에 타인의 초상권, 사생활의 비밀 및 자유가 침해되지 않도록 영상기기를 적절한 장소에 설치해야 합니다.</li>
+          <li>회원은 타인의 동의 없이 사적인 공간을 무단 촬영하여 발생하는 모든 법적 책임이 본인에게 있음을 확인합니다.</li>
+        </ul>
+        <div class="warning-box">
+          <strong>⚠️ 주의사항</strong><br>
+          서비스가 제공하는 AI 분석 결과는 반려동물 건강 관리를 위한 참고용 정보이며, <strong>수의학적 진단이나 치료를 대체할 수 없습니다.</strong>
+        </div>
+      </div>
+
+      <div class="legal-section">
+        <h2>제6조 (서비스 이용 제한 및 해지)</h2>
+        <ul>
+          <li>회원은 언제든지 서비스 내 설정 메뉴 또는 고객센터를 통해 이용계약 해지(회원탈퇴)를 신청할 수 있습니다.</li>
+          <li>회사는 회원이 타인의 개인정보를 도용하거나, 영상 데이터를 불법적인 목적으로 사용하는 등 서비스 운영을 방해하는 경우 이용을 제한하거나 계약을 해지할 수 있습니다.</li>
+        </ul>
+      </div>
+
+      <div class="legal-section">
+        <h2>제7조 (책임제한)</h2>
+        <ul>
+          <li>회사는 천재지변, 통신 장애, 영상기기의 하드웨어 결함 등 회사의 귀책사유 없이 발생한 서비스 중단 및 오류에 대해 책임을 지지 않습니다.</li>
+          <li>AI 분석 알고리즘 특성상 감지 오차나 분석 오류가 발생할 수 있으며, 회사는 분석 결과의 완전성이나 절대적 정확성을 보장하지 않습니다.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <!-- 4. 하단 푸터 영역 -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="main.html">
+          <img src="../assets/logo.png" alt="쫑긋 로고" class="footer-logo-img">
+        </a>
+        <p>평소를 알고, 변화를 알려주는 펫케어 서비스</p>
+      </div>
+      <div class="footer-links">
+        <div class="col">
+          <h4>서비스</h4>
+          <a href="#">서비스 소개</a>
+          <a href="#">서비스 가입</a>
+          <a href="#">요금 안내</a>
+        </div>
+        <div class="col">
+          <h4>고객센터</h4>
+          <a href="notice.html">공지사항</a>
+          <a href="#">자주 묻는 질문</a>
+          <a href="contact.html">문의하기</a>
+        </div>
+        <div class="col">
+          <h4>기타</h4>
+          <a href="privacy.html">개인정보처리방침</a>
+          <a href="use.html">이용약관</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 쫑긋. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+
+</html>

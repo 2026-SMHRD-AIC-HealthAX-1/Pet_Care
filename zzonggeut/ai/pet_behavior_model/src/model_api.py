@@ -11,6 +11,8 @@ from typing import Optional
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 
+from roi_models import RoiValidationError, parse_roi_request
+
 
 # =========================================================
 # 1. 프로젝트 경로
@@ -251,6 +253,23 @@ async def deliver_result_to_spring(result: dict) -> dict:
         },
     )
 
+
+def canonical_roi_config(roi_request):
+    if roi_request is None:
+        return None
+    return [area.to_dict() for area in roi_request.roi_areas]
+
+
+def existing_roi_config(existing: dict):
+    space = existing.get("space_analysis")
+    if not isinstance(space, dict):
+        return None
+    results = space.get("roi_results")
+    if not isinstance(results, list):
+        return None
+    keys = ("roi_id", "roi_name", "roi_type", "x", "y", "width", "height")
+    return [{key: item.get(key) for key in keys} for item in results if isinstance(item, dict)]
+
 def check_existing_result(
     result_path: Path,
     analysis_id: str,
@@ -258,6 +277,7 @@ def check_existing_result(
     video_id: str,
     camera_id: str,
     species: str,
+    roi_request=None,
 ) -> Optional[dict]:
     if not result_path.exists():
         return None
@@ -282,6 +302,9 @@ def check_existing_result(
                 f"{field_name}: "
                 f"기존={existing_value!r}, 요청={expected_value!r}"
             )
+
+    if existing_roi_config(existing) != canonical_roi_config(roi_request):
+        mismatches.append("roi_areas: 기존 ROI 설정과 현재 요청 ROI 설정이 다릅니다.")
 
     if mismatches:
         raise HTTPException(
@@ -367,6 +390,7 @@ async def analyze_video(
     recorded_at: str = Form(...),
     recorded_at_source: str = Form("REQUEST_TIME"),
     time_slot: Optional[str] = Form(None),
+    roi_json: Optional[str] = Form(None),
 ):
     if not PIPELINE_SCRIPT.is_file():
         raise HTTPException(
@@ -398,6 +422,20 @@ async def analyze_video(
     )
     species = validate_species(species)
 
+    roi_request = None
+    if roi_json is not None and roi_json.strip():
+        try:
+            roi_raw = json.loads(roi_json)
+            roi_request = parse_roi_request(
+                roi_raw,
+                expected_camera_id=camera_id,
+            )
+        except (json.JSONDecodeError, RoiValidationError) as error:
+            raise HTTPException(
+                status_code=400,
+                detail={"code": "INVALID_REQUEST", "message": f"ROI 요청이 올바르지 않습니다: {error}"},
+            ) from error
+
     original_filename = video.filename or "uploaded_video"
     extension = validate_video_extension(original_filename)
 
@@ -414,6 +452,7 @@ async def analyze_video(
         video_id=video_id,
         camera_id=camera_id,
         species=species,
+        roi_request=roi_request,
     )
 
     if existing_result is not None:
@@ -464,6 +503,18 @@ async def analyze_video(
             "--time-slot",
             time_slot.strip(),
         ])
+
+    roi_request_path = None
+    if roi_request is not None:
+        roi_request_path = UPLOAD_DIR / f"{analysis_id}_roi_request.json"
+        roi_request_path.write_text(
+            json.dumps({
+                "camera_id": roi_request.camera_id,
+                "roi_areas": canonical_roi_config(roi_request),
+            }, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        command.extend(["--roi-request-json", str(roi_request_path)])
 
     try:
         async with ANALYSIS_LOCK:
@@ -539,6 +590,8 @@ async def analyze_video(
         # 분석에 사용한 임시 업로드 영상만 제거한다.
         # 분석 결과 JSON과 CSV 파일은 유지한다.
         upload_path.unlink(missing_ok=True)
+        if roi_request_path is not None:
+            roi_request_path.unlink(missing_ok=True)
 
 
 # =========================================================

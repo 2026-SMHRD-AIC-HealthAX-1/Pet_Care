@@ -216,6 +216,26 @@ def resolve_project_path(path_value):
     return path.resolve()
 
 
+def load_optional_space_analysis(path_value):
+    """Load an optional, precomputed ROI result without running ROI analysis."""
+    if path_value is None:
+        return None
+
+    path = resolve_project_path(path_value)
+    if not path.is_file():
+        raise FileNotFoundError(
+            "공간분석 JSON 파일을 찾을 수 없습니다.\n"
+            f"{path}"
+        )
+
+    with path.open("r", encoding="utf-8-sig") as file:
+        value = json.load(file)
+
+    if not isinstance(value, dict):
+        raise ValueError("space_analysis JSON의 최상위 값은 객체여야 합니다.")
+    return value
+
+
 # =========================================================
 # 4. CSV 파일 확인 및 읽기
 # =========================================================
@@ -1061,6 +1081,12 @@ def get_arguments():
         help="변화 감지 요약 CSV 경로",
     )
 
+    parser.add_argument(
+        "--space-analysis-json",
+        default=None,
+        help="선택적 ROI 공간분석 결과 JSON 경로",
+    )
+
     return parser.parse_args()
 
 
@@ -1126,6 +1152,10 @@ def main():
 
     video_info = read_video_info(
         video_path
+    )
+
+    space_analysis = load_optional_space_analysis(
+        args.space_analysis_json
     )
 
     tracking_row = read_single_row_csv(
@@ -1260,7 +1290,7 @@ def main():
             change_detection,
 
         "space_analysis":
-            None,
+            space_analysis,
 
         "model_info": {
             "pipeline_version":

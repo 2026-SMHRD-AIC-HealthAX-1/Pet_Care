@@ -10,3 +10,9 @@
 5. **Push 전 테스트**: 로컬 서버 기동(`port 9090`) 확인 후 push
 6. **Push 알림**: 톡방에 `[푸시] 도메인/기능 요약 - 이름` 남기기
 7. **커밋 메시지**: `[타입(도메인)]: 설명 - 이름` (예: `feat(pet): 펫 등록 로직 구현 - 세인`)
+
+[AI 서버 연동 정보]
+- 프레임워크: FastAPI (Python)
+- 실행 포트: 8000
+- API 엔드포인트: http://localhost:8000/api/coordinate
+- 실행 방법: uvicorn server:app --reload --port 8000

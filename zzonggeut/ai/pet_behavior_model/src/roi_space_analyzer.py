@@ -190,10 +190,12 @@ def analyze_roi_usage(
                             >= settings.minimum_stay_sec
                         ):
                             state["visits"].append(
-                                (
-                                    state["current_approach_time"],
-                                    state["current_stay_time"],
-                                )
+                                {
+                                    "entry_time_sec": state["current_approach_time"],
+                                    "exit_time_sec": state["candidate_since"],
+                                    "stay_time_sec": state["current_stay_time"],
+                                    "end_reason": "EXIT",
+                                }
                             )
                         state["confirmed_inside"] = False
                         state["current_approach_time"] = None
@@ -214,20 +216,36 @@ def analyze_roi_usage(
             and state["current_stay_time"] >= settings.minimum_stay_sec
         ):
             state["visits"].append(
-                (
-                    state["current_approach_time"],
-                    state["current_stay_time"],
-                )
+                {
+                    "entry_time_sec": state["current_approach_time"],
+                    "exit_time_sec": None,
+                    "stay_time_sec": state["current_stay_time"],
+                    "end_reason": "VIDEO_END",
+                }
             )
 
         approach_times = [
-            _round_seconds(approach_time)
-            for approach_time, _ in state["visits"]
+            _round_seconds(visit["entry_time_sec"])
+            for visit in state["visits"]
         ]
         stay_time_sec = sum(
-            stay_time
-            for _, stay_time in state["visits"]
+            visit["stay_time_sec"]
+            for visit in state["visits"]
         )
+        visit_events = [
+            {
+                "event_index": event_index,
+                "entry_time_sec": _round_seconds(visit["entry_time_sec"]),
+                "exit_time_sec": (
+                    _round_seconds(visit["exit_time_sec"])
+                    if visit["exit_time_sec"] is not None
+                    else None
+                ),
+                "stay_time_sec": _round_seconds(visit["stay_time_sec"]),
+                "end_reason": visit["end_reason"],
+            }
+            for event_index, visit in enumerate(state["visits"], start=1)
+        ]
         roi_results.append(
             {
                 **roi.to_dict(),
@@ -237,11 +255,12 @@ def analyze_roi_usage(
                     approach_times[0] if approach_times else None
                 ),
                 "approach_times_sec": approach_times,
+                "visit_events": visit_events,
             }
         )
 
     return {
-        "calculation_version": "roi-space-v1",
+        "calculation_version": "roi-space-v2",
         "point_policy": "BBOX_CENTER",
         "settings": {
             "entry_confirmation_sec": float(settings.entry_confirmation_sec),

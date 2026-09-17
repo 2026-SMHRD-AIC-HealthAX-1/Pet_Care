@@ -18,7 +18,7 @@ class SpaceAnalysisSchemaTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         schema = json.loads(
-            (PROJECT_ROOT / "schemas" / "analysis_result.schema.json")
+            (PROJECT_ROOT / "schemas" / "analysis_result_v1.2.schema.json")
             .read_text(encoding="utf-8-sig")
         )
         cls.validator = Draft202012Validator(
@@ -50,7 +50,7 @@ class SpaceAnalysisSchemaTest(unittest.TestCase):
 
     def test_invalid_roi_object_is_rejected(self):
         invalid = {
-            "calculation_version": "roi-space-v1",
+            "calculation_version": "roi-space-v2",
             "point_policy": "HEAD_POINT",
             "settings": {
                 "entry_confirmation_sec": 0.0,

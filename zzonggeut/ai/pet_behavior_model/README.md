@@ -25,11 +25,12 @@
 
 기본 집계 단위는 5초입니다.
 
-공간 분석 코드는 별도로 존재하지만 현재 메인 파이프라인에는 연결되지 않아 결과 JSON에서 space_analysis는 null로 반환됩니다.
+ROI가 입력되면 기존 Tracking CSV를 재사용해 공간 분석을 수행합니다. ROI가 없거나 빈 배열이면 결과 JSON의 `space_analysis`는 null입니다.
 
 ## 주요 구조
 
 - src/model_api.py: FastAPI와 Spring 결과 전달
+- src/pet_behavior_analyzer.py: 외부 Python 코드용 공식 호출 인터페이스
 - src/run_pipeline.py: 전체 분석 파이프라인
 - src/track_pet.py: 객체 탐지 및 추적
 - src/extract_features.py: 행동 특징 산출
@@ -68,6 +69,33 @@ Uvicorn 실행: python -m uvicorn src.model_api:app --host 0.0.0.0 --port 8000
 상태 확인 주소: http://localhost:8000/health
 
 정상 상태에서는 status가 UP이고 pipeline_ready가 true로 반환됩니다.
+
+## Python 메소드 호출
+
+`pet_behavior_model` 폴더를 현재 작업 디렉터리 또는 Python 경로에 둔 뒤 다음처럼 호출합니다.
+
+```python
+from src import PetBehaviorAnalyzer
+
+analyzer = PetBehaviorAnalyzer()
+result = analyzer.analyze(
+    video_path="data/videos/sample.mp4",
+    analysis_id="ANL-001",
+    pet_id="PET-001",
+    video_id="VID-001",
+    camera_id="CAM-001",
+    species="DOG",
+    recorded_at="2026-09-16T10:00:00+09:00",
+)
+```
+
+`analyze()`는 기존 `run_pipeline.py`를 실행하고 Schema 1.2 결과를 Python `dict`로 반환합니다. 분석 자체가 실패해도 Schema 1.2 `FAILED` 결과가 생성되면 해당 dict를 반환합니다. 결과 파일이 생성되지 않거나 읽기·Schema·식별정보 검증에 실패한 경우에는 `PetBehaviorAnalyzerError`의 하위 예외가 발생합니다. Spring 전송은 이 클래스가 수행하지 않습니다.
+
+선택적 ROI는 `roi_data` dict로 전달합니다. `None` 또는 빈 `roi_areas`는 ROI 미입력으로 처리합니다.
+
+Schema 1.2에서는 기존 ROI 집계값과 함께 접근 이벤트별 `visit_events`를 반환합니다. 정상 이탈은 `end_reason="EXIT"`, 영상 종료 시 ROI 내부에 남아 있는 이벤트는 `end_reason="VIDEO_END"`로 표현합니다.
+
+현재 master에는 `FramePacket`, `AnalysisContext`, `FrameSource`, `UploadFrameSource`가 포함되어 있지 않습니다. 향후 공통 프레임 입력 구조가 병합되면 public interface의 입력 계층에서 `video_path`를 `UploadFrameSource`로 변환하는 방식으로 연결하며, 이번 UPLOAD 인터페이스에는 LIVE 처리를 포함하지 않습니다.
 
 ## Spring 전달 설정
 
@@ -152,8 +180,9 @@ Spring 복구 후 동일한 analysis_id, pet_id, video_id, species로 다시 요
 
 ## 검증 완료 항목
 
-- Python 소스 13개 문법 검사
-- 분석 결과 JSON 11개 Schema 검사
+- Python 소스 및 공개 호출 인터페이스 문법 검사
+- Schema 1.0/1.1 보존 및 Schema 1.2 결과 검사
+- ROI `visit_events` 단위·계약 검사
 - 강아지·고양이 분석 결과 생성
 - 강아지·고양이 기존 결과 Spring 전달
 - 신규 강아지 분석 후 Spring 자동 전달
@@ -171,4 +200,4 @@ Spring 복구 후 동일한 analysis_id, pet_id, video_id, species로 다시 요
 - 프론트엔드 화면 연결
 - 사용자 인증
 - 알림 발송
-- 공간 분석 메인 파이프라인 통합
+- LIVE 프레임 입력 및 세션 관리

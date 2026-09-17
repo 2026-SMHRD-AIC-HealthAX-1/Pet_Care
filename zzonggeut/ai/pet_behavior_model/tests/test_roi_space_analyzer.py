@@ -80,6 +80,25 @@ class RoiSpaceAnalyzerTest(unittest.TestCase):
         self.assertEqual([1.0, 4.5], roi["approach_times_sec"])
         self.assertEqual(1.0, roi["first_approach_time_sec"])
         self.assertAlmostEqual(2.75, roi["stay_time_sec"])
+        self.assertEqual(
+            [
+                {
+                    "event_index": 1,
+                    "entry_time_sec": 1.0,
+                    "exit_time_sec": 3.0,
+                    "stay_time_sec": 1.25,
+                    "end_reason": "EXIT",
+                },
+                {
+                    "event_index": 2,
+                    "entry_time_sec": 4.5,
+                    "exit_time_sec": None,
+                    "stay_time_sec": 1.5,
+                    "end_reason": "VIDEO_END",
+                },
+            ],
+            roi["visit_events"],
+        )
 
     def test_interpolated_position_is_valid(self):
         result = analyze_roi_usage(
@@ -111,6 +130,8 @@ class RoiSpaceAnalyzerTest(unittest.TestCase):
         roi = result["roi_results"][0]
         self.assertEqual(1, roi["approach_count"])
         self.assertEqual(2.0, roi["stay_time_sec"])
+        self.assertEqual(1, len(roi["visit_events"]))
+        self.assertEqual("VIDEO_END", roi["visit_events"][0]["end_reason"])
 
     def test_multiple_rois_are_independent(self):
         result = analyze_roi_usage(
@@ -123,6 +144,18 @@ class RoiSpaceAnalyzerTest(unittest.TestCase):
             [1, 1],
             [item["approach_count"] for item in result["roi_results"]],
         )
+
+    def test_minimum_stay_filters_short_event(self):
+        result = analyze_roi_usage(
+            [row(0.0, 30, 30), row(0.25, 35, 35), row(0.5, 10, 10)],
+            roi_request(),
+            100,
+            100,
+            RoiAnalysisSettings(minimum_stay_sec=0.5),
+        )
+        roi = result["roi_results"][0]
+        self.assertEqual(0, roi["approach_count"])
+        self.assertEqual([], roi["visit_events"])
 
     def test_confirmation_settings_are_separate_and_default_to_zero(self):
         defaults = RoiAnalysisSettings()

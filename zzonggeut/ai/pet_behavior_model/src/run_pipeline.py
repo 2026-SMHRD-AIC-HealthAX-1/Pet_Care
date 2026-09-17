@@ -42,8 +42,8 @@ OUTPUT_DIR = (
 INPUT_DIR = BASE_DIR / "data" / "inputs"
 BASELINE_DIR = OUTPUT_DIR / "baselines"
 SUPPORTED_VIDEO_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv"}
-SCHEMA_VERSION = "1.1"
-PIPELINE_VERSION = "pet-behavior-v1.1"
+SCHEMA_VERSION = "1.2"
+PIPELINE_VERSION = "pet-behavior-v1.2"
 
 
 # =========================================================
@@ -349,7 +349,7 @@ def save_failed_result(inputs, started_at, error_code, message):
         message,
     )
 
-    schema_path = BASE_DIR / "schemas" / "analysis_result.schema.json"
+    schema_path = BASE_DIR / "schemas" / "analysis_result_v1.2.schema.json"
 
     with schema_path.open("r", encoding="utf-8") as file:
         schema = json.load(file)

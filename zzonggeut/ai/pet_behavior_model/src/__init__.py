@@ -10,6 +10,16 @@ from .pet_behavior_analyzer import (
     ResultReadError,
     ResultSchemaError,
 )
+from .frame_sources import AnalysisContext, FramePacket, FrameSource, UploadFrameSource
+from .live_analyzer import (
+    EmptyLiveSessionError,
+    LiveAnalysisSession,
+    LiveFrameShapeError,
+    LiveFrameTimestampError,
+    LivePetBehaviorAnalyzer,
+    LiveSessionClosedError,
+    LiveSessionError,
+)
 
 __all__ = [
     "PetBehaviorAnalyzer",
@@ -20,4 +30,15 @@ __all__ = [
     "ResultReadError",
     "ResultIdentityMismatchError",
     "ResultSchemaError",
+    "FramePacket",
+    "AnalysisContext",
+    "FrameSource",
+    "UploadFrameSource",
+    "LivePetBehaviorAnalyzer",
+    "LiveAnalysisSession",
+    "LiveSessionError",
+    "LiveSessionClosedError",
+    "LiveFrameTimestampError",
+    "LiveFrameShapeError",
+    "EmptyLiveSessionError",
 ]

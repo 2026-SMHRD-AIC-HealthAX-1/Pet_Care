@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>관심영역 설정 - 쫑긋</title>
+  <link rel="stylesheet" href="../css/dashboardStyle.css">
+  <link rel="stylesheet" href="../css/roiStyle.css">
+</head>
+<body>
+<header class="navbar">
+  <div class="logo"><a href="main.html"><img src="../assets/logo.png" alt="쫑긋 로고" class="logo-img"></a></div>
+  <nav class="nav-links">
+    <a href="dashboard.html">대시보드</a><a href="live-view.html">실시간 모니터링</a>
+    <a href="behavior-log.html">행동 분석</a><a href="notifications.html">변화 알림</a><a href="activity-report.html">리포트</a>
+  </nav>
+  <div class="nav-utils"><span class="roi-nav-label">관심영역 설정</span></div>
+</header>
+
+<main class="roi-page">
+  <section class="roi-heading">
+    <div><p class="eyebrow">SPACE ANALYSIS · ROI</p><h1>관심영역 지정</h1><p>영상 위에 밥그릇, 물그릇, 침대 등의 영역을 지정하면 AI 공간 이용 분석에 사용할 비율 좌표 JSON을 생성합니다.</p></div>
+    <div class="camera-field"><label for="cameraId">카메라 ID</label><input id="cameraId" value="CAM-001" maxlength="50"></div>
+  </section>
+
+  <section class="roi-workspace">
+    <div class="roi-card editor-card">
+      <div class="roi-card-header"><div><h2>영상 영역</h2><p>영상을 선택한 뒤 드래그하여 사각형 ROI를 만드세요.</p></div><label class="file-button">영상 선택<input id="videoInput" type="file" accept="video/*"></label></div>
+      <div id="stage" class="video-stage">
+        <video id="video" controls playsinline></video>
+        <div id="emptyState" class="empty-state"><strong>테스트/업로드 영상을 선택해주세요</strong><span>MP4, MOV 등 브라우저에서 재생 가능한 영상</span></div>
+        <div id="roiLayer" class="roi-layer" aria-label="ROI 편집 영역"></div>
+      </div>
+      <div class="stage-help"><span>＋ 빈 공간 드래그: 생성</span><span>↔ 영역 드래그: 이동</span><span>◩ 모서리 드래그: 크기 변경</span></div>
+    </div>
+
+    <aside class="roi-card side-card">
+      <div class="roi-card-header"><div><h2>ROI 목록</h2><p>이름을 선택하고 여러 영역을 관리할 수 있습니다.</p></div><span id="roiCount" class="count-badge">0개</span></div>
+      <div class="roi-name-row"><label for="roiName">새 ROI 이름</label><select id="roiName"><option value="WATER_BOWL">물그릇</option><option value="FOOD_BOWL">밥그릇</option><option value="BED">침대</option><option value="OTHER">기타</option></select></div>
+      <div id="roiList" class="roi-list"><div class="list-empty">아직 지정한 영역이 없습니다.</div></div>
+      <button id="deleteSelected" class="danger-button" type="button" disabled>선택 ROI 삭제</button>
+    </aside>
+  </section>
+
+  <section class="roi-card json-card">
+    <div class="roi-card-header"><div><h2>생성된 ROI JSON</h2><p>좌표는 실제 영상 표시 영역 기준 0~1 비율값입니다.</p></div><button id="copyJson" class="copy-button" type="button">JSON 복사</button></div>
+    <pre id="jsonOutput"></pre>
+    <div id="validationMessage" class="validation-message">ROI를 지정하면 좌표 검증 결과가 표시됩니다.</div>
+  </section>
+</main>
+<script src="../js/roi.js"></script>
+</body>
+</html>

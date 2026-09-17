@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>서비스 가입 - 쫑긋</title>
+  <style>
+    /* ===============================
+       쫑긋 - 공통 스타일 (petStyle.css)
+       =============================== */
+
+    :root {
+      --primary: #0b8484;
+      --primary-dark: #096d6d;
+      --primary-light: #e6f4f4;
+      --accent: #ffb84d;
+      --accent-light: #fff4e0;
+      --cream: #fdfaf5;
+      --text: #2c2c2c;
+      --text-sub: #6b6b6b;
+      --text-light: #9a9a9a;
+      --line: #eeeae4;
+      --radius: 24px;
+      --shadow: 0 6px 28px rgba(45, 40, 30, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', sans-serif;
+    }
+
+    body {
+      background-color: var(--cream);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { text-decoration: none; }
+    ul { list-style: none; }
+
+    /* ---------- Navbar ---------- */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 48px;
+      background: rgba(253, 250, 245, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .logo-img {
+      height: 32px;
+      width: auto;
+      display: block;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      flex: 1;
+    }
+
+    .nav-menu a {
+      font-size: 15px;
+      color: var(--text-sub);
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-menu a:hover { color: var(--primary); }
+
+    .nav-menu a.active {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .nav-login-btn {
+      padding: 10px 24px;
+      background-color: var(--primary);
+      color: #fff !important;
+      border-radius: 999px;
+      font-weight: 600;
+      transition: all 0.2s;
+      margin-left: auto;
+    }
+
+    .nav-login-btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    /* ---------- 공통 버튼 ---------- */
+    .btn {
+      display: inline-block;
+      padding: 15px 38px;
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(11, 132, 132, 0.25);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background-color: #fff;
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+    }
+
+    .btn-outline:hover { background-color: var(--primary-light); }
+
+    /* ---------- 공통 섹션 ---------- */
+    .section {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 90px 24px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      background: var(--accent-light);
+      color: #c47d00;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 7px 16px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.7px;
+      margin-bottom: 12px;
+    }
+
+    .section-desc {
+      text-align: center;
+      font-size: 15px;
+      color: var(--text-sub);
+      margin-bottom: 52px;
+    }
+
+    .center { text-align: center; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      background: #fff;
+      border-top: 1px solid var(--line);
+      padding: 44px 24px;
+      text-align: center;
+    }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    /* ---------- 반응형 ---------- */
+    @media (max-width: 880px) {
+      .navbar { padding: 14px 20px; }
+      .nav-menu { gap: 14px; }
+      .nav-menu a { font-size: 14px; }
+      .nav-login-btn { padding: 8px 16px; }
+      .section { padding: 60px 20px; }
+      .section-title { font-size: 24px; }
+    }
+  </style>
+  <style>
+    /* ===== 서비스 가입 전용 ===== */
+    .signup-wrap {
+      background: linear-gradient(180deg, #e6f4f4 0%, #fdfaf5 240px);
+      min-height: calc(100vh - 70px);
+      padding: 54px 24px 80px;
+    }
+
+    .signup-inner { max-width: 620px; margin: 0 auto; }
+
+    .signup-head { text-align: center; margin-bottom: 30px; }
+
+    .signup-head h1 {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.9px;
+      margin-bottom: 10px;
+    }
+
+    .signup-head p { font-size: 15px; color: var(--text-sub); }
+
+    /* 로그인 안내 배너 */
+    .login-notice {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: var(--accent-light);
+      border: 1px solid #f5e2bf;
+      border-radius: 14px;
+      padding: 13px 18px;
+      font-size: 13.5px;
+      color: #8a6100;
+      margin-bottom: 26px;
+      text-align: center;
+    }
+
+    .login-notice a {
+      color: #7a5500;
+      font-weight: 800;
+      text-decoration: underline;
+    }
+
+    /* 진행 단계 */
+    .progress {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 30px;
+    }
+
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: var(--text-light);
+      font-weight: 600;
+    }
+
+    .progress-step .dot {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: #e4e0d9;
+      color: #fff;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .progress-step.on { color: var(--primary); }
+    .progress-step.on .dot { background: var(--primary); }
+
+    .progress-line { width: 26px; height: 2px; background: #e4e0d9; }
+
+    /* 카드 */
+    .signup-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 40px 38px;
+      box-shadow: var(--shadow);
+    }
+
+    .form-section { margin-bottom: 32px; }
+
+    .form-section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+      padding-bottom: 12px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .form-section-title .ico { font-size: 18px; }
+
+    .section-lead {
+      font-size: 13.5px;
+      color: var(--text-light);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+      min-width: 0;
+    }
+
+    .form-group label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .form-group label .req { color: #e05555; margin-left: 2px; }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      min-width: 0;
+      padding: 12px 14px;
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+      background-color: #faf8f5;
+      color: var(--text);
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .form-group input::placeholder { color: #bdb8b0; }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--primary);
+      background-color: #fff;
+      box-shadow: 0 0 0 4px rgba(11, 132, 132, 0.09);
+    }
+
+    .form-hint { font-size: 12.5px; color: var(--text-light); }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    /* 플랜 선택 */
+    .plan-options { display: flex; flex-direction: column; gap: 12px; }
+
+    .plan-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      border: 1.5px solid var(--line);
+      border-radius: 16px;
+      padding: 18px 20px;
+      cursor: pointer;
+      background: #faf8f5;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .plan-option:hover { border-color: #bcd9d9; }
+
+    .plan-option input[type="radio"] {
+      width: 18px; height: 18px;
+      accent-color: var(--primary);
+      margin-top: 3px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .plan-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      box-shadow: 0 0 0 4px rgba(11, 132, 132, 0.08);
+    }
+
+    .plan-option-body { flex: 1; min-width: 0; }
+
+    .plan-option-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+      flex-wrap: wrap;
+    }
+
+    .plan-option-name { font-size: 15.5px; font-weight: 800; color: var(--text); }
+
+    .plan-tag {
+      background: var(--accent);
+      color: #593800;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+
+    .plan-option-desc { font-size: 13.5px; color: var(--text-sub); line-height: 1.6; }
+
+    .plan-option-price {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--primary);
+      white-space: nowrap;
+      margin-left: auto;
+      padding-left: 10px;
+    }
+
+    .plan-option-price small { font-size: 12px; font-weight: 500; color: var(--text-light); }
+
+    .plan-compare-link {
+      display: block;
+      text-align: right;
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 700;
+      margin-top: 12px;
+    }
+
+    .plan-compare-link:hover { text-decoration: underline; }
+
+    /* 반려동물 선택 */
+    .pet-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .pet-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 1.5px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 18px;
+      background: #faf8f5;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 0;
+    }
+
+    .pet-card:hover { border-color: #bcd9d9; }
+
+    .pet-card input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+    }
+
+    .pet-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      box-shadow: 0 0 0 4px rgba(11, 132, 132, 0.08);
+    }
+
+    .pet-avatar {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .pet-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .pet-info strong { font-size: 15.5px; font-weight: 800; color: var(--text); }
+    .pet-info span { font-size: 13px; color: var(--text-sub); }
+
+    .pet-mark {
+      margin-left: auto;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: 1.5px solid #ddd8d0;
+      background: #fff;
+      color: transparent;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .pet-card.selected .pet-mark {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* 선택 안 함 옵션 */
+    .skip-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      padding: 13px 18px;
+      border: 1.5px dashed var(--line);
+      border-radius: 14px;
+      font-size: 14px;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .skip-option:hover { border-color: #cfc9c0; }
+
+    .skip-option input[type="checkbox"] {
+      width: 17px; height: 17px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .skip-option.on {
+      border-color: var(--primary);
+      border-style: solid;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* 선택 비활성화 상태 */
+    .pet-list.disabled { opacity: 0.45; pointer-events: none; }
+
+    .pet-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .pet-add-btn {
+      background: none;
+      border: none;
+      font-size: 13.5px;
+      color: var(--primary);
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .pet-add-btn:hover { text-decoration: underline; }
+
+    /* 약관 동의 */
+    .agree-box {
+      background: #faf8f5;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px 22px;
+    }
+
+    .agree-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 14px;
+      color: var(--text-sub);
+      padding: 8px 0;
+      cursor: pointer;
+    }
+
+    .agree-item input[type="checkbox"] {
+      width: 18px; height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .agree-all {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 14px;
+      margin-bottom: 6px;
+    }
+
+    .agree-item .required { color: var(--primary); font-size: 13px; }
+    .agree-item .optional { color: var(--text-light); font-size: 13px; }
+
+    .agree-item .view {
+      margin-left: auto;
+      font-size: 12.5px;
+      color: var(--text-light);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .agree-item .view:hover { color: var(--primary); }
+
+    /* 모달 팝업 스타일 (공통) */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+
+      /* 화면이 작아서 모달이 화면보다 커질 경우 스크롤 가능 */
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: #fff;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 480px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      transform: translateY(20px);
+      transition: transform 0.25s ease;
+
+      /* 작은 화면에서도 모달 안쪽 내용이 잘리지 않도록 */
+      overflow: hidden;
+      flex-shrink: 0;
+      min-height: 0;
+    }
+
+    /* 반려동물 등록 폼이 모달 높이를 억지로 늘리지 않게 설정 */
+    #petRegisterForm {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow: hidden;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: var(--text-light);
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+    }
+
+    .modal-close-btn:hover { color: var(--text); }
+
+    .modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: #444;
+
+      /* 모달 높이를 넘는 내용은 이 영역에서 스크롤 */
+      min-height: 0;
+      flex: 1 1 auto;
+    }
+
+    .modal-body ul {
+      list-style-type: disc;
+      padding-left: 20px;
+      margin-top: 10px;
+    }
+
+    .modal-body li {
+      margin-bottom: 6px;
+    }
+
+    .modal-footer {
+      padding-top: 12px;
+      margin-top: 10px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .modal-footer .btn {
+      padding: 10px 22px;
+      font-size: 14px;
+    }
+
+    /* 성별 라디오 라벨 스타일 */
+    .gender-radio-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .gender-radio-group label {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      background: #faf8f5;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .gender-radio-group input[type="radio"] {
+      display: none;
+    }
+
+    .gender-radio-group label:has(input:checked) {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    /* 최종 확인 박스 */
+    .summary-box {
+      background: var(--primary-light);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-bottom: 20px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 14.5px;
+      padding: 6px 0;
+    }
+
+    .summary-row span:first-child { color: var(--text-sub); }
+    .summary-row span:last-child { font-weight: 700; color: var(--text); }
+
+    .summary-row.total {
+      border-top: 1px solid #cfe5e5;
+      margin-top: 8px;
+      padding-top: 14px;
+      font-size: 16px;
+    }
+
+    .summary-row.total span:last-child { color: var(--primary); font-size: 19px; font-weight: 800; }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      margin-top: 4px;
+      font-size: 16.5px;
+    }
+
+    @media (max-width: 880px) {
+      .signup-wrap { padding: 36px 16px 60px; }
+      .signup-card { padding: 28px 22px; border-radius: 20px; }
+      .signup-head h1 { font-size: 24px; }
+      .form-row { grid-template-columns: minmax(0, 1fr); gap: 0; }
+      .progress-step span:not(.dot) { display: none; }
+      .plan-option-price { margin-left: 0; padding-left: 0; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 네비게이션 -->
+  <header class="navbar">
+    <a href="main.html"><img src="../assets/logo.png" alt="쫑긋 로고" class="logo-img"></a>
+    <nav class="nav-menu">
+      <a href="about.html">서비스 소개</a>
+      <a href="signUp.html" class="active">서비스 가입</a>
+      <a href="pricing.html">요금 안내</a>
+    </nav>
+    <a href="login.html" class="nav-login-btn">로그인</a>
+  </header>
+
+  <main class="signup-wrap">
+    <div class="signup-inner">
+
+      <div class="signup-head">
+        <h1>서비스 가입</h1>
+        <p>플랜을 고르고 우리 아이를 등록하면 바로 시작할 수 있어요.</p>
+      </div>
+
+      <!-- 계정 안내 -->
+      <div class="login-notice">
+        서비스 가입은 로그인 후 진행됩니다. 아직 계정이 없으시다면
+        <a href="join.html">회원가입</a>을 먼저 해주세요.
+      </div>
+
+      <!-- 진행 단계 -->
+      <div class="progress">
+        <div class="progress-step on"><span class="dot">1</span><span>플랜 선택</span></div>
+        <div class="progress-line"></div>
+        <div class="progress-step"><span class="dot">2</span><span>결제</span></div>
+        <div class="progress-line"></div>
+        <div class="progress-step"><span class="dot">3</span><span>이용 시작</span></div>
+      </div>
+
+      <div class="signup-card">
+        <form class="signup-form">
+
+          <!-- 1. 플랜 선택 -->
+          <div class="form-section">
+            <div class="form-section-title"><span class="ico">📦</span> 이용 플랜 선택</div>
+            <p class="section-lead">언제든 변경하거나 해지할 수 있어요.</p>
+
+            <div class="plan-options">
+              <label class="plan-option selected">
+                <input type="radio" name="plan" value="basic" data-price="0" data-name="베이직" checked>
+                <div class="plan-option-body">
+                  <div class="plan-option-top">
+                    <span class="plan-option-name">베이직</span>
+                  </div>
+                  <p class="plan-option-desc">카메라 1대 · 반려동물 1마리 · 알림 하루 10회 · 기록 3일</p>
+                </div>
+                <div class="plan-option-price">무료</div>
+              </label>
+
+              <label class="plan-option">
+                <input type="radio" name="plan" value="standard" data-price="9900" data-name="스탠다드">
+                <div class="plan-option-body">
+                  <div class="plan-option-top">
+                    <span class="plan-option-name">스탠다드</span>
+                    <span class="plan-tag">인기</span>
+                  </div>
+                  <p class="plan-option-desc">카메라 3대 · 반려동물 3마리 · 알림 무제한 · 기록 30일</p>
+                </div>
+                <div class="plan-option-price">9,900원<small> / 월</small></div>
+              </label>
+
+              <label class="plan-option">
+                <input type="radio" name="plan" value="premium" data-price="19900" data-name="프리미엄">
+                <div class="plan-option-body">
+                  <div class="plan-option-top">
+                    <span class="plan-option-name">프리미엄</span>
+                  </div>
+                  <p class="plan-option-desc">카메라 무제한 · 반려동물 무제한 · 기록 90일 · 24시간 지원</p>
+                </div>
+                <div class="plan-option-price">19,900원<small> / 월</small></div>
+              </label>
+            </div>
+
+            <!-- servicePrice.html 로 이동 연결 -->
+            <a href="servicePrice.html" class="plan-compare-link">플랜 자세히 비교하기 →</a>
+          </div>
+
+          <!-- 2. 반려동물 선택 -->
+          <div class="form-section">
+            <div class="form-section-title"><span class="ico">🐶</span> 반려동물 선택</div>
+            <p class="section-lead">등록된 반려동물 중 이 서비스로 지켜볼 아이를 골라주세요. 여러 마리도 선택할 수 있어요.</p>
+
+            <div class="pet-list" id="petList">
+              <label class="pet-card selected">
+                <input type="checkbox" class="pet-check" data-name="초코" checked>
+                <span class="pet-avatar">🐩</span>
+                <span class="pet-info">
+                  <strong>초코</strong>
+                  <span>강아지 · 남아 · 3살</span>
+                </span>
+                <span class="pet-mark">✓</span>
+              </label>
+
+              <label class="pet-card">
+                <input type="checkbox" class="pet-check" data-name="보리">
+                <span class="pet-avatar">🐕</span>
+                <span class="pet-info">
+                  <strong>보리</strong>
+                  <span>강아지 · 여아 · 7살</span>
+                </span>
+                <span class="pet-mark">✓</span>
+              </label>
+
+              <label class="pet-card">
+                <input type="checkbox" class="pet-check" data-name="하늘">
+                <span class="pet-avatar">🐈</span>
+                <span class="pet-info">
+                  <strong>하늘</strong>
+                  <span>고양이 · 남아 · 5살</span>
+                </span>
+                <span class="pet-mark">✓</span>
+              </label>
+            </div>
+
+            <label class="skip-option">
+              <input type="checkbox" id="petSkip">
+              <span>지금은 선택하지 않고, 가입 후에 지정할게요</span>
+            </label>
+
+            <div class="pet-footer">
+              <span class="form-hint" id="petCount">1마리 선택됨</span>
+              <button type="button" class="pet-add-btn" id="openPetModalBtn">+ 새 반려동물 등록하기</button>
+            </div>
+          </div>
+
+          <!-- 3. 카메라 연결 -->
+          <div class="form-section">
+            <div class="form-section-title"><span class="ico">🎥</span> 카메라 연결</div>
+            <p class="section-lead">지금 연결하지 않고 가입 후에 등록하셔도 괜찮아요.</p>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="camType">카메라 종류</label>
+                <select id="camType">
+                  <option value="">선택하세요</option>
+                  <option value="homecam">가정용 홈캠</option>
+                  <option value="webcam">PC · 노트북 웹캠</option>
+                  <option value="ipcam">IP 카메라</option>
+                  <option value="later">나중에 등록할게요</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="camPlace">설치 위치</label>
+                <select id="camPlace">
+                  <option value="">선택하세요</option>
+                  <option value="living">거실</option>
+                  <option value="room">방</option>
+                  <option value="kitchen">주방</option>
+                  <option value="etc">기타</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="camName">기기 이름</label>
+              <input type="text" id="camName" placeholder="예) 거실 홈캠">
+              <span class="form-hint">여러 대를 등록할 때 구분하기 위한 이름이에요.</span>
+            </div>
+          </div>
+
+          <!-- 4. 약관 동의 -->
+          <div class="form-section">
+            <div class="form-section-title"><span class="ico">📄</span> 서비스 이용 동의</div>
+            <p class="section-lead">서비스 이용에 필요한 항목이에요.</p>
+
+            <div class="agree-box">
+              <label class="agree-item agree-all">
+                <input type="checkbox" id="agreeAll">
+                전체 동의하기
+              </label>
+
+              <label class="agree-item">
+                <input type="checkbox" class="agree-check" id="agree-terms" required>
+                서비스 이용약관 동의 <span class="required">(필수)</span>
+                <a href="#" class="view" data-modal="terms">보기</a>
+              </label>
+
+              <label class="agree-item">
+                <input type="checkbox" class="agree-check" id="agree-video" required>
+                영상 정보 수집 및 처리 동의 <span class="required">(필수)</span>
+                <a href="#" class="view" data-modal="video">보기</a>
+              </label>
+
+              <label class="agree-item">
+                <input type="checkbox" class="agree-check" id="agree-payment" required>
+                유료 결제 및 자동 갱신 동의 <span class="required">(필수)</span>
+                <a href="#" class="view" data-modal="payment">보기</a>
+              </label>
+
+              <label class="agree-item">
+                <input type="checkbox" class="agree-check" id="agree-marketing">
+                서비스 소식 및 혜택 수신 동의 <span class="optional">(선택)</span>
+                <a href="#" class="view" data-modal="marketing">보기</a>
+              </label>
+            </div>
+          </div>
+
+          <!-- 최종 확인 -->
+          <div class="summary-box">
+            <div class="summary-row">
+              <span>선택한 플랜</span>
+              <span id="sumPlan">베이직</span>
+            </div>
+            <div class="summary-row">
+              <span>선택한 반려동물</span>
+              <span id="sumPets">초코</span>
+            </div>
+            <div class="summary-row">
+              <span>결제 주기</span>
+              <span id="sumCycle">–</span>
+            </div>
+            <div class="summary-row total">
+              <span>첫 결제 금액</span>
+              <span id="sumPrice">0원</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary submit-btn">서비스 시작하기</button>
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 약관 보기 모달 (팝업) -->
+  <div class="modal-overlay" id="termsModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle">약관 상세보기</h3>
+        <button type="button" class="modal-close-btn" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-body" id="modalContent">
+        <!-- 약관 내용 동적 삽입 -->
+      </div>
+      <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--line);">
+        <button type="button" class="btn btn-primary" id="modalConfirm">동의</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 새 반려동물 등록 모달 -->
+  <div class="modal-overlay" id="petRegisterModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>새 반려동물 등록</h3>
+        <button type="button" class="modal-close-btn" id="petModalClose">&times;</button>
+      </div>
+      <form id="petRegisterForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="newPetName">이름 <span class="req">*</span></label>
+            <input type="text" id="newPetName" placeholder="예) 해피" required>
+          </div>
+
+          <div class="form-group">
+            <label for="newPetSpecies">종 <span class="req">*</span></label>
+            <select id="newPetSpecies" required>
+              <option value="">선택하세요</option>
+              <option value="강아지">강아지</option>
+              <option value="고양이">고양이</option>
+              <option value="기타">기타</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>성별 <span class="req">*</span></label>
+            <div class="gender-radio-group">
+              <label>
+                <input type="radio" name="newPetGender" value="남아" checked> 남아
+              </label>
+              <label>
+                <input type="radio" name="newPetGender" value="여아"> 여아
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="newPetAge">나이 (살) <span class="req">*</span></label>
+            <input type="number" id="newPetAge" min="0" max="30" placeholder="예) 2" required>
+          </div>
+
+          <!-- 입력 양식 바로 밑에 버튼배치하여 위치 상향 조정 -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" id="petModalCancel">취소</button>
+            <button type="submit" class="btn btn-primary">등록하기</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="footer-copy">© 2026 쫑긋. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // 약관 데이터 정의
+    const termsData = {
+      terms: {
+        title: "서비스 이용약관 동의 (필수)",
+        content: `
+          <p>본 약관은 주식회사 쫑긋(이하 "회사"라 합니다)이 제공하는 AI 기반 반려동물 탐지 및 행동 분석 서비스(이하 "서비스"라 합니다)의 이용과 관련하여 회사와 회원의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.</p>
+          <ul>
+            <li><strong>용어의 정의:</strong> "서비스"란 회사가 제공하는 AI 영상 기반 반려동물 위치/행동 탐지, 실시간 모니터링, 이상행동 분석 리포트, 알림 등 제반 서비스를 의미하며, "회원"이란 본 약관에 동의하고 서비스를 이용하는 고객을 말합니다.</li>
+            <li><strong>약관의 효력 및 개정:</strong> 회사는 본 약관을 서비스 화면에 게시하며, 관련 법령을 위배하지 않는 범위에서 약관을 개정할 수 있습니다. 약관 개정 시 적용일자 7일 전부터 공지사항을 통해 고지합니다.</li>
+            <li><strong>서비스 이용계약의 성립:</strong> 이용계약은 회원이 본 필수 약관에 동의하고 회사가 승낙함으로써 체결됩니다.</li>
+          </ul>
+        `
+      },
+      video: {
+        title: "영상 정보 수집 및 처리 동의 (필수)",
+        content: `
+          <p>회사는 AI 기반 반려동물 행동 분석 및 실시간 모니터링 서비스 제공을 위해 회원이 연결한 영상기기(IP카메라, 모바일 카메라 등)로부터 영상 데이터를 수집하고 처리합니다.</p>
+          <ul>
+            <li><strong>수집 및 처리 목적:</strong> 반려동물 행동 패턴 학습, 위치/이상행동 감지, 맞춤형 AI 리포트 생성 및 품질 개선</li>
+            <li><strong>처리하는 영상 정보:</strong> 연결된 영상기기를 통해 촬영되는 실시간 및 녹화 영상 데이터</li>
+            <li><strong>보유 및 이용 기간:</strong> 회원 탈퇴 시 또는 서비스 이용 종료 시까지 (단, 관계 법령에 의거하여 보존할 필요가 있는 경우 해당 기간 동안 보관)</li>
+            <li><strong>영상기기 설치 및 회원 의무:</strong> 회원은 영상기기 설치 시 타인의 초상권 및 사생활이 침해되지 않도록 주의해야 하며, 무단 촬영으로 발생하는 모든 법적 책임은 회원 본인에게 있습니다.</li>
+          </ul>
+        `
+      },
+      payment: {
+        title: "유료 결제 및 자동 갱신 동의 (필수)",
+        content: `
+          <p>회사는 유료 구독 서비스(스탠다드 플랜 등) 이용 회원에게 아래와 같은 결제 및 자동 갱신 조건 정책을 적용합니다.</p>
+          <ul>
+            <li><strong>결제 방식 및 주기:</strong> 회원은 월간 또는 연간 단위의 정기 결제 플랜을 이용할 수 있으며, 지정된 결제 수단으로 서비스 이용 요금이 자동으로 청구됩니다.</li>
+            <li><strong>자동 갱신 조건:</strong> 정기 결제 서비스는 회원이 직접 해지 신청을 하기 전까지 동일한 조건으로 매월/매년 자동 갱신 및 결제됩니다.</li>
+            <li><strong>청약철회 및 환불 정책:</strong>
+              <ul>
+                <li>결제 후 7일 이내에 서비스를 전혀 이용하지 않은 경우 전액 환불이 가능합니다.</li>
+                <li>결제 후 서비스를 이용했거나 7일이 경과한 경우, 당월 이용 금액을 차감한 잔여 기간에 대한 기준에 따라 환불 처리됩니다.</li>
+              </ul>
+            </li>
+            <li><strong>구독 해지 안내:</strong> 회원은 [마이페이지 > 구독 관리] 메뉴를 통해 언제든지 자동 결제 해지를 신청할 수 있으며, 해지 시에도 기존 결제 주기의 남은 기간 동안은 서비스를 계속 이용할 수 있습니다.</li>
+          </ul>
+        `
+      },
+      marketing: {
+        title: "서비스 소식 및 혜택 수신 동의 (선택)",
+        content: `
+          <p>회사는 회원이 동의한 경우에 한하여 각종 서비스 업데이트 소식, 이벤트 및 마케팅 혜택 정보를 제공합니다.</p>
+          <ul>
+            <li><strong>수신 항목:</strong> 앱 푸시 알림, 이메일, SMS/LMS 메시지</li>
+            <li><strong>제공 내용:</strong> 신규 기능 안내, 할인이벤트 및 프로모션 소식, 주간 케어 팁, 회원 맞춤 혜택 안내</li>
+            <li><strong>동의 철회:</strong> 본 동의는 선택 사항이며, 동의하지 않더라도 서비스 이용에는 제한이 없습니다. 동의 후에도 [마이페이지 > 알림 설정] 메뉴에서 언제든지 수신 여부를 변경할 수 있습니다.</li>
+          </ul>
+        `
+      }
+    };
+
+    // 모달 엘리먼트 및 상태 관리
+    const modalOverlay = document.getElementById('termsModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalContent = document.getElementById('modalContent');
+    const modalClose = document.getElementById('modalClose');
+    const modalConfirm = document.getElementById('modalConfirm');
+    let currentKey = null;
+
+    function openModal(key) {
+      const data = termsData[key];
+      if (data) {
+        currentKey = key;
+        modalTitle.textContent = data.title;
+        modalContent.innerHTML = data.content;
+        modalOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+      currentKey = null;
+    }
+
+    document.querySelectorAll('.agree-item .view').forEach(viewBtn => {
+      viewBtn.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        const modalKey = viewBtn.getAttribute('data-modal');
+        openModal(modalKey);
+      });
+    });
+
+    modalClose.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', e => {
+      if (e.target === modalOverlay) closeModal();
+    });
+
+    modalConfirm.addEventListener('click', () => {
+      if (currentKey) {
+        const targetCheckbox = document.getElementById(`agree-${currentKey}`);
+        if (targetCheckbox) {
+          targetCheckbox.checked = true;
+          checkAllAgreed();
+        }
+      }
+      closeModal();
+    });
+
+    // 전체 동의 체크박스
+    const agreeAll = document.getElementById('agreeAll');
+    const agreeChecks = document.querySelectorAll('.agree-check');
+
+    function checkAllAgreed() {
+      agreeAll.checked = [...agreeChecks].every(c => c.checked);
+    }
+
+    agreeAll.addEventListener('change', () => {
+      agreeChecks.forEach(chk => chk.checked = agreeAll.checked);
+    });
+
+    agreeChecks.forEach(chk => {
+      chk.addEventListener('change', checkAllAgreed);
+    });
+
+    // 플랜 선택
+    const planRadios = document.querySelectorAll('input[name="plan"]');
+    const sumPlan = document.getElementById('sumPlan');
+    const sumPrice = document.getElementById('sumPrice');
+    const sumCycle = document.getElementById('sumCycle');
+
+    function updatePlan() {
+      planRadios.forEach(r => {
+        r.closest('.plan-option').classList.toggle('selected', r.checked);
+        if (r.checked) {
+          const price = Number(r.dataset.price);
+          sumPlan.textContent = r.dataset.name;
+          sumPrice.textContent = price === 0 ? '0원' : price.toLocaleString() + '원';
+          sumCycle.textContent = price === 0 ? '–' : '매월 자동 결제';
+        }
+      });
+    }
+
+    planRadios.forEach(r => r.addEventListener('change', updatePlan));
+    updatePlan();
+
+    // 반려동물 선택 및 모달 관리
+    const petList = document.getElementById('petList');
+    const petSkip = document.getElementById('petSkip');
+    const petCount = document.getElementById('petCount');
+    const sumPets = document.getElementById('sumPets');
+
+    function updatePets() {
+      const petChecks = document.querySelectorAll('.pet-check');
+      petChecks.forEach(chk => {
+        chk.closest('.pet-card').classList.toggle('selected', chk.checked);
+      });
+
+      const picked = [...petChecks].filter(c => c.checked).map(c => c.dataset.name);
+
+      if (petSkip.checked) {
+        petCount.textContent = '가입 후에 지정합니다';
+        sumPets.textContent = '가입 후 지정';
+      } else {
+        petCount.textContent = picked.length + '마리 선택됨';
+        sumPets.textContent = picked.length ? picked.join(', ') : '선택 안 함';
+      }
+    }
+
+    petList.addEventListener('change', e => {
+      if (e.target.classList.contains('pet-check')) {
+        updatePets();
+      }
+    });
+
+    petSkip.addEventListener('change', () => {
+      const skip = petSkip.checked;
+      petSkip.closest('.skip-option').classList.toggle('on', skip);
+      petList.classList.toggle('disabled', skip);
+      if (skip) {
+        document.querySelectorAll('.pet-check').forEach(c => c.checked = false);
+      }
+      updatePets();
+    });
+
+    // 새 반려동물 등록 모달 처리
+    const petRegisterModal = document.getElementById('petRegisterModal');
+    const openPetModalBtn = document.getElementById('openPetModalBtn');
+    const petModalClose = document.getElementById('petModalClose');
+    const petModalCancel = document.getElementById('petModalCancel');
+    const petRegisterForm = document.getElementById('petRegisterForm');
+
+    function openPetModal() {
+      petRegisterModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePetModal() {
+      petRegisterModal.classList.remove('active');
+      document.body.style.overflow = '';
+      petRegisterForm.reset();
+    }
+
+    openPetModalBtn.addEventListener('click', openPetModal);
+    petModalClose.addEventListener('click', closePetModal);
+    petModalCancel.addEventListener('click', closePetModal);
+
+    petRegisterModal.addEventListener('click', e => {
+      if (e.target === petRegisterModal) closePetModal();
+    });
+
+    function getPetIcon(species) {
+      if (species === '강아지') return '🐶';
+      if (species === '고양이') return '🐱';
+      return '🐾';
+    }
+
+    petRegisterForm.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const name = document.getElementById('newPetName').value.trim();
+      const species = document.getElementById('newPetSpecies').value;
+      const gender = document.querySelector('input[name="newPetGender"]:checked').value;
+      const age = document.getElementById('newPetAge').value;
+
+      if (!name || !species || !age) return;
+
+      const icon = getPetIcon(species);
+
+      const label = document.createElement('label');
+      label.className = 'pet-card selected';
+      label.innerHTML = `
+        <input type="checkbox" class="pet-check" data-name="${name}" checked>
+        <span class="pet-avatar">${icon}</span>
+        <span class="pet-info">
+          <strong>${name}</strong>
+          <span>${species} · ${gender} · ${age}살</span>
+        </span>
+        <span class="pet-mark">✓</span>
+      `;
+
+      if (petSkip.checked) {
+        petSkip.checked = false;
+        petSkip.closest('.skip-option').classList.remove('on');
+        petList.classList.remove('disabled');
+      }
+
+      petList.appendChild(label);
+      updatePets();
+      closePetModal();
+    });
+
+    updatePets();
+  </script>
+
+</body>
+
+</html>

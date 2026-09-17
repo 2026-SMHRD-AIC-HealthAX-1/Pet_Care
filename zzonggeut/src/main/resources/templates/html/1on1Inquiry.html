@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나의 1:1 문의 내역 - 쫑긋</title>
+  <link rel="stylesheet" href="../css/dashboardStyle.css">
+  <style>
+    .inquiry-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .page-title-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .page-title-area h2 {
+      font-size: 22px;
+      color: #222;
+    }
+
+    .back-btn {
+      padding: 8px 16px;
+      background-color: #f1f3f5;
+      color: #495057;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background-color 0.2s;
+    }
+
+    .back-btn:hover {
+      background-color: #e9ecef;
+    }
+
+    /* 목록 카드 스타일 */
+    .inquiry-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px 28px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      border: 1px solid #f0f0f0;
+    }
+
+    .inquiry-list-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .inquiry-list-table th,
+    .inquiry-list-table td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+    }
+
+    .inquiry-list-table th {
+      color: #666;
+      font-weight: 600;
+      background-color: #fafafa;
+    }
+
+    .inquiry-item-title {
+      color: #222;
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .inquiry-item-title:hover {
+      color: #0b8484;
+      text-decoration: underline;
+    }
+
+    .status-tag {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      background-color: #eef7f6;
+      color: #0b8484;
+    }
+
+    /* 모달 팝업 스타일 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #fff;
+      width: 100%;
+      max-width: 600px;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      color: #222;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 상단 네비게이션 바 -->
+  <header class="navbar">
+    <div class="logo">
+      <a href="main.html">
+        <img src="../assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      </a>
+    </div>
+    <nav class="nav-links">
+      <a href="dashboard.html">대시보드</a>
+      <a href="activity-report.html">리포트</a>
+    </nav>
+    <div class="nav-utils">
+      <button class="icon-btn" id="alarmBtn">🔔</button>
+      <button class="icon-btn" id="profileBtn">👤</button>
+    </div>
+  </header>
+
+  <main class="inquiry-container">
+
+    <!-- 상단 타이틀 영역 -->
+    <div class="page-title-area">
+      <h2>📝 나의 1:1 문의 내역</h2>
+      <a href="mypage.html" class="back-btn">← 마이페이지로 돌아가기</a>
+    </div>
+
+    <!-- 문의글 목록 카드 -->
+    <div class="inquiry-card">
+      <table class="inquiry-list-table">
+        <thead>
+          <tr>
+            <th style="width: 60%;">제목</th>
+            <th style="width: 20%;">작성일</th>
+            <th style="width: 20%;">상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <!-- 제목 클릭 시 팝업 열기 -->
+              <a href="javascript:void(0);" class="inquiry-item-title" id="openModalBtn">
+                카메라 실시간 연동이 간헐적으로 끊어집니다.
+              </a>
+            </td>
+            <td style="color: #777;">2026.08.22</td>
+            <td><span class="status-tag">답변완료</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <!-- 1:1 문의 상세 모달 (팝업) -->
+  <div class="modal-overlay" id="inquiryModal">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h3>💬 1:1 문의 내용 상세</h3>
+      </div>
+
+      <!-- 질문 영역 -->
+      <div style="background-color: #f8f9fa; padding: 14px; border-radius: 8px; margin-bottom: 16px;">
+        <div style="font-size: 12px; color: #0b8484; font-weight: bold; margin-bottom: 4px;">Q. 질문 내용 (2026.08.22)</div>
+        <div style="font-weight: 600; color: #222; margin-bottom: 6px;">카메라 실시간 연동이 간헐적으로 끊어집니다.</div>
+        <div style="font-size: 13px; color: #555; line-height: 1.6;">
+          안녕하세요. 실시간 카메라 스트리밍을 통해 아이 반응을 모니터링 중인데, 10~15분 간격으로 라이브 영상 연결이 순간적으로 끊겼다가 재연결됩니다.<br>
+          Wi-Fi 신호는 양호한 상태인데 앱 문제인지 카메라 기기 문제인지 확인 부탁드립니다.
+        </div>
+      </div>
+
+      <!-- 답변 영역 -->
+      <div style="background-color: #eef7f6; padding: 14px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ccece6;">
+        <div style="font-size: 12px; color: #0b8484; font-weight: bold; margin-bottom: 4px;">A. 쫑긋 CS팀 답변 (2026.08.23)</div>
+        <div style="font-size: 13px; color: #333; line-height: 1.6;">
+          안녕하세요, 김쫑긋 회원님. 반려동물 AI 헬스케어 쫑긋입니다.<br><br>
+          이용에 불편을 드려 죄송합니다. 전달해주신 현상은 최근 실시된 AI 영상 스트리밍 엔진 업데이트 과정에서 일부 네트워크 환경과의 호환성 문제로 발생했던 것으로 확인되었습니다.<br><br>
+          <strong>[조치 방법]</strong><br>
+          1. 최신 앱 버전(v2.4.1)으로 업데이트를 진행해 주세요.<br>
+          2. 기기 전원을 재부팅(소켓 분리 후 10초 뒤 재연결) 후 펌웨어 자동 업데이트를 완료해 주시면 끊김 현상이 해결됩니다.<br><br>
+          지속적으로 문제가 해결되지 않을 경우 1:1 고객센터(1588-0000)로 문의해 주시면 정밀 점검을 도와드리겠습니다. 감사합니다!
+        </div>
+      </div>
+
+      <div style="text-align: right;">
+        <button type="button" class="btn primary-btn" id="closeInquiryModalBtn"
+          style="padding: 8px 20px; background: #0b8484; color: #fff; border: none; border-radius: 6px; cursor: pointer;">닫기</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 하단 푸터 -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p>© 2026 쫑긋. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- 모달 열기/닫기 자바스크립트 -->
+  <script>
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = document.getElementById('closeInquiryModalBtn');
+    const modalOverlay = document.getElementById('inquiryModal');
+
+    // 제목 클릭 시 모달 열기
+    openModalBtn.addEventListener('click', () => {
+      modalOverlay.classList.add('active');
+    });
+
+    // 닫기 버튼 클릭 시 모달 닫기
+    closeModalBtn.addEventListener('click', () => {
+      modalOverlay.classList.remove('active');
+    });
+
+    // 배경 클릭 시 모달 닫기
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) {
+        modalOverlay.classList.remove('active');
+      }
+    });
+  </script>
+
+</body>
+
+</html>

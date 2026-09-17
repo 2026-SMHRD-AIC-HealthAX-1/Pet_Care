@@ -125,8 +125,8 @@ session = live_analyzer.start_session(
             "roi_areas": [
                 {
                     "roi_id": "ROI-FOOD-001",
-                    "roi_name": "밥그릇",
-                    "roi_type": "FOOD",
+                    "roi_name": "FOOD_BOWL",
+                    "roi_type": "RECTANGLE",
                     "x": 0.1,
                     "y": 0.6,
                     "width": 0.2,
@@ -165,7 +165,7 @@ except Exception:
 
 기본 전달 주소:
 
-http://localhost:8081/api/ai/analysis-results
+http://localhost:9090/api/ai/analysis-results
 
 다른 Spring 서버를 사용할 경우 모델 서버 실행 전에 다음 환경변수를 설정합니다.
 

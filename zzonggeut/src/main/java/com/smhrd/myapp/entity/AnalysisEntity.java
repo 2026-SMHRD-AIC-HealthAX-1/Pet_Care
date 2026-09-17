@@ -1,4 +1,4 @@
-package com.smhrd.myapp.domain.analysis;
+package com.smhrd.myapp.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,7 +13,7 @@ public class AnalysisEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "SEQ")
+    @Column(name = "SEQ", nullable = false)
     private Integer seq;
 
     @Column(name = "PET_SEQ", nullable = false)

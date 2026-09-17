@@ -1,8 +1,11 @@
-package com.smhrd.myapp.domain.user;
+package com.smhrd.myapp.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+
+import com.smhrd.myapp.service.UserService;
+
 import java.time.LocalDateTime;
 
 @RestController
@@ -19,6 +22,6 @@ public class UserController {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime birth,
             @RequestParam char isReceiveAlarm
     ) {
-        return userService.join(id, pw, name, birth, isReceiveAlarm);
+        return userService.join(id, pw, name, birth);
     }
 }

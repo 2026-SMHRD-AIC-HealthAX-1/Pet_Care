@@ -74,7 +74,7 @@ ANALYZER = PetBehaviorAnalyzer(base_dir=BASE_DIR)
 
 SPRING_RESULT_URL = os.getenv(
     "SPRING_RESULT_URL",
-    "http://localhost:8081/api/ai/analysis-results",
+    "http://localhost:9090/api/ai/analysis-results",
 )
 SPRING_TIMEOUT_SEC = 10
 SPRING_MAX_ATTEMPTS = 3

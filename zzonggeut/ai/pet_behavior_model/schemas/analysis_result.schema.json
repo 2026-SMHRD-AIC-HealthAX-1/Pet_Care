@@ -581,11 +581,137 @@
       ]
     },
     "space_analysis": {
-      "type": [
-        "object",
-        "null"
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "calculation_version": {
+              "const": "roi-space-v1"
+            },
+            "point_policy": {
+              "const": "BBOX_CENTER"
+            },
+            "settings": {
+              "type": "object",
+              "properties": {
+                "entry_confirmation_sec": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "exit_confirmation_sec": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "minimum_stay_sec": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "entry_confirmation_sec",
+                "exit_confirmation_sec",
+                "minimum_stay_sec"
+              ],
+              "additionalProperties": false
+            },
+            "roi_results": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "roi_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+                  },
+                  "roi_name": {
+                    "enum": [
+                      "FOOD_BOWL",
+                      "WATER_BOWL",
+                      "BED",
+                      "ETC"
+                    ]
+                  },
+                  "roi_type": {
+                    "const": "RECTANGLE"
+                  },
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "width": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1
+                  },
+                  "height": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1
+                  },
+                  "approach_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "stay_time_sec": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "first_approach_time_sec": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "approach_times_sec": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 0
+                    }
+                  }
+                },
+                "required": [
+                  "roi_id",
+                  "roi_name",
+                  "roi_type",
+                  "x",
+                  "y",
+                  "width",
+                  "height",
+                  "approach_count",
+                  "stay_time_sec",
+                  "first_approach_time_sec",
+                  "approach_times_sec"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "calculation_version",
+            "point_policy",
+            "settings",
+            "roi_results"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
       ],
-      "description": "Optional ROI extension; internal structure is not defined in v1.0."
+      "description": "Optional user-defined rectangular ROI analysis."
     },
     "model_info": {
       "type": "object",

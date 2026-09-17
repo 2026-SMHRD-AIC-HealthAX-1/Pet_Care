@@ -12,6 +12,9 @@ from pathlib import Path
 import cv2
 from jsonschema import Draft202012Validator, FormatChecker
 
+from roi_models import RoiValidationError, parse_roi_request
+from roi_space_analyzer import analyze_roi_usage, load_tracking_csv
+
 from baseline_policy import (
     FEATURE_VERSION,
     POLICY_VERSION,
@@ -57,6 +60,7 @@ JSON_SCRIPT = SRC_DIR / "generate_analysis_json.py"
 HISTORY_SCRIPT = SRC_DIR / "update_baseline_history.py"
 
 BASELINE_BUILD_SCRIPT = SRC_DIR / "build_baseline_from_history.py"
+ROI_TEMP_DIR = OUTPUT_DIR / "analysis_results" / ".roi_tmp"
 
 
 # =========================================================
@@ -415,6 +419,34 @@ def find_existing_analysis_result(inputs):
                 f"{key}: 기존={existing.get(key)!r}, 요청={value!r}"
             )
 
+    requested_roi = inputs.get("roi_request")
+    requested_roi_config = (
+        [area.to_dict() for area in requested_roi.roi_areas]
+        if requested_roi is not None
+        else None
+    )
+    existing_space = existing.get("space_analysis")
+    existing_roi_config = None
+    if isinstance(existing_space, dict):
+        roi_results = existing_space.get("roi_results")
+        if isinstance(roi_results, list):
+            existing_roi_config = [
+                {
+                    key: item.get(key)
+                    for key in (
+                        "roi_id", "roi_name", "roi_type",
+                        "x", "y", "width", "height",
+                    )
+                }
+                for item in roi_results
+                if isinstance(item, dict)
+            ]
+
+    if existing_roi_config != requested_roi_config:
+        mismatches.append(
+            "roi_areas: 기존 ROI 설정과 현재 요청 ROI 설정이 다릅니다."
+        )
+
     if mismatches:
         raise AnalysisIdConflictError(
             "동일 analysis_id가 다른 분석 정보에 이미 사용되었습니다. "
@@ -504,6 +536,12 @@ def get_pipeline_inputs():
         "--recorded-at-source",
         default="REQUEST_TIME",
         help="촬영 시각 출처: CAMERA, FILE_METADATA 또는 REQUEST_TIME",
+    )
+
+    parser.add_argument(
+        "--roi-request-json",
+        default=None,
+        help="선택적 ROI 요청 JSON 파일 경로",
     )
 
     parser.add_argument(
@@ -637,6 +675,24 @@ def get_pipeline_inputs():
         else (INPUT_DIR / f"{prefix}_history.json").resolve()
     )
 
+    roi_request_path = (
+        resolve_path(args.roi_request_json)
+        if args.roi_request_json
+        else None
+    )
+    roi_request = None
+    if roi_request_path is not None:
+        try:
+            with roi_request_path.open("r", encoding="utf-8-sig") as file:
+                roi_raw = json.load(file)
+            roi_request = parse_roi_request(
+                roi_raw,
+                expected_camera_id=camera_id,
+            )
+        except (OSError, json.JSONDecodeError, RoiValidationError) as error:
+            if input_error is None:
+                input_error = f"ROI 요청이 올바르지 않습니다: {error}"
+
     return {
         "current_video_path": current_video_path,
         "baseline_csv_path": baseline_csv_path,
@@ -653,6 +709,8 @@ def get_pipeline_inputs():
         ),
         "recorded_at_source": recorded_at_source,
         "time_slot": time_slot,
+        "roi_request_path": roi_request_path,
+        "roi_request": roi_request,
         "input_error": input_error,
     }
 
@@ -1021,6 +1079,33 @@ def main():
         sys.exit(1)
 
     # -----------------------------------------------------
+    # STEP 2.5. 선택적 ROI 공간분석 (기존 Tracking 재사용)
+    # -----------------------------------------------------
+    roi_temp_path = None
+    if inputs["roi_request"] is not None:
+        PIPELINE_CONTEXT["step_name"] = "ROI_SPACE_ANALYSIS"
+        capture = cv2.VideoCapture(str(current_video_path))
+        try:
+            frame_width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+            frame_height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        finally:
+            capture.release()
+        if frame_width <= 0 or frame_height <= 0:
+            raise ValueError("ROI 분석용 영상 너비/높이를 읽을 수 없습니다.")
+
+        tracking_rows = load_tracking_csv(result_paths["tracking"])
+        space_analysis = analyze_roi_usage(
+            tracking_rows,
+            inputs["roi_request"],
+            frame_width,
+            frame_height,
+        )
+        ROI_TEMP_DIR.mkdir(parents=True, exist_ok=True)
+        roi_temp_path = ROI_TEMP_DIR / f"{inputs['analysis_id']}_space_analysis.json"
+        with roi_temp_path.open("w", encoding="utf-8") as file:
+            json.dump(space_analysis, file, ensure_ascii=False, indent=2, allow_nan=False)
+
+    # -----------------------------------------------------
     # STEP 3. Rolling 피처 추출
     # -----------------------------------------------------
     PIPELINE_CONTEXT["step_name"] = "FEATURE_EXTRACTION"
@@ -1101,6 +1186,11 @@ def main():
         "--change-summary-csv",
         str(change_summary_for_json),
     ]
+    if roi_temp_path is not None:
+        json_arguments.extend([
+            "--space-analysis-json",
+            make_path_argument(roi_temp_path),
+        ])
 
     run_step(
         5,
@@ -1108,6 +1198,9 @@ def main():
         JSON_SCRIPT,
         json_arguments,
     )
+
+    if roi_temp_path is not None:
+        roi_temp_path.unlink(missing_ok=True)
 
     # -----------------------------------------------------
     # STEP 6. Baseline 이력 누적
@@ -1283,6 +1376,11 @@ if __name__ == "__main__":
 
     except Exception as error:
         failure_output = None
+
+        if PIPELINE_CONTEXT:
+            analysis_id = PIPELINE_CONTEXT.get("inputs", {}).get("analysis_id")
+            if analysis_id:
+                (ROI_TEMP_DIR / f"{analysis_id}_space_analysis.json").unlink(missing_ok=True)
 
         if PIPELINE_CONTEXT:
             try:

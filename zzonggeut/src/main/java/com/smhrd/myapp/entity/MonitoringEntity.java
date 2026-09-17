@@ -1,9 +1,12 @@
-package com.smhrd.myapp.domain.monitoring;
+package com.smhrd.myapp.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
+
+import com.smhrd.myapp.gita.PetActRecordId;
 
 @Entity
 @Table(name = "PET_ACT_RECORD")
@@ -13,15 +16,15 @@ import java.time.LocalDateTime;
 public class MonitoringEntity {
 
     @Id
-    @Column(name = "DTTM")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "DTTM", nullable=false)
     private LocalDateTime dttm;
 
-    @Id
-    @Column(name = "PET_SEQ")
+    @Column(name = "PET_SEQ", nullable=false)
     private Integer petSeq;
 
     @Column(name = "ACT_NAME", length = 10)
-    String actName;
+    private String actName;
 
     @Column(name = "ACT_TIME")
     private Integer actTime;

@@ -1,4 +1,4 @@
-package com.smhrd.myapp.domain.monitoring;
+package com.smhrd.myapp.gita;
 
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

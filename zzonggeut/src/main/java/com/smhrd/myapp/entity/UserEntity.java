@@ -1,4 +1,4 @@
-package com.smhrd.myapp.domain.user;
+package com.smhrd.myapp.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -14,7 +14,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class UserEntity {
+	
+	// USER 테이블
+	
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", length = 10, nullable = false)
     private String id;
 
@@ -26,7 +30,4 @@ public class UserEntity {
 
     @Column(name = "BIRTH")
     private LocalDateTime birth;
-
-    @Column(name = "isReceiveAlarm", length = 1)
-    private char isReceiveAlarm;
 }

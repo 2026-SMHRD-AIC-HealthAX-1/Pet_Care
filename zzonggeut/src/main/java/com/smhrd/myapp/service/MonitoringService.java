@@ -1,4 +1,4 @@
-package com.smhrd.myapp.domain.monitoring;
+package com.smhrd.myapp.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 @Service
 @RequiredArgsConstructor
 public class MonitoringService {
-    private final MonitoringRepository monitoringRepository;
+    //private final MonitoringRepository monitoringRepository;
 
     public String executePythonPipeline() {
         StringBuilder logOutput = new StringBuilder();

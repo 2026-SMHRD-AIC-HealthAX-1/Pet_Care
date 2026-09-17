@@ -1,9 +1,11 @@
-package com.smhrd.myapp.domain.monitoring;
+package com.smhrd.myapp.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.smhrd.myapp.service.MonitoringService;
 
 @RestController
 @RequiredArgsConstructor

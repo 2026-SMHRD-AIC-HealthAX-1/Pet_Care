@@ -1,4 +1,4 @@
-package com.smhrd.myapp.domain.analysis;
+package com.smhrd.myapp.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -6,5 +6,5 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AnalysisService {
-    private final AnalysisRepository analysisRepository;
+    //private final AnalysisRepository analysisRepository;
 }

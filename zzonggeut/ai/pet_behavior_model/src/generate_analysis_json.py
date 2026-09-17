@@ -24,7 +24,7 @@ OUTPUT_DIR = (
 SCHEMA_PATH = (
     PROJECT_ROOT
     / "schemas"
-    / "analysis_result.schema.json"
+    / "analysis_result_v1.2.schema.json"
 )
 
 RESULT_DIR = (
@@ -1233,7 +1233,7 @@ def main():
 
     result = {
         "schema_version":
-            "1.1",
+            "1.2",
 
         "analysis_id":
             args.analysis_id,
@@ -1294,7 +1294,7 @@ def main():
 
         "model_info": {
             "pipeline_version":
-                "pet-behavior-v1.1",
+                "pet-behavior-v1.2",
 
             "feature_version":
                 "pet-features-v2.0",

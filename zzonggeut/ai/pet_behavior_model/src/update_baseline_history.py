@@ -27,6 +27,8 @@ from baseline_policy import (
     validate_number,
 )
 
+SUPPORTED_ANALYSIS_SCHEMA_VERSIONS = {"1.1", "1.2"}
+
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = PROJECT_ROOT / "data" / "outputs"
@@ -71,8 +73,11 @@ def validate_analysis_result(data):
         raise BaselinePolicyError(
             "INVALID_ANALYSIS_RESULT", "필수 필드가 누락되었습니다: " + ", ".join(missing)
         )
-    if data["schema_version"] != SCHEMA_VERSION:
-        raise BaselinePolicyError("INVALID_ANALYSIS_RESULT", "schema_version은 1.1이어야 합니다.")
+    if data["schema_version"] not in SUPPORTED_ANALYSIS_SCHEMA_VERSIONS:
+        raise BaselinePolicyError(
+            "INVALID_ANALYSIS_RESULT",
+            "분석 결과 schema_version은 1.1 또는 1.2여야 합니다.",
+        )
 
     quality = data["tracking_quality"]
     change_detection = data["change_detection"]

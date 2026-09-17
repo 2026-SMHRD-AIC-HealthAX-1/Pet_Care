@@ -2,7 +2,6 @@ import asyncio
 import json
 import os
 import re
-import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -11,7 +10,28 @@ from typing import Optional
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 
-from roi_models import RoiValidationError, parse_roi_request
+try:
+    from .pet_behavior_analyzer import (
+        AnalysisConflictError,
+        AnalyzerInputError,
+        PetBehaviorAnalyzer,
+        PipelineExecutionError,
+        ResultIdentityMismatchError,
+        ResultReadError,
+        ResultSchemaError,
+    )
+    from .roi_models import RoiValidationError, parse_roi_request
+except ImportError:
+    from pet_behavior_analyzer import (
+        AnalysisConflictError,
+        AnalyzerInputError,
+        PetBehaviorAnalyzer,
+        PipelineExecutionError,
+        ResultIdentityMismatchError,
+        ResultReadError,
+        ResultSchemaError,
+    )
+    from roi_models import RoiValidationError, parse_roi_request
 
 
 # =========================================================
@@ -50,6 +70,7 @@ IDENTIFIER_PATTERN = re.compile(
 # 현재 파이프라인은 영상별 중간 결과 파일을 생성하므로
 # MVP에서는 분석 요청을 한 번에 하나씩 처리한다.
 ANALYSIS_LOCK = asyncio.Lock()
+ANALYZER = PetBehaviorAnalyzer(base_dir=BASE_DIR)
 
 SPRING_RESULT_URL = os.getenv(
     "SPRING_RESULT_URL",
@@ -68,7 +89,7 @@ app = FastAPI(
         "반려동물 영상을 분석하고 "
         "통합 분석 결과 JSON을 반환하는 모델 API"
     ),
-    version="1.1.0",
+    version="1.2.0",
 )
 
 
@@ -371,7 +392,7 @@ async def health_check():
     return {
         "status": "UP",
         "service": "pet-behavior-model-api",
-        "version": "1.1.0",
+        "version": "1.2.0",
         "pipeline_ready": PIPELINE_SCRIPT.is_file(),
     }
 
@@ -444,28 +465,7 @@ async def analyze_video(
         / f"{analysis_id}_result.json"
     )
 
-    # 동일 요청이 이미 완료됐다면 기존 결과를 반환한다.
-    existing_result = check_existing_result(
-        result_path=result_path,
-        analysis_id=analysis_id,
-        pet_id=pet_id,
-        video_id=video_id,
-        camera_id=camera_id,
-        species=species,
-        roi_request=roi_request,
-    )
-
-    if existing_result is not None:
-        await deliver_result_to_spring(existing_result)
-
-        return JSONResponse(
-            status_code=200,
-            content=existing_result,
-            headers={
-                "X-Analysis-Reused": "true",
-                "X-Spring-Delivery": "delivered",
-            },
-        )
+    result_reused = result_path.is_file()
 
     # 중간 CSV 파일명이 영상명으로 생성되므로
     # analysis_id를 사용해 요청별 영상명을 고유하게 만든다.
@@ -479,119 +479,67 @@ async def analyze_video(
         upload_path,
     )
 
-    command = [
-        sys.executable,
-        str(PIPELINE_SCRIPT),
-        str(upload_path),
-        species,
-        "--analysis-id",
-        analysis_id,
-        "--pet-id",
-        pet_id,
-        "--video-id",
-        video_id,
-        "--camera-id",
-        camera_id,
-        "--recorded-at",
-        recorded_at,
-        "--recorded-at-source",
-        recorded_at_source.strip().upper(),
-    ]
-
-    if time_slot and time_slot.strip():
-        command.extend([
-            "--time-slot",
-            time_slot.strip(),
-        ])
-
-    roi_request_path = None
-    if roi_request is not None:
-        roi_request_path = UPLOAD_DIR / f"{analysis_id}_roi_request.json"
-        roi_request_path.write_text(
-            json.dumps({
-                "camera_id": roi_request.camera_id,
-                "roi_areas": canonical_roi_config(roi_request),
-            }, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
-        command.extend(["--roi-request-json", str(roi_request_path)])
-
     try:
         async with ANALYSIS_LOCK:
-            process = await asyncio.create_subprocess_exec(
-                *command,
-                cwd=str(BASE_DIR),
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.STDOUT,
-            )
-
-            output_bytes, _ = await process.communicate()
-
-        pipeline_output = output_bytes.decode(
-            "utf-8",
-            errors="replace",
-        )
-
-        # 실패 분석도 run_pipeline.py에서 FAILED 결과 JSON을 생성하므로
-        # 결과 파일이 있으면 정상적인 분석 응답으로 반환한다.
-        if result_path.is_file():
-            result = load_result_json(result_path)
-
-            expected_identity = {
-                "analysis_id": analysis_id,
-                "pet_id": pet_id,
-                "video_id": video_id,
-                "camera_id": camera_id,
-                "species": species.upper(),
-            }
-
-            for field_name, expected_value in expected_identity.items():
-                if result.get(field_name) != expected_value:
-                    raise HTTPException(
-                        status_code=500,
-                        detail={
-                            "code": "RESULT_IDENTITY_MISMATCH",
-                            "message": (
-                                "생성된 분석 결과의 식별정보가 "
-                                "요청 정보와 일치하지 않습니다."
-                            ),
-                            "field": field_name,
-                        },
-                    )
-
-            await deliver_result_to_spring(result)
-
-            return JSONResponse(
-                status_code=200,
-                content=result,
-                headers={
-                    "X-Pipeline-Return-Code": str(
-                        process.returncode
-                    ),
-                    "X-Analysis-Reused": "false",
-                    "X-Spring-Delivery": "delivered",
-                },
-            )
-
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "code": "ANALYSIS_RESULT_NOT_CREATED",
-                "message": (
-                    "파이프라인 실행 후 결과 JSON이 "
-                    "생성되지 않았습니다."
+            result = await asyncio.to_thread(
+                ANALYZER.analyze,
+                video_path=upload_path,
+                analysis_id=analysis_id,
+                pet_id=pet_id,
+                video_id=video_id,
+                camera_id=camera_id,
+                species=species,
+                recorded_at=recorded_at,
+                recorded_at_source=recorded_at_source,
+                time_slot=time_slot,
+                roi_data=(
+                    {
+                        "camera_id": roi_request.camera_id,
+                        "roi_areas": canonical_roi_config(roi_request),
+                    }
+                    if roi_request is not None
+                    else None
                 ),
-                "pipeline_return_code": process.returncode,
-                "pipeline_output": pipeline_output[-4000:],
+            )
+        await deliver_result_to_spring(result)
+
+        return JSONResponse(
+            status_code=200,
+            content=result,
+            headers={
+                "X-Analysis-Reused": str(result_reused).lower(),
+                "X-Spring-Delivery": "delivered",
             },
         )
+
+    except (AnalyzerInputError, RoiValidationError) as error:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "INVALID_REQUEST", "message": str(error)},
+        ) from error
+
+    except AnalysisConflictError as error:
+        raise HTTPException(
+            status_code=409,
+            detail={"code": "ANALYSIS_ID_CONFLICT", "message": str(error)},
+        ) from error
+
+    except ResultIdentityMismatchError as error:
+        raise HTTPException(
+            status_code=500,
+            detail={"code": "RESULT_IDENTITY_MISMATCH", "message": str(error)},
+        ) from error
+
+    except (PipelineExecutionError, ResultReadError, ResultSchemaError) as error:
+        raise HTTPException(
+            status_code=500,
+            detail={"code": "ANALYSIS_EXECUTION_ERROR", "message": str(error)},
+        ) from error
 
     finally:
         # 분석에 사용한 임시 업로드 영상만 제거한다.
         # 분석 결과 JSON과 CSV 파일은 유지한다.
         upload_path.unlink(missing_ok=True)
-        if roi_request_path is not None:
-            roi_request_path.unlink(missing_ok=True)
 
 
 # =========================================================

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원 정보 수정 - 쫑긋</title>
+  <link rel="stylesheet" href="../css/dashboardStyle.css">
+  <style>
+    /* 전체 기본 설정 및 레이아웃 보장 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #f8f9fa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #333;
+    }
+
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 30px auto 60px;
+      padding: 0 20px;
+    }
+
+    /* 상단 프로필 카드 스타일 */
+    .mypage-top-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 28px 32px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .user-profile-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .user-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background-color: #eef7f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+
+    .user-details h2 {
+      font-size: 20px;
+      color: #222;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      background-color: #e6f4f4;
+      color: #0b8484;
+    }
+
+    .user-details p {
+      font-size: 13px;
+      color: #777;
+    }
+
+    .user-stats-summary {
+      display: flex;
+      gap: 32px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-item .stat-title {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 4px;
+    }
+
+    .stat-item .stat-value {
+      font-size: 20px;
+      font-weight: bold;
+      color: #0b8484;
+    }
+
+    /* 2열 그리드 레이아웃 */
+    .mypage-grid {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* 좌측 사이드바 메뉴 */
+    .mypage-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid #f0f0f0;
+      color: #444;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .menu-btn:hover,
+    .menu-btn.active {
+      background-color: #eef7f6;
+      color: #0b8484;
+      border-color: #0b8484;
+      font-weight: bold;
+    }
+
+    /* 우측 메인 카드 */
+    .dash-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .card-header {
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .card-header h3 {
+      font-size: 18px;
+      color: #222;
+    }
+
+    /* 회원 정보 수정 폼 영역 */
+    .form-container {
+      max-width: 560px;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #0b8484;
+    }
+
+    /* 읽기 전용(수정 불가) 입력창 스타일 */
+    .form-input[readonly] {
+      background-color: #f4f5f7;
+      color: #777;
+      cursor: not-allowed;
+      border-color: #e5e7eb;
+    }
+
+    .input-hint {
+      font-size: 12px;
+      color: #888;
+      margin-top: 6px;
+    }
+
+    /* 휴대폰 번호 인증 관련 그룹 */
+    .input-with-btn {
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-with-btn .form-input {
+      flex: 1;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #f7f7f7;
+    }
+
+    /* 버튼 스타일 */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .primary-btn {
+      background-color: #0b8484;
+      color: #fff;
+    }
+
+    .primary-btn:hover {
+      background-color: #096b6b;
+    }
+
+    .outline-btn {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      color: #666;
+    }
+
+    .outline-btn:hover {
+      background-color: #f5f5f5;
+    }
+
+    .sub-btn {
+      background-color: #eef7f6;
+      color: #0b8484;
+      border: 1px solid #0b8484;
+      white-space: nowrap;
+    }
+
+    .sub-btn:hover {
+      background-color: #0b8484;
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 1. 상단 네비게이션 바 -->
+  <header class="navbar">
+    <div class="logo">
+      <a href="main.html">
+        <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      </a>
+    </div>
+    <nav class="nav-links">
+      <a href="dashboard.html">대시보드</a>
+      <a href="live-view.html">실시간 모니터링</a>
+      <a href="behavior-log.html">행동 분석</a>
+      <a href="pet-management.html">반려동물 관리</a>
+      <a href="activity-report.html">리포트</a>
+    </nav>
+    <div class="nav-utils">
+      <button class="icon-btn" id="alarmBtn">🔔</button>
+      <button class="icon-btn" id="profileBtn">👤</button>
+      <select class="pet-select">
+        <option value="1">우리 강아지 🐶</option>
+        <option value="2">우리 고양이 🐱</option>
+      </select>
+    </div>
+  </header>
+
+  <main class="dashboard-container">
+
+    <!-- 상단: 사용자 기본 정보 요약 -->
+    <section class="mypage-top-card">
+      <div class="user-profile-info">
+        <div class="user-avatar">👤</div>
+        <div class="user-details">
+          <h2>김쫑긋 님 <span class="badge">PRO 멤버십</span></h2>
+          <p>jonggeut@example.com · 010-1234-5678</p>
+        </div>
+      </div>
+
+      <div class="user-stats-summary">
+        <div class="stat-item">
+          <div class="stat-title">✏️ 나의 게시글</div>
+          <div class="stat-value">5 건</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-title">💬 나의 문의글</div>
+          <div class="stat-value">1 건</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 메인 그리드 영역 -->
+    <div class="mypage-grid">
+
+      <!-- 좌측 사이드 메뉴 -->
+      <aside class="mypage-menu">
+        <a href="myPage.html#profile" class="menu-btn active">👤 계정 관리 & 회원정보</a>
+        <a href="myPage.html#notification" class="menu-btn">🔔 알림 설정</a>
+        <a href="myPage.html#subscription" class="menu-btn">💳 구독 관리</a>
+        <a href="myPage.html#notice" class="menu-btn">📢 공지사항</a>
+        <a href="myPage.html#activity" class="menu-btn">📝 나의 활동 & 문의</a>
+      </aside>
+
+      <!-- 우측 메인 콘텐츠 영역 -->
+      <section class="mypage-content">
+        <div class="dash-card">
+          <div class="card-header">
+            <h3>⚙️ 회원 정보 수정</h3>
+          </div>
+
+          <div class="form-container">
+            <form id="editProfileForm">
+              <!-- 이메일 (변경 불가) -->
+              <div class="form-group">
+                <label for="userEmail">이메일 (아이디)</label>
+                <input type="email" id="userEmail" class="form-input" value="jonggeut@example.com" readonly>
+                <div class="input-hint">이메일 계정은 변경할 수 없습니다.</div>
+              </div>
+
+              <!-- 이름 수정 -->
+              <div class="form-group">
+                <label for="userName">이름</label>
+                <input type="text" id="userName" class="form-input" value="김쫑긋" required>
+              </div>
+
+              <!-- 휴대폰 번호 수정 -->
+              <div class="form-group">
+                <label for="userPhone">휴대폰 번호</label>
+                <div class="input-with-btn">
+                  <input type="tel" id="userPhone" class="form-input" value="010-1234-5678" required>
+                  <button type="button" class="btn sub-btn" id="verifyPhoneBtn">본인 인증</button>
+                </div>
+                <div class="input-hint">번호 변경 시 휴대폰 본인 인증이 필요합니다.</div>
+              </div>
+
+              <!-- 하단 버튼 영역 -->
+              <div class="form-actions">
+                <a href="myPage.html" class="btn outline-btn">취소</a>
+                <button type="submit" class="btn primary-btn">저장하기</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- 하단 푸터 -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p>© 2026 쫑긋. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // 본인 인증 버튼 이벤트 테스트
+    document.getElementById('verifyPhoneBtn').addEventListener('click', () => {
+      alert('휴대폰 본인 인증 절차를 진행합니다.');
+    });
+
+    // 폼 제출 이벤트
+    document.getElementById('editProfileForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('회원 정보가 성공적으로 수정되었습니다.');
+      window.location.href = 'myPage.html';
+    });
+  </script>
+
+</body>
+
+</html>

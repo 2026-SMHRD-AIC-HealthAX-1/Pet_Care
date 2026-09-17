@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>비밀번호 찾기 - 쫑긋</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', sans-serif;
+    }
+
+    body {
+      background-color: #f7faf9;
+      color: #333;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 40px;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+    }
+
+    /* main.html과 동일한 로고 스타일 추가 */
+    .logo-img {
+      height: 52px;
+      width: auto;
+      display: block;
+    }
+
+    /* 카드 영역 */
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 80px);
+      padding: 40px 20px;
+    }
+
+    .login-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .login-header h2 {
+      font-size: 26px;
+      color: #0b8484;
+      margin-bottom: 8px;
+    }
+
+    .login-header p {
+      font-size: 14px;
+      color: #666;
+    }
+
+    /* 입력 폼 디자인 */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    .form-group input {
+      padding: 12px 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      background-color: #fafafa;
+      transition: all 0.2s ease;
+    }
+
+    .form-group input:focus {
+      border-color: #0b8484;
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(11, 132, 132, 0.1);
+    }
+
+    /* 버튼 */
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background-color: #0b8484;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background-color 0.2s ease;
+    }
+
+    .submit-btn:hover {
+      background-color: #096d6d;
+    }
+
+    /* 하단 링크 영역 */
+    .login-utils {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #f0f0f0;
+      font-size: 13px;
+    }
+
+    .login-utils a {
+      color: #0b8484;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .login-utils a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 1. 상단 네비게이션 바 -->
+  <header class="navbar">
+    <div class="logo">
+      <a href="main.html">
+        <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      </a>
+    </div>
+  </header>
+
+  <!-- 2. 비밀번호 찾기 폼 섹션 -->
+  <main class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h2>비밀번호 찾기</h2>
+        <p>아이디와 이메일을 입력하면 재설정 링크를 보내드려요.</p>
+      </div>
+
+      <form class="login-form">
+        <!-- 아이디 입력 -->
+        <div class="form-group">
+          <label for="userId">아이디</label>
+          <input type="text" id="userId" placeholder="아이디를 입력하세요" required>
+        </div>
+
+        <!-- 이메일 입력 -->
+        <div class="form-group">
+          <label for="userEmail">이메일</label>
+          <input type="email" id="userEmail" placeholder="가입한 이메일을 입력하세요" required>
+        </div>
+
+        <!-- 확인 버튼 -->
+        <button type="submit" class="submit-btn">비밀번호 재설정 메일 보내기</button>
+      </form>
+
+      <!-- 로그인으로 돌아가기 -->
+      <div class="login-utils">
+        <a href="login.html">로그인으로 돌아가기</a>
+      </div>
+    </div>
+  </main>
+
+</body>
+
+</html>

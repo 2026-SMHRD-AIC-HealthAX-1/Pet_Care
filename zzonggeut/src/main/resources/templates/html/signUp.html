@@ -27,29 +27,29 @@
         <p>쫑긋과 함께 반려견/반려묘를 더 스마트하게 케어해보세요.</p>
       </div>
 
-      <form class="signup-form">
+      <form method="post" class="signup-form">
         <!-- 아이디 -->
         <div class="form-group">
           <label for="userId">아이디(이메일 입력)</label>
-          <input type="email" id="userId" placeholder="아이디(이메일)를 입력하세요" required>
+          <input type="email" id="userId" name="id" placeholder="아이디(이메일)를 입력하세요" required>
         </div>
 
         <!-- 비밀번호 -->
         <div class="form-group">
           <label for="userPw">비밀번호</label>
-          <input type="password" id="userPw" placeholder="비밀번호를 입력하세요" required>
+          <input type="password" id="userPw" name="pw" placeholder="비밀번호를 입력하세요" required>
         </div>
 
         <!-- 이름 -->
         <div class="form-group">
           <label for="userName">이름</label>
-          <input type="text" id="userName" placeholder="이름을 입력하세요" required>
+          <input type="text" id="userName" name="name" placeholder="이름을 입력하세요" required>
         </div>
 
         <!-- 휴대폰 번호 -->
         <div class="form-group">
           <label for="userPhone">휴대폰 번호</label>
-          <input type="tel" id="userPhone" placeholder="휴대폰 번호를 입력하세요 (예: 01012345678)" required>
+          <input type="tel" id="userPhone" name="phone" placeholder="휴대폰 번호를 입력하세요 (예: 01012345678)" required>
         </div>
 
         <!-- 가입하기 버튼 -->
@@ -57,7 +57,40 @@
       </form>
     </div>
   </main>
+	
+	<script>
+  		document.querySelector('.signup-form').addEventListener('submit', function(e) {
+     		e.preventDefault(); // 기본 폼 제출(새로고침) 막기
 
+      		// 사용자가 입력한 값 가져오기
+      		const id = document.getElementById('userId').value;
+      		const pw = document.getElementById('userPw').value;
+      		const name = document.getElementById('userName').value;
+      		const phone = document.getElementById('userPhone').value;
+
+      		// API(`/api/users/join`)로 데이터 전송
+      		fetch('/api/users/join', {
+          		method: 'POST',
+          		headers: {
+              		'Content-Type': 'application/x-www-form-urlencoded',
+          		},
+          		body: new URLSearchParams({ id, pw, name, phone })
+      		})
+      		.then(response => {
+          		if (response.ok) {
+              		alert('회원가입이 완료되었습니다!');
+              		location.href = '/main'; // 성공 시 메인 페이지로 이동!
+          		} else {
+              		alert('회원가입에 실패했습니다. 입력 정보를 확인해주세요.');
+          		}
+      		})
+      		.catch(error => {
+          		console.error('에러 발생:', error);
+          		alert('서버 통신 중 에러가 발생했습니다.');
+      		});
+  		});
+	</script>
+	
 </body>
 
 </html>

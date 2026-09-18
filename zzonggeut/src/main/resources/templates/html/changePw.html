@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
@@ -270,13 +270,13 @@
   <!-- 1. 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <a href="main.html">
+      <a href="/main">
         <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
     <nav class="nav-links">
-      <a href="dashboard.html">대시보드</a>
-      <a href="report.html">리포트</a>
+      <a href="/dashboard">대시보드</a>
+      <a href="/report">리포트</a>
     </nav>
     <div class="nav-utils">
       <button class="icon-btn" id="alarmBtn">🔔</button>
@@ -295,8 +295,14 @@
       <div class="user-profile-info">
         <div class="user-avatar">👤</div>
         <div class="user-details">
-          <h2>김쫑긋 님 <span class="badge">PRO 멤버십</span></h2>
-          <p>jonggeut@example.com · 010-1234-5678</p>
+          <h2>
+          	<span th:text="${session.loginUser.name}"></span> 님 
+          	<span class="badge">PRO 멤버십</span>
+          </h2>
+          <p>
+          	<span th:text="${session.loginUser.id}">email@test.com</span> · 
+          	<span th:text="${session.loginUser.phone}">010-0000-0000</span>
+          </p>
         </div>
       </div>
 
@@ -317,7 +323,7 @@
 
       <!-- 좌측: 사이드 메뉴 -->
       <aside class="mypage-menu">
-        <a href="myPage.html#profile" class="menu-btn active">👤 계정 관리 & 회원정보</a>
+        <a href="/mypage" class="menu-btn active">👤 계정 관리 & 회원정보</a>
         <a href="myPage.html#notification" class="menu-btn">🔔 알림 설정</a>
         <a href="myPage.html#subscription" class="menu-btn">💳 구독 관리</a>
         <a href="myPage.html#notice" class="menu-btn">📢 공지사항</a>
@@ -341,26 +347,26 @@
               </ul>
             </div>
 
-            <form id="passwordForm">
+            <form id="passwordForm" action="/api/users/password/update" method="post">
               <div class="form-group">
                 <label for="currentPassword">현재 비밀번호</label>
-                <input type="password" id="currentPassword" class="form-input" placeholder="현재 비밀번호를 입력해 주세요" required>
+                <input type="password" id="currentPassword" name="currentPassword" class="form-input" placeholder="현재 비밀번호를 입력해 주세요" required>
               </div>
 
               <div class="form-group">
                 <label for="newPassword">새 비밀번호</label>
-                <input type="password" id="newPassword" class="form-input" placeholder="새 비밀번호 (8~20자 영문, 숫자, 특수문자 조합)" required>
+                <input type="password" id="newPassword" name="newPassword" class="form-input" placeholder="새 비밀번호 (8~20자 영문, 숫자, 특수문자 조합)" required>
                 <div class="input-hint">8~20자 이내의 영문, 숫자, 특수문자를 조합하여 입력해 주세요.</div>
               </div>
 
               <div class="form-group">
                 <label for="confirmPassword">새 비밀번호 확인</label>
-                <input type="password" id="confirmPassword" class="form-input" placeholder="새 비밀번호를 한 번 더 입력해 주세요" required>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" placeholder="새 비밀번호를 한 번 더 입력해 주세요" required>
                 <div id="matchMessage" class="validation-msg"></div>
               </div>
 
               <div class="form-actions">
-                <a href="myPage.html" class="btn outline-btn" style="text-decoration: none;">취소</a>
+                <a href="/mypage" class="btn outline-btn" style="text-decoration: none;">취소</a>
                 <button type="submit" class="btn primary-btn">비밀번호 변경 완료</button>
               </div>
             </form>
@@ -378,18 +384,43 @@
     </div>
   </footer>
 
-  <script>
+  <script th:inline="javascript">
+    const currentPw = document.getElementById('currentPassword');
     const newPw = document.getElementById('newPassword');
     const confirmPw = document.getElementById('confirmPassword');
     const matchMsg = document.getElementById('matchMessage');
     const form = document.getElementById('passwordForm');
 
-    function checkPasswordMatch() {
+    // 새 비밀번호 입력창 아래에 기존 비밀번호 중복 경고를 띄울 요소 생성
+    const newPwGroup = newPw.closest('.form-group');
+    let duplicateMsg = document.getElementById('duplicateMessage');
+    if (!duplicateMsg) {
+      duplicateMsg = document.createElement('div');
+      duplicateMsg.id = 'duplicateMessage';
+      duplicateMsg.className = 'validation-msg';
+      newPwGroup.appendChild(duplicateMsg);
+    }
+
+    // 실시간 검증 함수
+    function checkPasswordValidation() {
+      // 1. 기존 비밀번호와 새 비밀번호가 같은지 검사
+      if (currentPw.value && newPw.value && currentPw.value === newPw.value) {
+        duplicateMsg.textContent = '✕ 기존 비밀번호와 동일한 비밀번호입니다. 다시 확인해 주세요.';
+        duplicateMsg.className = 'validation-msg error';
+      } else {
+        duplicateMsg.textContent = '';
+        duplicateMsg.className = 'validation-msg';
+      }
+
+      // 2. 새 비밀번호 확인란 검사 (여기가 핵심!)
       if (!confirmPw.value) {
-        matchMsg.style.display = 'none';
+        matchMsg.style.display = 'none'; // 입력값이 없으면 숨김
+        matchMsg.textContent = '';
         return;
       }
 
+      // 값이 있다면 무조건 보이게 하고 일치 여부 판단
+      matchMsg.style.display = 'block'; 
       if (newPw.value === confirmPw.value) {
         matchMsg.textContent = '✓ 비밀번호가 일치합니다.';
         matchMsg.className = 'validation-msg success';
@@ -399,21 +430,40 @@
       }
     }
 
-    newPw.addEventListener('input', checkPasswordMatch);
-    confirmPw.addEventListener('input', checkPasswordMatch);
+    // 이벤트 리스너 연결
+    currentPw.addEventListener('input', checkPasswordValidation);
+    newPw.addEventListener('input', checkPasswordValidation);
+    confirmPw.addEventListener('input', checkPasswordValidation);
 
+    // 폼 제출 시 최종 방어
     form.addEventListener('submit', (e) => {
-      e.preventDefault();
+      if (currentPw.value === newPw.value) {
+        e.preventDefault();
+        alert('기존 비밀번호와 동일한 비밀번호로 변경할 수 없습니다.');
+        newPw.focus();
+        return;
+      }
 
       if (newPw.value !== confirmPw.value) {
+        e.preventDefault();
         alert('새 비밀번호가 일치하지 않습니다. 다시 확인해 주세요.');
         confirmPw.focus();
         return;
       }
-
-      alert('비밀번호가 성공적으로 변경되었습니다. 마이페이지로 이동합니다.');
-      window.location.href = 'myPage.html';
     });
+
+    // 서버에서 전달된 메시지 알럿 띄우기
+    /*<![CDATA[*/
+    var errorMessage = /*[[${errorMessage}]]*/ null;
+    var successMessage = /*[[${successMessage}]]*/ null;
+
+    if (errorMessage) {
+      alert(errorMessage);
+    }
+    if (successMessage) {
+      alert(successMessage);
+    }
+    /*]]>*/
   </script>
 
 </body>

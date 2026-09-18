@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
@@ -155,34 +155,70 @@
   <!-- 2. 아이디 찾기 폼 섹션 -->
   <main class="login-container">
     <div class="login-card">
-      <div class="login-header">
-        <h2>아이디 찾기</h2>
-        <p>가입 시 등록한 정보로 아이디를 확인해보세요.</p>
-      </div>
-
-      <form class="login-form">
-        <!-- 이름 입력 -->
-        <div class="form-group">
-          <label for="userName">이름</label>
-          <input type="text" id="userName" placeholder="이름을 입력하세요" required>
+      
+      <!-- [경우 1] 아직 아이디를 찾기 전 (입력 폼) -->
+      <div th:if="${foundId == null}">
+        <div class="login-header">
+          <h2>아이디 찾기</h2>
+          <p>가입 시 등록한 정보로 아이디를 확인해보세요.</p>
         </div>
 
-        <!-- 이메일 입력 -->
-        <div class="form-group">
-          <label for="userEmail">이메일</label>
-          <input type="email" id="userEmail" placeholder="가입한 이메일을 입력하세요" required>
+        <form class="login-form" action="/api/users/find-id/process" method="POST">
+          <!-- 이름 입력 -->
+          <div class="form-group">
+            <label for="userName">이름</label>
+            <input type="text" id="userName" name="name" placeholder="이름을 입력하세요" required>
+          </div>
+
+          <!-- 전화번호 입력 -->
+          <div class="form-group">
+            <label for="userPhone">전화번호</label>
+            <input type="text" id="userPhone" name="phone" placeholder="'-' 없이 번호만 입력" required>
+          </div>
+
+          <!-- 확인 버튼 -->
+          <button type="submit" class="submit-btn">아이디 찾기</button>
+        </form>
+
+        <!-- 로그인으로 돌아가기 -->
+        <div class="login-utils">
+          <a href="/login">로그인으로 돌아가기</a>
+        </div>
+      </div>
+
+      <!-- [경우 2] 아이디를 성공적으로 찾은 후 (결과 화면) -->
+      <div th:if="${foundId != null}" style="text-align: center;">
+        <div class="login-header">
+          <h2>아이디 찾기 완료</h2>
+          <p>회원님의 정보와 일치하는 아이디입니다.</p>
         </div>
 
-        <!-- 확인 버튼 -->
-        <button type="submit" class="submit-btn">아이디 찾기</button>
-      </form>
+        <!-- 아이디를 보여주는 박스 -->
+        <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin: 24px 0;">
+          <p style="font-size: 14px; color: #166534; margin-bottom: 6px;">아이디</p>
+          <p style="font-size: 18px; font-weight: bold; color: #15803d;" th:text="${foundId}">test@test.com</p>
+        </div>
 
-      <!-- 로그인으로 돌아가기 -->
-      <div class="login-utils">
-        <a href="login.html">로그인으로 돌아가기</a>
+        <!-- 로그인하러 가기 버튼 -->
+        <a href="/login" class="submit-btn" style="display: block; text-decoration: none; line-height: normal; box-sizing: border-box;">로그인하러 가기</a>
+
+        <!-- 로그인으로 돌아가기 -->
+        <div class="login-utils">
+          <a href="/login">로그인으로 돌아가기</a>
+        </div>
       </div>
+
     </div>
   </main>
+  
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    var errorMessage = /*[[${errorMessage}]]*/ null;
+    if (errorMessage) {
+      alert(errorMessage);
+    }
+    /*]]>*/
+  </script>
 
 </body>
 

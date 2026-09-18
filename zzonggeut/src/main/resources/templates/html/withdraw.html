@@ -133,7 +133,7 @@
       </div>
 
       <!-- 비밀번호 확인 폼 -->
-      <form class="withdraw-form" action="#" method="POST">
+      <form class="withdraw-form" action="/api/users/withdraw/process" method="POST">
         <div class="form-group">
           <label for="password">비밀번호 확인</label>
           <input type="password" id="password" name="password" placeholder="현재 비밀번호를 입력해 주세요" required>
@@ -145,7 +145,7 @@
         </div>
 
         <div class="button-group">
-          <a href="myPage.html" class="btn-cancel">취소</a>
+          <a href="/mypage" class="btn-cancel">취소</a>
           <button type="submit" class="btn-withdraw">탈퇴하기</button>
         </div>
       </form>
@@ -185,6 +185,15 @@
       <p>© 2026 쫑긋. All rights reserved.</p>
     </div>
   </footer>
+  
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    var errorMessage = /*[[${errorMessage}]]*/ null;
+    if (errorMessage) {
+      alert(errorMessage);
+    }
+    /*]]>*/
+  </script>
 
 </body>
 

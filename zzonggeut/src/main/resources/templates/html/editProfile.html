@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
@@ -273,12 +273,12 @@
   <!-- 1. 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <a href="main.html">
+      <a href="/main">
         <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
     <nav class="nav-links">
-      <a href="dashboard.html">대시보드</a>
+      <a href="/dashboard">대시보드</a>
       <a href="live-view.html">실시간 모니터링</a>
       <a href="behavior-log.html">행동 분석</a>
       <a href="pet-management.html">반려동물 관리</a>
@@ -286,7 +286,7 @@
     </nav>
     <div class="nav-utils">
       <button class="icon-btn" id="alarmBtn">🔔</button>
-      <button class="icon-btn" id="profileBtn">👤</button>
+      <a href="/mypage" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
       <select class="pet-select">
         <option value="1">우리 강아지 🐶</option>
         <option value="2">우리 고양이 🐱</option>
@@ -301,8 +301,14 @@
       <div class="user-profile-info">
         <div class="user-avatar">👤</div>
         <div class="user-details">
-          <h2>김쫑긋 님 <span class="badge">PRO 멤버십</span></h2>
-          <p>jonggeut@example.com · 010-1234-5678</p>
+          <h2>
+          	<span th:text="${loginUser.name}"></span> 님
+          	<span class="badge">PRO 멤버십</span>
+          </h2>
+          <p>
+          	<span th:text="${loginUser.id}"></span> &nbsp;·&nbsp; 
+            <span th:text="${loginUser.phone}"></span>
+		  </p>
         </div>
       </div>
 
@@ -323,11 +329,11 @@
 
       <!-- 좌측 사이드 메뉴 -->
       <aside class="mypage-menu">
-        <a href="myPage.html#profile" class="menu-btn active">👤 계정 관리 & 회원정보</a>
-        <a href="myPage.html#notification" class="menu-btn">🔔 알림 설정</a>
-        <a href="myPage.html#subscription" class="menu-btn">💳 구독 관리</a>
-        <a href="myPage.html#notice" class="menu-btn">📢 공지사항</a>
-        <a href="myPage.html#activity" class="menu-btn">📝 나의 활동 & 문의</a>
+        <a href="/mypage#profile" class="menu-btn active">👤 계정 관리 & 회원정보</a>
+        <a href="/mypage#notification" class="menu-btn">🔔 알림 설정</a>
+        <a href="/mypage#subscription" class="menu-btn">💳 구독 관리</a>
+        <a href="/mypage#notice" class="menu-btn">📢 공지사항</a>
+        <a href="/mypage#activity" class="menu-btn">📝 나의 활동 & 문의</a>
       </aside>
 
       <!-- 우측 메인 콘텐츠 영역 -->
@@ -338,25 +344,25 @@
           </div>
 
           <div class="form-container">
-            <form id="editProfileForm">
+            <form id="editProfileForm" action="/api/users/update" method="post">
               <!-- 이메일 (변경 불가) -->
               <div class="form-group">
                 <label for="userEmail">이메일 (아이디)</label>
-                <input type="email" id="userEmail" class="form-input" value="jonggeut@example.com" readonly>
+                <input type="email" id="userEmail" name="id" class="form-input" th:value="${loginUser.id}" readonly>
                 <div class="input-hint">이메일 계정은 변경할 수 없습니다.</div>
               </div>
 
               <!-- 이름 수정 -->
               <div class="form-group">
                 <label for="userName">이름</label>
-                <input type="text" id="userName" class="form-input" value="김쫑긋" required>
+                <input type="text" id="userName" name="name" class="form-input" th:value="${loginUser.name}" required>
               </div>
 
               <!-- 휴대폰 번호 수정 -->
               <div class="form-group">
                 <label for="userPhone">휴대폰 번호</label>
                 <div class="input-with-btn">
-                  <input type="tel" id="userPhone" class="form-input" value="010-1234-5678" required>
+                  <input type="tel" id="userPhone" name="phone" class="form-input" th:value="${loginUser.phone}" required>
                   <button type="button" class="btn sub-btn" id="verifyPhoneBtn">본인 인증</button>
                 </div>
                 <div class="input-hint">번호 변경 시 휴대폰 본인 인증이 필요합니다.</div>
@@ -364,7 +370,7 @@
 
               <!-- 하단 버튼 영역 -->
               <div class="form-actions">
-                <a href="myPage.html" class="btn outline-btn">취소</a>
+                <a href="/mypage" class="btn outline-btn">취소</a>
                 <button type="submit" class="btn primary-btn">저장하기</button>
               </div>
             </form>
@@ -384,16 +390,9 @@
   </footer>
 
   <script>
-    // 본인 인증 버튼 이벤트 테스트
+    // 본인 인증 버튼 이벤트 테스트 (이건 남겨두세요!)
     document.getElementById('verifyPhoneBtn').addEventListener('click', () => {
       alert('휴대폰 본인 인증 절차를 진행합니다.');
-    });
-
-    // 폼 제출 이벤트
-    document.getElementById('editProfileForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      alert('회원 정보가 성공적으로 수정되었습니다.');
-      window.location.href = 'myPage.html';
     });
   </script>
 

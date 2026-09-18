@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="[http://www.thymeleaf.org](http://www.thymeleaf.org)">
 
 <head>
   <meta charset="UTF-8">
@@ -338,17 +338,17 @@
   <!-- 1. 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <a href="main.html">
+      <a href="/main">
         <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
     <nav class="nav-links">
-      <a href="dashboard.html">대시보드</a>
-      <a href="activity-report.html">리포트</a>
+      <a href="/dashboard">대시보드</a>
+      <a href="/activity-report">리포트</a>
     </nav>
     <div class="nav-utils">
       <button class="icon-btn" id="alarmBtn">🔔</button>
-      <button class="icon-btn" id="profileBtn">👤</button>
+      <a href="/mypage" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
       <select class="pet-select">
         <option value="1">우리 강아지 🐶</option>
         <option value="2">우리 고양이 🐱</option>
@@ -363,8 +363,14 @@
       <div class="user-profile-info">
         <div class="user-avatar">👤</div>
         <div class="user-details">
-          <h2>김쫑긋 님 <span class="badge live-badge" style="font-size: 11px;">스탠다드 멤버십</span></h2>
-          <p>jonggeut@example.com  ·  010-1234-5678</p>
+          <h2>
+          	<span th:text="${loginUser.name}"></span> 님 
+            <span class="badge live-badge" style="font-size: 11px;">에베베</span>
+          </h2>
+          <p>
+          	<span th:text="${loginUser.id}"></span> &nbsp;·&nbsp; 
+            <span th:text="${loginUser.phone}"></span>
+		  </p>
         </div>
       </div>
 
@@ -395,26 +401,26 @@
         <div class="dash-card section-card" id="profile">
           <div class="card-header">
             <h3>⚙️ 계정 관리 & 회원 정보 수정</h3>
-            <a href="editProfile.html" class="btn primary-btn" style="text-decoration: none; display: inline-block;">회원
+            <a href="/editprofile" class="btn primary-btn" style="text-decoration: none; display: inline-block;">회원
               정보 수정</a>
           </div>
           <table class="data-table">
             <tbody>
               <tr>
                 <th style="width: 20%;">이름</th>
-                <td>김쫑긋</td>
+                <td th:text="${loginUser.name}"></td>
               </tr>
               <tr>
                 <th>아이디(이메일)</th>
-                <td>jonggeut@example.com</td>
+                <td th:text="${loginUser.id}"></td>
               </tr>
               <tr>
                 <th>휴대폰 번호</th>
-                <td>010-1234-5678</td>
+                <td th:text="${loginUser.phone}"></td>
               </tr>
               <tr>
                 <th>비밀번호</th>
-                <td>•••••••••• <a href="changePw.html" class="btn-sm"
+                <td>•••••••••• <a href="/changepw" class="btn-sm"
                     style="margin-left: 10px; text-decoration: none; display: inline-block;">변경</a></td>
               </tr>
             </tbody>
@@ -423,7 +429,7 @@
           <!-- 회원탈퇴 버튼 경로 연결 부분 -->
           <div class="account-actions" style="margin-top: 20px; justify-content: flex-end;">
             <button class="btn outline-btn">로그아웃</button>
-            <a href="withdraw.html" class="btn danger-btn">회원탈퇴</a>
+            <a href="/withdraw" class="btn danger-btn">회원탈퇴</a>
           </div>
         </div>
 
@@ -482,7 +488,7 @@
         <div class="dash-card section-card" id="notice">
           <div class="card-header">
             <h3>📢 공지사항</h3>
-            <a href="notice.html" class="btn-sm" style="text-decoration: none; display: inline-block;">전체보기</a>
+            <a href="/notice" class="btn-sm" style="text-decoration: none; display: inline-block;">전체보기</a>
           </div>
           <div class="list-item">
             <a href="#" class="notice-modal-link" data-target="noticeModal1">[서비스 안내] AI 3.0 업데이트 및 알고리즘 고도화 안내</a>
@@ -498,7 +504,7 @@
         <div class="dash-card section-card" id="activity">
           <div class="card-header">
             <h3>📝 나의 1:1 문의글</h3>
-            <a href="1on1Inquiry.html" class="btn-sm" style="text-decoration: none; display: inline-block;">전체보기</a>
+            <a href="/1on1Inquiry" class="btn-sm" style="text-decoration: none; display: inline-block;">전체보기</a>
           </div>
           <table class="data-table">
             <thead>

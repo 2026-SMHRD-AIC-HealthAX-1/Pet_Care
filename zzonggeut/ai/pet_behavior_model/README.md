@@ -104,6 +104,16 @@ Schema 1.2에서는 기존 ROI 집계값과 함께 접근 이벤트별 `visit_ev
 
 기존 `PetBehaviorAnalyzer.analyze()` UPLOAD 호출은 그대로 유지됩니다.
 
+### LIVE 분석 FPS 기준
+
+현재 MVP 기준 AI 분석 FPS는 **5 FPS**입니다.
+
+카메라 또는 홈캠 영상 자체는 15~30 FPS 등 일반적인 FPS로 송출할 수 있으며,
+AI는 수신된 프레임 중 일부를 샘플링하여 약 5 FPS 기준으로 분석합니다.
+
+현재 개발 PC 환경에서 실시간 처리 성능을 검증한 결과,
+5 FPS를 안정적인 MVP 운영 기준으로 확정했습니다.
+
 ## LIVE Python 메소드 호출
 
 백엔드는 분석별로 하나의 세션을 만들고 프레임을 순서대로 전달한 뒤 종료합니다.
@@ -152,14 +162,15 @@ except Exception:
 검은 프레임으로 기록하여 기존 Tracking이 탐지 누락으로 관찰하게 합니다. 해상도 변경,
 빈 세션, 역순·중복 timestamp, 허용 범위를 넘는 긴 프레임 중단은 예외로 처리합니다.
 
-`finish()`는 임시 LIVE 영상을 닫고 기존 `PetBehaviorAnalyzer.analyze()`를 호출합니다.
-따라서 DOG/CAT Tracking, 5초 피처, ROI, 변화 감지, Schema 1.2 결과 생성은 기존 경로를
-그대로 재사용하며 별도 YOLO/Tracking 구현을 만들지 않습니다. 임시 LIVE 영상은 성공과
-실패 모두에서 제거됩니다.
+`poll_intervals()`를 사용하면 LIVE 세션이 종료되기 전에도 완료된 5초 단위 분석 결과를 조회할 수 있습니다.
 
-현재 LIVE 연결은 프레임을 수신하면서 임시 영상으로 버퍼링하고 세션 종료 후 전체 분석을
-실행하는 1차 구현입니다. 프레임마다 YOLO 결과나 5초 중간 결과를 즉시 반환하는 스트리밍
-추론은 포함하지 않습니다.
+`finish()`는 세션에 누적된 Tracking, 품질, 피처, ROI 결과를 최종 정리한 뒤
+`PetBehaviorAnalyzer.analyze_precomputed()` 경로를 사용하여 Schema 1.2 최종 결과를 생성합니다.
+
+따라서 LIVE 종료 시 YOLO와 Tracking을 다시 실행하지 않으며,
+이미 계산된 LIVE 분석 결과를 그대로 재사용합니다.
+
+임시 LIVE 영상 및 임시 분석 파일은 성공과 실패 모두에서 정리됩니다.
 
 ## Spring 전달 설정
 
@@ -204,6 +215,12 @@ $env:SPRING_RESULT_URL = "http://서버주소:포트/api/ai/analysis-results"
 - 갱신 제외: `STRONG_CHANGE`, `NOT_EVALUATED`
 - 같은 날짜 내부: 완전 구간 수 기반 가중 평균
 - Baseline 계산: 날짜 대표값을 날짜별 동일 가중치로 평균
+Baseline이 아직 준비되지 않은 경우:
+
+`baseline_status = NOT_READY`
+`change_status = NOT_EVALUATED`
+
+이 상태는 오류가 아니라 기준 데이터가 아직 충분히 쌓이지 않은 정상 상태입니다.
 
 신규 자동 파일 prefix:
 

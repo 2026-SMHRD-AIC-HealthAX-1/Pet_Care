@@ -4,7 +4,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Optional
 
-from roi_models import RoiRequest
+try:
+    from .roi_models import RoiRequest
+except ImportError:
+    from roi_models import RoiRequest
 
 
 @dataclass(frozen=True)

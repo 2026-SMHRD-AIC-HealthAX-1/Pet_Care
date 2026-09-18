@@ -10,56 +10,45 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PetEntity {
 
-    @Id
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SEQ", nullable = false)
     private Integer seq;
 
-    @Column(name = "USER_SEQ", nullable = false)
+    @Column(name = "USER_SEQ")
     private Integer user_seq;
     
-    @Column(name = "P_NAME", length = 5, nullable = false)
+    @Column(name = "P_NAME", length = 50)
     private String pName;
 
-    @Column(name = "P_GENDER", length = 3, nullable = false)
-    private char pGender;
+    @Column(name = "P_GENDER", length = 10)
+    private String pGender;
 
-    @Column(name = "P_SPECIES", length = 10, nullable = false)
+    @Column(name = "P_SPECIES", length = 20)
     private String pSpecies;
 
-    @Column(name = "P_AGE", nullable = false)
-    private Integer pAge; // TINYINT 매핑
+    @Column(name = "P_AGE")
+    private Integer pAge;
 
-    @Column(name = "P_WEIGHT", nullable = false)
-    private Integer pWeight;
+    @Column(name = "P_WEIGHT")
+    private Float pWeight;
 
-    @Column(name = "isMule", length = 1, nullable = false)
-    private char isMule;
+    @Column(name = "isMule", length = 10)
+    private String neutered;
     
     @Column(name = "P_SPEC", length = 200)
     private String pSpec;
 
-    @Column(name = "isVaccin_1", length = 1, nullable = false)
-    private char isVaccin_1;
+    // char 대신 Character 사용으로 null 바인딩 에러 방지
+    @Column(name = "isVaccin_1", length = 10)
+    private String isVaccin1;
 
-    @Column(name = "isVaccin_2", length = 1, nullable = false)
-    private char isVaccin_2;
+    @Column(name = "isVaccin_2", length = 10)
+    private String isVaccin2;
     
-    @Column(name = "isVaccin_3", length = 1, nullable = false)
-    private char isVaccin_3;
+    @Column(name = "isVaccin_3", length = 10)
+    private String isVaccin3;
     
-    public PetEntity(String pName, char pGender, String pSpecies, Integer pAge, Integer pWeight,
-                     String pSpec, char isMule, char isVaccin_1, char isVaccin_2, char isVaccin_3) {
-        this.pName = pName;
-        this.pGender = pGender;
-        this.pSpecies = pSpecies;
-        this.pAge = pAge;
-        this.pWeight = pWeight;
-        this.pSpec = pSpec;
-        this.isMule = isMule;
-        this.isVaccin_1 = isVaccin_1;
-        this.isVaccin_2 = isVaccin_2;
-        this.isVaccin_3 = isVaccin_3;
-
-    }
+    @Column(name = "before_Data", length = 500)
+    private String beforeData;
 }

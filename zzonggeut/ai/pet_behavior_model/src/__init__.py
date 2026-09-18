@@ -17,6 +17,8 @@ from .live_analyzer import (
     LiveFrameShapeError,
     LiveFrameTimestampError,
     LivePetBehaviorAnalyzer,
+    LiveDetector,
+    YoloLiveDetector,
     LiveSessionClosedError,
     LiveSessionError,
 )
@@ -35,6 +37,8 @@ __all__ = [
     "FrameSource",
     "UploadFrameSource",
     "LivePetBehaviorAnalyzer",
+    "LiveDetector",
+    "YoloLiveDetector",
     "LiveAnalysisSession",
     "LiveSessionError",
     "LiveSessionClosedError",

@@ -186,6 +186,20 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* '내 반려동물' 버튼 디자인 */
+    .pet-btn {
+      padding: 8px 16px;
+      /* 기존 10px 18px -> 8px 16px로 수정 */
+      border-radius: 8px;
+      background-color: #0b8484;
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.2s;
+    }
   </style>
 </head>
 
@@ -205,10 +219,7 @@
     <div class="nav-utils">
       <button class="icon-btn" id="alarmBtn">🔔</button>
       <button class="icon-btn" id="profileBtn">👤</button>
-      <select class="pet-select">
-        <option value="1">우리 강아지 🐶</option>
-        <option value="2">우리 고양이 🐱</option>
-      </select>
+      <a href="petManagement.html" class="pet-btn">내 반려동물</a>
     </div>
   </header>
 

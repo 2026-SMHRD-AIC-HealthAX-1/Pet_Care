@@ -6,6 +6,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>개발자에게 문의하기 - 쫑긋</title>
   <link rel="stylesheet" href="../css/contactStyle.css">
+  
+  <!-- '내 반려동물' 버튼 사이즈 및 디자인 고정 스타일 -->
+  <style>
+    .pet-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      background-color: #0b8484;
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.2s;
+    }
+
+    .pet-btn:hover {
+      background-color: #086868;
+    }
+  </style>
 </head>
 
 <body>
@@ -24,7 +43,8 @@
     <div class="nav-utils">
       <button class="icon-btn" id="alarmBtn">🔔</button>
       <a href="myPage.html" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
-      <a href="petManagement.html" class="btn primary-btn">내 반려동물</a>
+      <!-- 수정 위치: primary-btn 대신 pet-btn 클래스 적용 -->
+      <a href="petManagement.html" class="pet-btn">내 반려동물</a>
     </div>
   </header>
 

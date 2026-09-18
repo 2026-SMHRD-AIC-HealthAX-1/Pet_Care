@@ -425,7 +425,7 @@
     .plan-compare-link:hover { text-decoration: underline; }
 
     /* 반려동물 선택 */
-    .pet-list { display: flex; flex-direction: column; gap: 10px; }
+    .pet-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
 
     .pet-card {
       display: flex;
@@ -882,43 +882,12 @@
           <div class="form-section">
             <div class="form-section-title"><span class="ico">🐶</span> 반려동물 선택</div>
             <p class="section-lead">등록된 반려동물 중 이 서비스로 지켜볼 아이를 골라주세요. 여러 마리도 선택할 수 있어요.</p>
-
-            <div class="pet-list" id="petList">
-              <label class="pet-card selected">
-                <input type="checkbox" class="pet-check" data-name="초코" checked>
-                <span class="pet-avatar">🐩</span>
-                <span class="pet-info">
-                  <strong>초코</strong>
-                  <span>강아지 · 남아 · 3살</span>
-                </span>
-                <span class="pet-mark">✓</span>
-              </label>
-
-              <label class="pet-card">
-                <input type="checkbox" class="pet-check" data-name="보리">
-                <span class="pet-avatar">🐕</span>
-                <span class="pet-info">
-                  <strong>보리</strong>
-                  <span>강아지 · 여아 · 7살</span>
-                </span>
-                <span class="pet-mark">✓</span>
-              </label>
-
-              <label class="pet-card">
-                <input type="checkbox" class="pet-check" data-name="하늘">
-                <span class="pet-avatar">🐈</span>
-                <span class="pet-info">
-                  <strong>하늘</strong>
-                  <span>고양이 · 남아 · 5살</span>
-                </span>
-                <span class="pet-mark">✓</span>
-              </label>
-            </div>
-
-            <label class="skip-option">
+<label class="skip-option">
               <input type="checkbox" id="petSkip">
               <span>지금은 선택하지 않고, 가입 후에 지정할게요</span>
             </label>
+
+            <div class="pet-list" id="petList"></div>
 
             <div class="pet-footer">
               <span class="form-hint" id="petCount">1마리 선택됨</span>
@@ -1254,11 +1223,15 @@
 
       const picked = [...petChecks].filter(c => c.checked).map(c => c.dataset.name);
 
+      if (petCount) {
+        petCount.textContent = petSkip.checked
+          ? '가입 후에 지정합니다'
+          : picked.length + '마리 선택됨';
+      }
+
       if (petSkip.checked) {
-        petCount.textContent = '가입 후에 지정합니다';
         sumPets.textContent = '가입 후 지정';
       } else {
-        petCount.textContent = picked.length + '마리 선택됨';
         sumPets.textContent = picked.length ? picked.join(', ') : '선택 안 함';
       }
     }

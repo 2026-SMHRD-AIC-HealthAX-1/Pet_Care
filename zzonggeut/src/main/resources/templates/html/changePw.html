@@ -262,6 +262,23 @@
     .outline-btn:hover {
       background-color: #f5f5f5;
     }
+
+    /* 내 반려동물 단일 버튼 CSS */
+    .pet-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      background-color: #0b8484;
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.2s;
+    }
+
+    .pet-btn:hover {
+      background-color: #086868;
+    }
   </style>
 </head>
 
@@ -281,10 +298,8 @@
     <div class="nav-utils">
       <button class="icon-btn" id="alarmBtn">🔔</button>
       <button class="icon-btn" id="profileBtn">👤</button>
-      <select class="pet-select">
-        <option value="1">우리 강아지 🐶</option>
-        <option value="2">우리 고양이 🐱</option>
-      </select>
+      <!-- 단일 버튼 1개로 교체 -->
+      <a href="petManagement.html" class="pet-btn">내 반려동물</a>
     </div>
   </header>
 

@@ -35,9 +35,17 @@ class LivePetBehaviorAnalyzerTests(unittest.TestCase):
             "schema_version": "1.2",
             "analysis_id": "ANL-LIVE-001",
         }
+        class FakeDetector:
+            def __init__(self):
+                self.count = 0
+            def track(self, frame):
+                self.count += 1
+                return [{"center_x": 16.0 + self.count * 0.2, "center_y": 24.0,
+                         "track_id": 1, "confidence": 0.99, "class_id": 16}]
         self.live = LivePetBehaviorAnalyzer(
             analyzer=self.mock_analyzer,
             temp_root=self.temp_dir.name,
+            detector_factory=lambda species: FakeDetector(),
         )
         self.frame = np.full((48, 64, 3), 127, dtype=np.uint8)
 
@@ -114,6 +122,35 @@ class LivePetBehaviorAnalyzerTests(unittest.TestCase):
         session.abort()
         with self.assertRaises(LiveSessionClosedError):
             session.push_frame(self.frame, 0.1)
+
+    def test_completed_intervals_are_available_before_finish(self):
+        session = self.live.start_session(context=make_context(), expected_fps=10)
+        for index in range(61):
+            session.push_frame(self.frame, index / 10)
+        intervals = session.poll_intervals()
+        self.assertEqual(len(intervals), 1)
+        self.assertEqual(intervals[0]["start_sec"], 0.0)
+        self.assertIn("normalized_moving_speed", intervals[0])
+        self.assertEqual(session.poll_intervals(), [])
+        session.abort()
+
+    def test_multiple_intervals_are_generated_in_order(self):
+        session = self.live.start_session(context=make_context(), expected_fps=10)
+        for index in range(111):
+            session.push_frame(self.frame, index / 10)
+        self.assertEqual([item["start_sec"] for item in session.poll_intervals()], [0.0, 5.0])
+        session.abort()
+
+    def test_open_roi_is_not_mislabeled_video_end_before_finish(self):
+        context = make_context()
+        context = AnalysisContext(**{**context.__dict__, "roi_data": {
+            "camera_id": "CAM-001", "roi_areas": [{"roi_id": "ROI-1", "roi_name": "BED",
+            "roi_type": "RECTANGLE", "x": 0.0, "y": 0.0, "width": 0.6, "height": 1.0}]}})
+        session = self.live.start_session(context=context, expected_fps=10)
+        for index in range(61): session.push_frame(self.frame, index / 10)
+        roi = session.poll_intervals()[0]["space_analysis"]
+        self.assertEqual(roi["roi_results"][0]["visit_events"], [])
+        session.abort()
 
 
 if __name__ == "__main__":

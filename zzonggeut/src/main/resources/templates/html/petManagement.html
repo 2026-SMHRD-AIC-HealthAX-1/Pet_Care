@@ -208,7 +208,7 @@
     <header class="navbar">
         <div class="logo">
             <a href="main.html">
-                <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+                <img src="/assets/logo.png" alt="쫑긋 로고" class="logo-img">
             </a>
         </div>
 
@@ -249,7 +249,7 @@
                     <h3>📋 반려동물 상세 정보</h3>
                 </div>
 
-                <form id="petDetailForm">
+                <form id="petDetailForm" action="/petinsert" method="post">
 
                     <h4 class="form-section-title">📌 기본 정보</h4>
                     <div class="form-grid-3">
@@ -289,7 +289,7 @@
 
                         <div class="form-group">
                             <label for="petWeight">몸무게 (kg)</label>
-                            <input type="number" id="petWeight" class="form-control" step="0.1" placeholder="예: 5.2">
+                            <input type="number" id="petWeight" name="pWeight" class="form-control" step="0.1" placeholder="예: 5.2">
                         </div>
                     </div>
 
@@ -315,7 +315,7 @@
                                 <span>1차 : </span>
                                 <div class="vaccine-options">
                                     <label class="radio-label">
-                                        <input type="radio" name="vaccine1" value="O"> O
+                                        <input type="radio" name="isVaccin1" value="O"> O
                                     </label>
                                     <label class="radio-label">
                                         <input type="radio" name="vaccine1" value="X" checked> X
@@ -326,7 +326,7 @@
                                 <span>2차 : </span>
                                 <div class="vaccine-options">
                                     <label class="radio-label">
-                                        <input type="radio" name="vaccine2" value="O"> O
+                                        <input type="radio" name="isVaccin2" value="O"> O
                                     </label>
                                     <label class="radio-label">
                                         <input type="radio" name="vaccine2" value="X" checked> X
@@ -337,7 +337,7 @@
                                 <span>3차 : </span>
                                 <div class="vaccine-options">
                                     <label class="radio-label">
-                                        <input type="radio" name="vaccine3" value="O"> O
+                                        <input type="radio" name="isVaccin3" value="O"> O
                                     </label>
                                     <label class="radio-label">
                                         <input type="radio" name="vaccine3" value="X" checked> X
@@ -349,13 +349,13 @@
 
                     <div class="form-group" style="margin-bottom: 24px;">
                         <label for="specialNotes">특이사항 (알레르기, 지병 등)</label>
-                        <input type="text" id="specialNotes" class="form-control" placeholder="예: 닭고기 알레르기 유, 소리에 민감함">
+                        <input type="text" id="specialNotes" name="pSpec" class="form-control" placeholder="예: 닭고기 알레르기 유, 소리에 민감함">
                     </div>
 
                     <h4 class="form-section-title">📝 사전 정보 (생활환경 및 참고사항)</h4>
                     <div class="form-group" style="margin-bottom: 24px;">
                         <label for="preInfo">평소 생활환경 및 행동 특징</label>
-                        <textarea id="preInfo" class="form-control"
+                        <textarea id="preInfo" class="form-control" name="beforeData"
                             placeholder="예: 평소 거실 소파 밑에서 휴식하는 것을 좋아하며, 외부인 방문 시 약 10분간 경계하는 편입니다."></textarea>
                     </div>
 

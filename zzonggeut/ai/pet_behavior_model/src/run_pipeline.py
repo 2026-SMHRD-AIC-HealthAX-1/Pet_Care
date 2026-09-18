@@ -550,6 +550,12 @@ def get_pipeline_inputs():
         help="베이스라인 비교 시간대. 예: 09:00-10:00",
     )
 
+    parser.add_argument(
+        "--precomputed-live",
+        action="store_true",
+        help="LIVE에서 이미 생성한 Tracking/Feature 산출물을 재사용",
+    )
+
     args = parser.parse_args()
 
     current_video_path = resolve_path(
@@ -712,6 +718,7 @@ def get_pipeline_inputs():
         "roi_request_path": roi_request_path,
         "roi_request": roi_request,
         "input_error": input_error,
+        "precomputed_live": args.precomputed_live,
     }
 
 
@@ -1012,19 +1019,15 @@ def main():
     print(f"Camera ID      : {inputs['camera_id']}")
     print(f"Feature Version: {FEATURE_VERSION}")
 
-    # -----------------------------------------------------
-    # STEP 1. Tracking
-    # -----------------------------------------------------
-    PIPELINE_CONTEXT["step_name"] = "TRACKING"
-    run_step(
-        1,
-        "PET TRACKING",
-        TRACK_SCRIPT,
-        [
-            current_video_argument,
-            pet_type,
-        ],
-    )
+    # LIVE는 push_frame()에서 이미 Tracking을 수행했으므로 이중 YOLO를 피한다.
+    if not inputs["precomputed_live"]:
+        PIPELINE_CONTEXT["step_name"] = "TRACKING"
+        run_step(1, "PET TRACKING", TRACK_SCRIPT, [current_video_argument, pet_type])
+    else:
+        for required in (result_paths["tracking"], result_paths["quality"],
+                         result_paths["features"], result_paths["interval_features"]):
+            if not required.is_file():
+                raise FileNotFoundError(f"LIVE 사전 계산 산출물이 없습니다: {required}")
 
     # -----------------------------------------------------
     # STEP 2. Tracking 품질 검사
@@ -1078,9 +1081,7 @@ def main():
 
         sys.exit(1)
 
-    # -----------------------------------------------------
-    # STEP 2.5. 선택적 ROI 공간분석 (기존 Tracking 재사용)
-    # -----------------------------------------------------
+    # STEP 2.5. ROI는 LIVE에서도 누적 Tracking을 재사용해 동일 계약으로 확정한다.
     roi_temp_path = None
     if inputs["roi_request"] is not None:
         PIPELINE_CONTEXT["step_name"] = "ROI_SPACE_ANALYSIS"
@@ -1105,18 +1106,9 @@ def main():
         with roi_temp_path.open("w", encoding="utf-8") as file:
             json.dump(space_analysis, file, ensure_ascii=False, indent=2, allow_nan=False)
 
-    # -----------------------------------------------------
-    # STEP 3. Rolling 피처 추출
-    # -----------------------------------------------------
-    PIPELINE_CONTEXT["step_name"] = "FEATURE_EXTRACTION"
-    run_step(
-        3,
-        "ROLLING FEATURE EXTRACTION",
-        FEATURE_SCRIPT,
-        [
-            current_video_argument,
-        ],
-    )
+    if not inputs["precomputed_live"]:
+        PIPELINE_CONTEXT["step_name"] = "FEATURE_EXTRACTION"
+        run_step(3, "ROLLING FEATURE EXTRACTION", FEATURE_SCRIPT, [current_video_argument])
 
     # -----------------------------------------------------
     # STEP 4. 변화 감지

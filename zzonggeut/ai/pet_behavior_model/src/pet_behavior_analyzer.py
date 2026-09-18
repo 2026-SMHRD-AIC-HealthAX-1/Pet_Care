@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -112,6 +113,49 @@ class PetBehaviorAnalyzer:
                 return existing
             return self._execute_pipeline(request, result_path)
 
+    def analyze_precomputed(
+        self,
+        *,
+        video_path: str | Path,
+        precomputed_artifacts: Mapping[str, Any],
+        analysis_id: str,
+        pet_id: str,
+        video_id: str,
+        camera_id: str,
+        species: str,
+        recorded_at: str,
+        recorded_at_source: str = "REQUEST_TIME",
+        time_slot: Optional[str] = None,
+        roi_data: Optional[Mapping[str, Any]] = None,
+    ) -> dict:
+        """Finalize a LIVE session without running YOLO or feature extraction again."""
+        request = self._normalize_request(
+            video_path=video_path, analysis_id=analysis_id, pet_id=pet_id,
+            video_id=video_id, camera_id=camera_id, species=species,
+            recorded_at=recorded_at, recorded_at_source=recorded_at_source,
+            time_slot=time_slot, roi_data=roi_data,
+        )
+        result_path = self.result_dir / f"{request['analysis_id']}_result.json"
+        stem = request["video_path"].stem
+        output_dir = self.base_dir / "data" / "outputs"
+        destinations = {
+            "tracking": output_dir / f"{stem}_tracking.csv",
+            "quality": output_dir / f"{stem}_tracking_quality.csv",
+            "features": output_dir / f"{stem}_features.csv",
+            "interval_features": output_dir / f"{stem}_features_by_interval.csv",
+        }
+        with _ANALYSIS_LOCK:
+            existing = self._load_existing_if_compatible(result_path, request)
+            if existing is not None:
+                return existing
+            output_dir.mkdir(parents=True, exist_ok=True)
+            for key, destination in destinations.items():
+                source = Path(precomputed_artifacts[key])
+                if not source.is_file():
+                    raise PipelineExecutionError(f"Missing precomputed LIVE artifact: {source}")
+                shutil.copy2(source, destination)
+            return self._execute_pipeline(request, result_path, precomputed_live=True)
+
     def _normalize_request(self, **values: Any) -> dict:
         for required_path in (self.pipeline_script, self.schema_path):
             if not required_path.is_file():
@@ -168,7 +212,7 @@ class PetBehaviorAnalyzer:
             raise AnalyzerInputError(f"Invalid ROI request: {error}") from error
         return values
 
-    def _execute_pipeline(self, request: dict, result_path: Path) -> dict:
+    def _execute_pipeline(self, request: dict, result_path: Path, precomputed_live: bool = False) -> dict:
         roi_path: Optional[Path] = None
         command = [
             self.python_executable,
@@ -184,6 +228,8 @@ class PetBehaviorAnalyzer:
         ]
         if request["time_slot"]:
             command.extend(["--time-slot", request["time_slot"]])
+        if precomputed_live:
+            command.append("--precomputed-live")
 
         try:
             roi_request: RoiRequest | None = request["roi_request"]

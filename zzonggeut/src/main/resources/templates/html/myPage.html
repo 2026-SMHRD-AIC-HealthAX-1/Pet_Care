@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="[http://www.thymeleaf.org](http://www.thymeleaf.org)">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>쫑긋 - 마이페이지</title>
-  <link rel="stylesheet" href="../css/dashboardStyle.css">
+  <!-- 🌟 정적 CSS 경로 타임리프 적용 -->
+  <link rel="stylesheet" th:href="@{/css/dashboardStyle.css}">
   <style>
     /* 마이페이지 전용 레이아웃 스타일 */
     .mypage-top-card {
@@ -331,10 +332,9 @@
       text-decoration: underline;
     }
 
-    /* '내 반려동물' 버튼 디자인 */
+    /* '내 반려동물' 버튼 디자인 (프론트 반영) */
     .pet-btn {
       padding: 8px 16px;
-      /* 기존 10px 18px -> 8px 16px로 수정 */
       border-radius: 8px;
       background-color: #0b8484;
       color: #fff;
@@ -345,10 +345,8 @@
       transition: background-color 0.2s;
     }
 
-    /* 로그아웃 밑에 그어진 선 없애기 */
-    .outline-btn {
-      text-decoration: none;
-      display: inline-block;
+    .pet-btn:hover {
+      background-color: #086868;
     }
   </style>
 </head>
@@ -358,18 +356,22 @@
   <!-- 1. 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <a href="/main">
-        <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      <!-- 🌟 로그인 후 메인인 /main으로 연결 -->
+      <a th:href="@{/main}">
+        <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
     <nav class="nav-links">
-      <a href="/dashboard">대시보드</a>
-      <a href="/activity-report">리포트</a>
+      <a th:href="@{/dashboard}">대시보드</a>
+      <!-- 리포트 경로 연동 -->
+      <a th:href="@{/report}">리포트</a>
     </nav>
     <div class="nav-utils">
       <button class="icon-btn" id="alarmBtn">🔔</button>
-      <a href="/mypage" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
-      <a href="petManagement.html" class="pet-btn">내 반려동물</a>
+      <!-- 🌟 마이페이지 링크 연결 -->
+      <a th:href="@{/mypage}" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+      <!-- 🌟 프론트 최신 반영: 내 반려동물 단일 버튼 적용 -->
+      <a th:href="@{/pet-management}" class="pet-btn">내 반려동물</a>
     </div>
   </header>
 
@@ -381,13 +383,13 @@
         <div class="user-avatar">👤</div>
         <div class="user-details">
           <h2>
-            <span th:text="${loginUser.name}"></span> 님
+          	<span th:text="${loginUser.name}">사용자</span> 님 
             <span class="badge live-badge" style="font-size: 11px;">스탠다드 멤버쉽</span>
           </h2>
           <p>
-            <span th:text="${loginUser.id}"></span> &nbsp;·&nbsp;
-            <span th:text="${loginUser.phone}"></span>
-          </p>
+          	<span th:text="${loginUser.id}">email@test.com</span> &nbsp;·&nbsp; 
+            <span th:text="${loginUser.phone}">010-0000-0000</span>
+		  </p>
         </div>
       </div>
 
@@ -404,7 +406,7 @@
 
       <!-- 좌측: 마이페이지 사이드 메뉴 -->
       <aside class="mypage-menu">
-        <a href="#profile" class="menu-btn active">⚙️ 계정 관리 & 회원정보</a>
+        <a href="#profile" class="menu-btn active">👤 계정 관리 & 회원정보</a>
         <a href="#notification" class="menu-btn">🔔 알림 설정 여부</a>
         <a href="#subscription" class="menu-btn">💳 구독 서비스 안내 & 관리</a>
         <a href="#notice" class="menu-btn">📢 공지사항</a>
@@ -418,8 +420,8 @@
         <div class="dash-card section-card" id="profile">
           <div class="card-header">
             <h3>⚙️ 계정 관리 & 회원 정보 수정</h3>
-            <a href="/editprofile" class="btn primary-btn" style="text-decoration: none; display: inline-block;">회원
-              정보 수정</a>
+            <!-- 🌟 회원 정보 수정 페이지 연결 -->
+            <a th:href="@{/editprofile}" class="btn primary-btn" style="text-decoration: none; display: inline-block;">회원 정보 수정</a>
           </div>
           <table class="data-table">
             <tbody>
@@ -437,7 +439,8 @@
               </tr>
               <tr>
                 <th>비밀번호</th>
-                <td>•••••••••• <a href="/changepw" class="btn-sm"
+                <!-- 🌟 비밀번호 변경 페이지 연결 -->
+                <td>•••••••••• <a th:href="@{/changepw}" class="btn-sm"
                     style="margin-left: 10px; text-decoration: none; display: inline-block;">변경</a></td>
               </tr>
             </tbody>
@@ -445,102 +448,106 @@
 
           <!-- 회원탈퇴 버튼 경로 연결 부분 -->
           <div class="account-actions" style="margin-top: 20px; justify-content: flex-end;">
-            <a href="mainBefore.html" class="btn outline-btn">로그아웃</a>
-            <a href="/withdraw" class="btn danger-btn">회원탈퇴</a>
+            <a th:href="@{/logout}" class="btn outline-btn" style="text-decoration: none; display: inline-block; line-height: normal;">로그아웃</a>
+            <!-- 🌟 회원탈퇴 페이지 연결 -->
+            <a th:href="@{/withdraw}" class="btn danger-btn">회원탈퇴</a>
           </div>
+        </div>
 
-          <!-- 2. 알림 설정 여부 -->
-          <div class="dash-card section-card" id="notification">
-            <div class="card-header">
-              <h3>🔔 알림 설정 여부</h3>
-            </div>
-            <div class="toggle-row">
-              <div class="toggle-info">
-                <div class="title">주간 AI 리포트 알림</div>
-                <div class="desc">매주 월요일 요약 리포트 발행 소식을 알려드립니다.</div>
-              </div>
-              <label class="switch">
-                <input type="checkbox" checked>
-                <span class="slider"></span>
-              </label>
-            </div>
-            <div class="toggle-row">
-              <div class="toggle-info">
-                <div class="title">마케팅 및 혜택 정보 수신</div>
-                <div class="desc">쿠폰 발행 및 이벤트 소식을 이메일/SMS로 받습니다.</div>
-              </div>
-              <label class="switch">
-                <input type="checkbox">
-                <span class="slider"></span>
-              </label>
-            </div>
+        <!-- 2. 알림 설정 여부 -->
+        <div class="dash-card section-card" id="notification">
+          <div class="card-header">
+            <h3>🔔 알림 설정 여부</h3>
           </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="title">주간 AI 리포트 알림</div>
+              <div class="desc">매주 월요일 요약 리포트 발행 소식을 알려드립니다.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="title">마케팅 및 혜택 정보 수신</div>
+              <div class="desc">쿠폰 발행 및 이벤트 소식을 이메일/SMS로 받습니다.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
 
-          <!-- 3. 구독 관리 (구독 해지) -->
-          <div class="dash-card section-card" id="subscription">
-            <div class="card-header">
-              <h3>💳 구독 서비스 안내 & 관리</h3>
-            </div>
-            <table class="data-table" style="margin-bottom: 16px;">
-              <tbody>
-                <tr>
-                  <th style="width: 20%;">현재 요금제</th>
-                  <td><strong>쫑긋 AI 스탠다드 플랜</strong> (월 9,900원)</td>
-                </tr>
-                <tr>
-                  <th>다음 결제일</th>
-                  <td>2026년 10월 01일</td>
-                </tr>
-              </tbody>
-            </table>
-            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-              <button class="btn outline-btn">결제 수단 변경</button>
-              <!-- 구독 해지 버튼 클릭 시 팝업 호출 함수 연결 -->
-              <button class="btn danger-btn" id="openCancelModalBtn">구독 해지</button>
-            </div>
+        <!-- 3. 구독 관리 (구독 해지) -->
+        <div class="dash-card section-card" id="subscription">
+          <div class="card-header">
+            <h3>💳 구독 서비스 안내 & 관리</h3>
           </div>
+          <table class="data-table" style="margin-bottom: 16px;">
+            <tbody>
+              <tr>
+                <th style="width: 20%;">현재 요금제</th>
+                <td><strong>쫑긋 AI 스탠다드 플랜</strong> (월 9,900원)</td>
+              </tr>
+              <tr>
+                <th>다음 결제일</th>
+                <td>2026년 10월 01일</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn outline-btn">결제 수단 변경</button>
+            <!-- 구독 해지 버튼 클릭 시 팝업 호출 함수 연결 -->
+            <button class="btn danger-btn" id="openCancelModalBtn">구독 해지</button>
+          </div>
+        </div>
 
-          <!-- 4. 공지사항 & 서비스 안내 -->
-          <div class="dash-card section-card" id="notice">
-            <div class="card-header">
-              <h3>📢 공지사항</h3>
-              <a href="/notice" class="btn-sm" style="text-decoration: none; display: inline-block;">전체보기</a>
-            </div>
-            <div class="list-item">
-              <a href="#" class="notice-modal-link" data-target="noticeModal1">[서비스 안내] AI 3.0 업데이트 및 알고리즘 고도화 안내</a>
-              <span class="item-date">2026.08.30</span>
-            </div>
-            <div class="list-item">
-              <a href="#" class="notice-modal-link" data-target="noticeModal2">[공지] 시스템 정기 점검 안내 (09/05 새벽 2시~4시)</a>
-              <span class="item-date">2026.08.25</span>
-            </div>
+        <!-- 4. 공지사항 & 서비스 안내 -->
+        <div class="dash-card section-card" id="notice">
+          <div class="card-header">
+            <h3>📢 공지사항</h3>
+            <!-- 🌟 공지사항 전체보기 연결 -->
+            <a th:href="@{/notice}" class="btn-sm" style="text-decoration: none; display: inline-block;">전체보기</a>
           </div>
+          <div class="list-item">
+            <a href="#" class="notice-modal-link" data-target="noticeModal1">[서비스 안내] AI 3.0 업데이트 및 알고리즘 고도화 안내</a>
+            <span class="item-date">2026.08.30</span>
+          </div>
+          <div class="list-item">
+            <a href="#" class="notice-modal-link" data-target="noticeModal2">[공지] 시스템 정기 점검 안내 (09/05 새벽 2시~4시)</a>
+            <span class="item-date">2026.08.25</span>
+          </div>
+        </div>
 
-          <!-- 5. 나의 활동 (게시글 & 문의글 내역) -->
-          <div class="dash-card section-card" id="activity">
-            <div class="card-header">
-              <h3>📝 나의 1:1 문의글</h3>
-              <a href="/1on1Inquiry" class="btn-sm" style="text-decoration: none; display: inline-block;">전체보기</a>
-            </div>
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>제목</th>
-                  <th>작성일</th>
-                  <th>상태</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <a href="#" class="inquiry-title-link" id="openInquiryModalBtn">카메라 실시간 연동이 간헐적으로 끊어집니다.</a>
-                  </td>
-                  <td>08/22</td>
-                  <td><span class="tag tag-ok">답변완료</span></td>
-                </tr>
-              </tbody>
-            </table>
+        <!-- 5. 나의 활동 (게시글 & 문의글 내역) -->
+        <div class="dash-card section-card" id="activity">
+          <div class="card-header">
+            <h3>📝 나의 1:1 문의글</h3>
+            <!-- 🌟 1:1 문의 내역 전체보기 연결 -->
+            <a th:href="@{/inquiry}" class="btn-sm" style="text-decoration: none; display: inline-block;">전체보기</a>
           </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>제목</th>
+                <th>작성일</th>
+                <th>상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <a href="#" class="inquiry-title-link" id="openInquiryModalBtn">카메라 실시간 연동이 간헐적으로 끊어집니다.</a>
+                </td>
+                <td>08/22</td>
+                <td><span class="tag tag-ok">답변완료</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
       </section>
 

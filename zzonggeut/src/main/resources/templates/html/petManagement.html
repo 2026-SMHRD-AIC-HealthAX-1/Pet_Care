@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>반려동물 관리 - 쫑긋</title>
-    <link rel="stylesheet" href="../css/dashboardStyle.css">
+    <!-- 🌟 정적 CSS 경로 타임리프 적용 -->
+    <link rel="stylesheet" th:href="@{/css/dashboardStyle.css}">
     <style>
         /* 반려동물 관리 전용 스타일 */
         .pet-manage-grid {
@@ -200,6 +201,23 @@
             color: #555;
             border: none;
         }
+
+        /* '내 반려동물' 버튼 디자인 (프론트 반영) */
+        .pet-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background-color: #0b8484;
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+
+        .pet-btn:hover {
+            background-color: #086868;
+        }
     </style>
 </head>
 
@@ -207,21 +225,24 @@
 
     <header class="navbar">
         <div class="logo">
-            <a href="main.html">
-                <img src="/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+            <!-- 🌟 로그인 후 메인인 /main으로 연결 -->
+            <a th:href="@{/main}">
+                <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
             </a>
         </div>
 
         <nav class="nav-links">
-            <a href="dashboard.html">대시보드</a>
-            <a href="activity-report.html">리포트</a>
+            <a th:href="@{/dashboard}">대시보드</a>
+            <!-- 리포트 경로 연동 -->
+            <a th:href="@{/report}">리포트</a>
         </nav>
 
         <div class="nav-utils">
             <button class="icon-btn" id="alarmBtn">🔔</button>
-            <button class="icon-btn" id="profileBtn">👤</button>
-            <a href="pet-management.html" class="btn primary-btn"
-                style="text-decoration: none; padding: 8px 16px; font-size: 14px;">내 반려동물</a>
+            <!-- 🌟 마이페이지 링크 연결 -->
+            <a th:href="@{/mypage}" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+            <!-- 🌟 프론트 최신 반영: 내 반려동물 단일 버튼 적용 -->
+            <a th:href="@{/pet-management}" class="pet-btn">내 반려동물</a>
         </div>
     </header>
 
@@ -249,18 +270,19 @@
                     <h3>📋 반려동물 상세 정보</h3>
                 </div>
 
-                <form id="petDetailForm" action="/petinsert" method="post">
+                <!-- 🌟 백엔드 전송 경로 및 메서드 설정 -->
+                <form id="petDetailForm" th:action="@{/petinsert}" method="post">
 
                     <h4 class="form-section-title">📌 기본 정보</h4>
                     <div class="form-grid-3">
                         <div class="form-group">
                             <label for="petName">이름</label>
-                            <input type="text" id="petName" class="form-control" placeholder="예: 몽이" required>
+                            <input type="text" id="petName" name="name" class="form-control" placeholder="예: 몽이" required>
                         </div>
 
                         <div class="form-group">
                             <label for="petType">종 (분류)</label>
-                            <select id="petType" class="form-control" required>
+                            <select id="petType" name="type" class="form-control" required>
                                 <option value="" disabled selected>선택하세요 (예: 강아지)</option>
                                 <option value="강아지">강아지</option>
                                 <option value="고양이">고양이</option>
@@ -284,7 +306,7 @@
                     <div class="form-grid-2">
                         <div class="form-group">
                             <label for="petAge">나이 (세)</label>
-                            <input type="number" id="petAge" class="form-control" placeholder="예: 3" required>
+                            <input type="number" id="petAge" name="age" class="form-control" placeholder="예: 3" required>
                         </div>
 
                         <div class="form-group">
@@ -315,7 +337,7 @@
                                 <span>1차 : </span>
                                 <div class="vaccine-options">
                                     <label class="radio-label">
-                                        <input type="radio" name="isVaccin1" value="O"> O
+                                        <input type="radio" name="vaccine1" value="O"> O
                                     </label>
                                     <label class="radio-label">
                                         <input type="radio" name="vaccine1" value="X" checked> X
@@ -326,7 +348,7 @@
                                 <span>2차 : </span>
                                 <div class="vaccine-options">
                                     <label class="radio-label">
-                                        <input type="radio" name="isVaccin2" value="O"> O
+                                        <input type="radio" name="vaccine2" value="O"> O
                                     </label>
                                     <label class="radio-label">
                                         <input type="radio" name="vaccine2" value="X" checked> X
@@ -337,7 +359,7 @@
                                 <span>3차 : </span>
                                 <div class="vaccine-options">
                                     <label class="radio-label">
-                                        <input type="radio" name="isVaccin3" value="O"> O
+                                        <input type="radio" name="vaccine3" value="O"> O
                                     </label>
                                     <label class="radio-label">
                                         <input type="radio" name="vaccine3" value="X" checked> X
@@ -525,29 +547,17 @@
                 renderPetList();
             }
 
-            // 폼 저장 (Submit)
+            // 폼 저장 (Submit) - 필요에 따라 비동기 또는 기본 제출 수행
             petForm.addEventListener('submit', (e) => {
-                e.preventDefault();
                 const formData = getFormData();
 
                 if (!formData.name || !formData.age || !formData.type) {
+                    e.preventDefault();
                     alert("필수 입력 항목(이름, 종, 나이)을 확인해주세요.");
                     return;
                 }
 
-                if (activePetId !== null) {
-                    const index = petDataList.findIndex(p => p.id === activePetId);
-                    if (index !== -1) {
-                        petDataList[index] = { id: activePetId, ...formData };
-                    }
-                } else {
-                    const newId = Date.now();
-                    petDataList.push({ id: newId, ...formData });
-                    activePetId = newId;
-                }
-
-                renderPetList();
-                scrollToTopList();
+                // 만약 프론트엔드 단독 시뮬레이션이 아닌 서버 전송을 원하시면 e.preventDefault()를 제거하거나 fetch API를 사용하실 수 있습니다.
             });
 
             // 취소 버튼

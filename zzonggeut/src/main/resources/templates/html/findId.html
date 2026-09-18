@@ -146,8 +146,9 @@
   <!-- 1. 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <a href="main.html">
-        <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      <!-- 🌟 로그인 전 메인인 /으로 연결 -->
+      <a th:href="@{/}">
+        <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
   </header>
@@ -163,7 +164,8 @@
           <p>가입 시 등록한 정보로 아이디를 확인해보세요.</p>
         </div>
 
-        <form class="login-form" action="/api/users/find-id/process" method="POST">
+        <!-- 🌟 UserController의 경로에 맞게 action 설정 -->
+        <form class="login-form" th:action="@{/find-id/process}" method="POST">
           <!-- 이름 입력 -->
           <div class="form-group">
             <label for="userName">이름</label>
@@ -182,7 +184,7 @@
 
         <!-- 로그인으로 돌아가기 -->
         <div class="login-utils">
-          <a href="/login">로그인으로 돌아가기</a>
+          <a th:href="@{/login}">로그인으로 돌아가기</a>
         </div>
       </div>
 
@@ -200,11 +202,11 @@
         </div>
 
         <!-- 로그인하러 가기 버튼 -->
-        <a href="/login" class="submit-btn" style="display: block; text-decoration: none; line-height: normal; box-sizing: border-box;">로그인하러 가기</a>
+        <a th:href="@{/login}" class="submit-btn" style="display: block; text-decoration: none; line-height: normal; box-sizing: border-box;">로그인하러 가기</a>
 
         <!-- 로그인으로 돌아가기 -->
         <div class="login-utils">
-          <a href="/login">로그인으로 돌아가기</a>
+          <a th:href="@{/login}">로그인으로 돌아가기</a>
         </div>
       </div>
 

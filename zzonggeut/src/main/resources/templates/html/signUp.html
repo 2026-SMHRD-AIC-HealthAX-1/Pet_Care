@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>회원가입 - 쫑긋</title>
-  <link rel="stylesheet" href="../css/signUpStyle.css">
+  <!-- 🌟 정적 CSS 경로 타임리프 적용 -->
+  <link rel="stylesheet" th:href="@{/css/signUpStyle.css}">
 </head>
 
 <body>
@@ -13,8 +14,9 @@
   <!-- 1. 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <a href="main.html">
-        <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      <!-- 🌟 로그인 전 메인인 /으로 연결 -->
+      <a th:href="@{/}">
+        <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
   </header>
@@ -27,7 +29,8 @@
         <p>쫑긋과 함께 반려견/반려묘를 더 스마트하게 케어해보세요.</p>
       </div>
 
-      <form method="post" class="signup-form">
+      <!-- 🌟 타임리프 action 경로 지정 -->
+      <form method="post" class="signup-form" th:action="@{/api/users/join}">
         <!-- 아이디 -->
         <div class="form-group">
           <label for="userId">아이디(이메일 입력)</label>
@@ -58,38 +61,38 @@
     </div>
   </main>
 	
-	<script>
-  		document.querySelector('.signup-form').addEventListener('submit', function(e) {
-     		e.preventDefault(); // 기본 폼 제출(새로고침) 막기
+  <script>
+    document.querySelector('.signup-form').addEventListener('submit', function(e) {
+      e.preventDefault(); // 기본 폼 제출(새로고침) 막기
 
-      		// 사용자가 입력한 값 가져오기
-      		const id = document.getElementById('userId').value;
-      		const pw = document.getElementById('userPw').value;
-      		const name = document.getElementById('userName').value;
-      		const phone = document.getElementById('userPhone').value;
+      // 사용자가 입력한 값 가져오기
+      const id = document.getElementById('userId').value;
+      const pw = document.getElementById('userPw').value;
+      const name = document.getElementById('userName').value;
+      const phone = document.getElementById('userPhone').value;
 
-      		// API(`/api/users/join`)로 데이터 전송
-      		fetch('/api/users/join', {
-          		method: 'POST',
-          		headers: {
-              		'Content-Type': 'application/x-www-form-urlencoded',
-          		},
-          		body: new URLSearchParams({ id, pw, name, phone })
-      		})
-      		.then(response => {
-          		if (response.ok) {
-              		alert('회원가입이 완료되었습니다!');
-              		location.href = '/main'; // 성공 시 메인 페이지로 이동!
-          		} else {
-              		alert('회원가입에 실패했습니다. 입력 정보를 확인해주세요.');
-          		}
-      		})
-      		.catch(error => {
-          		console.error('에러 발생:', error);
-          		alert('서버 통신 중 에러가 발생했습니다.');
-      		});
-  		});
-	</script>
+      // API(`/api/users/join`)로 데이터 전송
+      fetch('/api/users/join', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ id, pw, name, phone })
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('회원가입이 완료되었습니다!');
+          location.href = '/login'; // 성공 시 로그인 페이지로 이동!
+        } else {
+          alert('회원가입에 실패했습니다. 입력 정보를 확인해주세요.');
+        }
+      })
+      .catch(error => {
+        console.error('에러 발생:', error);
+        alert('서버 통신 중 에러가 발생했습니다.');
+      });
+    });
+  </script>
 	
 </body>
 

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>관심영역(ROI) 설정 - 쫑긋</title>
-  <!-- dashboardStyle.css 연동 -->
-  <link rel="stylesheet" href="../css/dashboardStyle.css">
+  <!-- 🌟 정적 CSS 경로 타임리프 적용 -->
+  <link rel="stylesheet" th:href="@{/css/dashboardStyle.css}">
   <style>
     /* roiSelect 전용 레이아웃 및 캔버스 스타일 추가 */
     .roi-page-header {
@@ -28,55 +28,30 @@
       gap: 20px;
     }
 
-    /* .video-wrapper {
+    .video-wrapper {
       position: relative;
       width: 100%;
-      aspect-ratio: 16 / 9;
-      background: #1a1a1a;
-      border-radius: 12px;
+      aspect-ratio: 16 / 9; /* 카메라 해상도 비율 */
+      background-color: #000; /* 여백이 생길 경우 검은색 처리 */
       overflow: hidden;
+      border-radius: 8px;
     }
 
-    video {
+    #video {
       width: 100%;
       height: 100%;
+      object-fit: contain; /* 원본 비율 100% 보존 */
       display: block;
-      object-fit: cover; /* object-fit: contain; or cover*/
-    /* } */
+    }
 
-    /*
     #roiCanvas {
       position: absolute;
-      left: 0;
       top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       cursor: crosshair;
-    } */
-
-	.video-wrapper {
-	  position: relative;
-	  width: 100%;
-	  aspect-ratio: 16 / 9; /* 또는 카메라 해상도 비율 */
-	  background-color: #000; /* 여백이 생길 경우 깔끔하게 검은색 처리 */
-	  overflow: hidden;
-	  border-radius: 8px;
-	}
-	
-	#video {
-	  width: 100%;
-	  height: 100%;
-	  object-fit: contain; /* 원본 비율 100% 보존 */
-	  display: block;
-	}
-	
-	#roiCanvas {
-	  position: absolute;
-	  top: 0;
-	  left: 0;
-	  width: 100%;
-	  height: 100%;
-	}
+    }
 
     .instruction {
       margin-top: 14px;
@@ -90,10 +65,10 @@
       font-weight: 500;
     }
 
-	#sourceupload {
-  		display: none;
-	}
-	
+    #sourceupload {
+      display: none;
+    }
+
     .form-section {
       margin-bottom: 20px;
     }
@@ -216,10 +191,9 @@
       }
     }
 
-    /* '내 반려동물' 버튼 디자인 */
+    /* '내 반려동물' 버튼 디자인 (프론트 반영) */
     .pet-btn {
       padding: 8px 16px;
-      /* 기존 10px 18px -> 8px 16px로 수정 */
       border-radius: 8px;
       background-color: #0b8484;
       color: #fff;
@@ -229,33 +203,42 @@
       display: inline-block;
       transition: background-color 0.2s;
     }
+
+    .pet-btn:hover {
+      background-color: #086868;
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- 1. 상단 네비게이션 바 (dashboard.html 규격 적용) -->
+  <!-- 1. 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <a href="main.html">
-        <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      <!-- 🌟 로그인 후 메인인 /main으로 연결 -->
+      <a th:href="@{/main}">
+        <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
     <nav class="nav-links">
-      <a href="dashboard.html">대시보드</a>
-      <a href="activity-report.html">리포트</a>
+      <a th:href="@{/dashboard}">대시보드</a>
+      <!-- 리포트 경로 연동 -->
+      <a th:href="@{/report}">리포트</a>
     </nav>
     <div class="nav-utils">
       <button class="icon-btn" id="alarmBtn">🔔</button>
-      <button class="icon-btn" id="profileBtn">👤</button>
-      <a href="petManagement.html" class="pet-btn">내 반려동물</a>
+      <!-- 🌟 마이페이지 링크 연결 -->
+      <a th:href="@{/mypage}" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+      <!-- 🌟 프론트 최신 반영: 내 반려동물 단일 버튼 적용 -->
+      <a th:href="@{/pet-management}" class="pet-btn">내 반려동물</a>
     </div>
   </header>
 
   <!-- 2. 메인 컨테이너 (중앙 정렬) -->
   <main class="dashboard-container">
 
-    <a href="dashboard.html" class="back-link">← 대시보드로 돌아가기</a>
+    <!-- 🌟 대시보드로 돌아가기 링크 타임리프 적용 -->
+    <a th:href="@{/dashboard}" class="back-link">← 대시보드로 돌아가기</a>
 
     <div class="roi-page-header">
       <h2 class="roi-page-title">🎯 관심영역(ROI) 설정</h2>
@@ -277,7 +260,7 @@
 
       <!-- 우측: 설정 컨트롤 카드 -->
       <section class="dash-card">
-        <div id="sourceupload" class="form-section" >
+        <div id="sourceupload" class="form-section">
           <label class="form-label">영상 소스 선택/업로드</label>
           <input type="file" id="videoInput" class="full-input" accept="video/*">
         </div>
@@ -312,7 +295,7 @@
 
   </main>
 
-  <!-- 3. 하단 푸터 (dashboard.html 규격 적용) -->
+  <!-- 3. 하단 푸터 -->
   <footer class="footer">
     <div class="footer-bottom">
       <p>© 2026 쫑긋. All rights reserved.</p>
@@ -339,16 +322,18 @@
     let startX = 0;
     let startY = 0;
 
-    let pc = null; // 재연결을 위해 let으로 선언
-    
-    videoInput.addEventListener("change", function () {
-      const file = this.files[0];
-      if (!file) return;
+    let pc = null; // WebRTC 연결 객체
 
-      const url = URL.createObjectURL(file);
-      video.src = url;
-      video.load();
-    });
+    if (videoInput) {
+      videoInput.addEventListener("change", function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const url = URL.createObjectURL(file);
+        video.src = url;
+        video.load();
+      });
+    }
 
     function resizeCanvas() {
       canvas.width = canvas.clientWidth;
@@ -507,7 +492,7 @@
       };
     }
 
- // 1. 영문 코드명을 화면 표시용 라벨로 변환해주는 함수
+    // 영문 코드명을 화면 표시용 라벨로 변환
     function getRoiLabel(name) {
       const labels = {
         "WATER_BOWL": "물그릇 (WATER_BOWL)",
@@ -517,20 +502,20 @@
       return labels[name] || name;
     }
 
-    // 2. DB 비율(0~1) 좌표를 현재 캔버스 픽셀 좌표로 환산하는 함수
+    // DB 비율(0~1) 좌표를 현재 캔버스 픽셀 좌표로 환산
     function convertFromRatio(dbRoi, cWidth, cHeight) {
       return {
         id: dbRoi.seq,
         name: dbRoi.roi_name,
-        label: getRoiLabel(dbRoi.roi_name), // 라벨 추가 (화면 및 캔버스 텍스트 출력용)
+        label: getRoiLabel(dbRoi.roi_name),
         x: dbRoi.x_start * cWidth,
         y: dbRoi.y_start * cHeight,
         width: dbRoi.width * cWidth,
         height: dbRoi.height * cHeight
       };
     }
-    
- // 3. DB에서 ROI 데이터를 조회해 화면에 렌더링하는 함수
+
+    // DB에서 ROI 데이터 조회
     async function loadRoiData() {
       try {
         const response = await fetch("/roiget");
@@ -545,16 +530,13 @@
           return;
         }
 
-        // 캔버스 크기 기준
         const cWidth = canvas.width;
         const cHeight = canvas.height;
 
-        // DB 데이터로 rois 배열 채우기
         rois = dbData.map(function (item) {
           return convertFromRatio(item, cWidth, cHeight);
         });
 
-        // 실제 선언된 함수 이름으로 정확히 호출
         updateROIList(); 
         drawROI();
 
@@ -563,109 +545,90 @@
       }
     }
 
-    // 페이지 진입 시 실행 (비디오나 캔버스 크기 계산 후 로드)
+    // 페이지 진입 시 실행
     window.addEventListener("load", function () {
       resizeCanvas();
       loadRoiData();
-      
       DiaplayVideo();
     });
-    
-    // 페이지 진입 시 실행 (비디오나 캔버스 크기 계산 후 로드)
+
+    // 페이지 이탈 시 스트리밍 종료
     window.addEventListener("beforeunload", function () {
-    	
       EndVideo();
-      
     });
-    
-    async function DiaplayVideo() 
-    {
-    	// 이미 연결되어 있다면 중복 실행 방지
-        if (pc && (pc.connectionState === "connected" || pc.connectionState === "connecting")) {
-            console.log("이미 스트리밍이 실행 중입니다.");
-            return;
+
+    async function DiaplayVideo() {
+      if (pc && (pc.connectionState === "connected" || pc.connectionState === "connecting")) {
+        console.log("이미 스트리밍이 실행 중입니다.");
+        return;
+      }
+
+      pc = new RTCPeerConnection();
+
+      pc.ontrack = (event) => {
+        const videoElement = document.getElementById("video");
+        videoElement.srcObject = event.streams[0];
+      };
+
+      pc.addTransceiver('video', { direction: 'recvonly' });
+
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+
+      try {
+        const response = await fetch('http://localhost:8000/offer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sdp: pc.localDescription.sdp,
+            type: pc.localDescription.type,
+            camera_num: 0
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`서버 응답 에러: ${response.status}`);
         }
 
-        // 1. PeerConnection 인스턴스 생성
-        pc = new RTCPeerConnection();
+        const answer = await response.json();
+        await pc.setRemoteDescription(new RTCSessionDescription(answer));
+        console.log("WebRTC 연결 수립 완료");
 
-        // 2. 서버로부터 수신된 비디오 트랙을 <video> 태그에 연결
-        pc.ontrack = (event) => {
-            const videoElement = document.getElementById("video");
-            videoElement.srcObject = event.streams[0];
-        };
-
-        // 3. 비디오 수신 전용 트랜시버 설정
-        pc.addTransceiver('video', { direction: 'recvonly' });
-
-        // 4. Offer 생성 및 LocalDescription 설정
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-
-        try {
-            // 5. FastAPI 서버로 Offer 전송
-            const response = await fetch('http://localhost:8000/offer', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    sdp: pc.localDescription.sdp,
-                    type: pc.localDescription.type,
-                    camera_num : 0
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`서버 응답 에러: ${response.status}`);
-            }
-
-            // 6. Answer 수신 및 RemoteDescription 설정
-            const answer = await response.json();
-            await pc.setRemoteDescription(new RTCSessionDescription(answer));
-            console.log("WebRTC 연결 수립 완료");
-
-        } catch (error) {
-            console.error("스트리밍 연결 실패:", error);
-            end(); // 오류 발생 시 정리
-        }
+      } catch (error) {
+        console.error("스트리밍 연결 실패:", error);
+      }
     }
-    
-    async function EndVideo() 
-    {
-    	const videoElement = document.getElementById("video");
 
-        // 1. 브라우저 비디오 화면 및 로컬 트랙 정지
-        if (videoElement.srcObject) {
-            const stream = videoElement.srcObject;
-            stream.getTracks().forEach(track => track.stop());
-            videoElement.srcObject = null;
-        }
+    async function EndVideo() {
+      const videoElement = document.getElementById("video");
 
-        // 2. 브라우저 측 WebRTC 소켓 종료
-        if (pc) {
-            pc.close();
-            pc = null;
-            console.log("브라우저 WebRTC 세션 종료");
-        }
+      if (videoElement.srcObject) {
+        const stream = videoElement.srcObject;
+        stream.getTracks().forEach(track => track.stop());
+        videoElement.srcObject = null;
+      }
 
-        // 3. Spring Boot에 송출 중단 명령 전송
-        try {
-            const response = await fetch('/api/streaming/stop', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            const result = await response.json();
-            console.log("송출 서버 종료 응답:", result);
-        } catch (error) {
-            console.error("송출 서버 종료 요청 실패:", error);
-        }
+      if (pc) {
+        pc.close();
+        pc = null;
+        console.log("브라우저 WebRTC 세션 종료");
+      }
+
+      try {
+        await fetch('/api/streaming/stop', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } catch (error) {
+        console.error("송출 서버 종료 요청 실패:", error);
+      }
     }
-    
- 	// 영상 프레임 데이터가 실제로 들어왔을 때 크기 재동기화
+
     video.addEventListener("loadeddata", function () {
       resizeCanvas();
       drawROI();
     });
- 
+
     deleteButton.addEventListener("click", function () {
       if (!selectedROI) {
         alert("삭제할 영역을 먼저 선택해주세요.");
@@ -678,11 +641,10 @@
       drawROI();
     });
 
-    function createJSON() 
-    {
+    function createJSON() {
       return {
         camera_id: "CAM-001",
-        video: videoInput.files[0] ? videoInput.files[0].name : null,
+        video: videoInput && videoInput.files[0] ? videoInput.files[0].name : null,
         rois: rois.map(function (roi) {
           const ratio = convertToRatio(roi);
           return {
@@ -695,50 +657,43 @@
           };
         })
       };
-    
     }
 
     saveButton.addEventListener("click", async function (e) {
-    	
-    	if (e) e.preventDefault();
+      if (e) e.preventDefault();
 
-    	  const data = createJSON();
-    	  console.log("전송할 데이터:", data);
+      const data = createJSON();
+      console.log("전송할 데이터:", data);
 
-    	  try {
-    	    // 스프링의 @PostMapping("/roiinsert")를 비동기 호출
-    	    const response = await fetch("/roiinsert", {
-    	      method: "POST",
-    	      headers: {
-    	        "Content-Type": "application/json"
-    	      },
-    	      body: JSON.stringify(data)
-    	    });
+      try {
+        const response = await fetch("/roiinsert", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        });
 
-    	    if (!response.ok) {
-    	      // 서버에서 500 등 에러 응답을 보낸 경우
-    	      const errorText = await response.text();
-    	      throw new Error(`서버 오류 [${response.status}]: ${errorText}`);
-    	    }
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`서버 오류 [${response.status}]: ${errorText}`);
+        }
 
-    	    // 통신 성공 시 화면 표시
-    	    console.log("ROI JSON:", JSON.stringify(data, null, 4));
-    	    jsonBox.textContent = JSON.stringify(data, null, 4);
-    	    jsonBox.style.display = "block";
+        jsonBox.textContent = JSON.stringify(data, null, 4);
+        jsonBox.style.display = "block";
 
-    	    alert("ROI 설정이 저장되었습니다.");
+        alert("ROI 설정이 저장되었습니다.");
 
-    	    // [중요] 저장이 완전히 성공했을 때만 다른 화면(/petmanagement)으로 이동
-    	    window.location.href = "/roiselect";
+        // 저장이 완료되면 대시보드나 관련 페이지로 이동
+        window.location.href = "/dashboard";
 
-    	  } catch (error) {
-    	    console.error("전송 실패 원인:", error);
-    	    alert("저장 실패: 콘솔 로그를 확인하세요.");
-    	  }
-    }); 
+      } catch (error) {
+        console.error("전송 실패 원인:", error);
+        alert("저장 실패: 콘솔 로그를 확인하세요.");
+      }
+    });
 
     resizeCanvas();
-    
   </script>
 </body>
 

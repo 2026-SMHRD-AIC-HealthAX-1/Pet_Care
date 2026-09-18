@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>회원 정보 수정 - 쫑긋</title>
-  <link rel="stylesheet" href="../css/dashboardStyle.css">
+  <!-- 🌟 정적 CSS 경로 타임리프 적용 -->
+  <link rel="stylesheet" th:href="@{/css/dashboardStyle.css}">
   <style>
     /* 전체 기본 설정 및 레이아웃 보장 */
     * {
@@ -266,9 +267,9 @@
       color: #fff;
     }
 
+    /* '내 반려동물' 버튼 설정 (프론트 반영) */
     .pet-btn {
       padding: 8px 16px;
-      /* 기존 10px 18px -> 8px 16px로 수정 */
       border-radius: 8px;
       background-color: #0b8484;
       color: #fff;
@@ -278,6 +279,10 @@
       display: inline-block;
       transition: background-color 0.2s;
     }
+
+    .pet-btn:hover {
+      background-color: #086868;
+    }
   </style>
 </head>
 
@@ -286,19 +291,22 @@
   <!-- 1. 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <a href="/main">
-        <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      <!-- 🌟 로그인 후 메인인 /main으로 연결 -->
+      <a th:href="@{/main}">
+        <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
     <nav class="nav-links">
-      <a href="dashboard.html">대시보드</a>
-      <a href="report.html">리포트</a>
+      <a th:href="@{/dashboard}">대시보드</a>
+      <!-- 리포트 경로 연동 -->
+      <a th:href="@{/report}">리포트</a>
     </nav>
     <div class="nav-utils">
       <button class="icon-btn" id="alarmBtn">🔔</button>
-      <a href="/mypage" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
-      <!-- 단일 버튼 1개로 교체 -->
-      <a href="petManagement.html" class="pet-btn">내 반려동물</a>
+      <!-- 🌟 마이페이지 링크 연결 -->
+      <a th:href="@{/mypage}" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+      <!-- 🌟 프론트 최신 반영: 내 반려동물 단일 버튼 적용 -->
+      <a th:href="@{/pet-management}" class="pet-btn">내 반려동물</a>
     </div>
   </header>
 
@@ -310,13 +318,13 @@
         <div class="user-avatar">👤</div>
         <div class="user-details">
           <h2>
-            <span th:text="${loginUser.name}"></span> 님
-            <span class="badge">PRO 멤버십</span>
+          	<span th:text="${loginUser.name}">사용자</span> 님
+          	<span class="badge">PRO 멤버십</span>
           </h2>
           <p>
-            <span th:text="${loginUser.id}"></span> &nbsp;·&nbsp;
-            <span th:text="${loginUser.phone}"></span>
-          </p>
+          	<span th:text="${loginUser.id}">email@test.com</span> &nbsp;·&nbsp; 
+            <span th:text="${loginUser.phone}">010-0000-0000</span>
+		  </p>
         </div>
       </div>
 
@@ -337,11 +345,11 @@
 
       <!-- 좌측 사이드 메뉴 -->
       <aside class="mypage-menu">
-        <a href="/mypage#profile" class="menu-btn active">👤 계정 관리 & 회원정보</a>
-        <a href="/mypage#notification" class="menu-btn">🔔 알림 설정</a>
-        <a href="/mypage#subscription" class="menu-btn">💳 구독 관리</a>
-        <a href="/mypage#notice" class="menu-btn">📢 공지사항</a>
-        <a href="/mypage#activity" class="menu-btn">📝 나의 활동 & 문의</a>
+        <a th:href="@{/mypage}" class="menu-btn active">👤 계정 관리 & 회원정보</a>
+        <a th:href="@{/mypage}" class="menu-btn">🔔 알림 설정</a>
+        <a th:href="@{/mypage}" class="menu-btn">💳 구독 관리</a>
+        <a th:href="@{/notice}" class="menu-btn">📢 공지사항</a>
+        <a th:href="@{/mypage}" class="menu-btn">📝 나의 활동 & 문의</a>
       </aside>
 
       <!-- 우측 메인 콘텐츠 영역 -->
@@ -352,7 +360,8 @@
           </div>
 
           <div class="form-container">
-            <form id="editProfileForm" action="/api/users/update" method="post">
+            <!-- 🌟 UserController의 정보 수정 처리 경로로 설정 -->
+            <form id="editProfileForm" th:action="@{/api/users/update}" method="post">
               <!-- 이메일 (변경 불가) -->
               <div class="form-group">
                 <label for="userEmail">이메일 (아이디)</label>
@@ -370,8 +379,7 @@
               <div class="form-group">
                 <label for="userPhone">휴대폰 번호</label>
                 <div class="input-with-btn">
-                  <input type="tel" id="userPhone" name="phone" class="form-input" th:value="${loginUser.phone}"
-                    required>
+                  <input type="tel" id="userPhone" name="phone" class="form-input" th:value="${loginUser.phone}" required>
                   <button type="button" class="btn sub-btn" id="verifyPhoneBtn">본인 인증</button>
                 </div>
                 <div class="input-hint">번호 변경 시 휴대폰 본인 인증이 필요합니다.</div>
@@ -379,7 +387,7 @@
 
               <!-- 하단 버튼 영역 -->
               <div class="form-actions">
-                <a href="/mypage" class="btn outline-btn">취소</a>
+                <a th:href="@{/mypage}" class="btn outline-btn">취소</a>
                 <button type="submit" class="btn primary-btn">저장하기</button>
               </div>
             </form>
@@ -399,7 +407,7 @@
   </footer>
 
   <script>
-    // 본인 인증 버튼 이벤트 테스트 (이건 남겨두세요!)
+    // 본인 인증 버튼 이벤트 테스트
     document.getElementById('verifyPhoneBtn').addEventListener('click', () => {
       alert('휴대폰 본인 인증 절차를 진행합니다.');
     });

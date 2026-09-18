@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>개발자에게 문의하기 - 쫑긋</title>
-  <link rel="stylesheet" href="../css/contactStyle.css">
+  <!-- 🌟 정적 CSS 경로 타임리프 적용 -->
+  <link rel="stylesheet" th:href="@{/css/contactStyle.css}">
   
-  <!-- '내 반려동물' 버튼 사이즈 및 디자인 고정 스타일 -->
+  <!-- '내 반려동물' 버튼 사이즈 및 디자인 고정 스타일 (프론트 반영) -->
   <style>
     .pet-btn {
       padding: 8px 16px;
@@ -32,19 +33,22 @@
   <!-- 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <a href="main.html">
-        <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      <!-- 🌟 로그인 후 메인인 /main으로 연결 -->
+      <a th:href="@{/main}">
+        <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
     <nav class="nav-links">
-      <a href="dashboard.html">대시보드</a>
-      <a href="activity-report.html">리포트</a>
+      <a th:href="@{/dashboard}">대시보드</a>
+      <!-- 리포트 경로 연동 -->
+      <a th:href="@{/report}">리포트</a>
     </nav>
     <div class="nav-utils">
       <button class="icon-btn" id="alarmBtn">🔔</button>
-      <a href="myPage.html" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
-      <!-- 수정 위치: primary-btn 대신 pet-btn 클래스 적용 -->
-      <a href="petManagement.html" class="pet-btn">내 반려동물</a>
+      <!-- 🌟 마이페이지 경로 연결 -->
+      <a th:href="@{/mypage}" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+      <!-- 🌟 프론트 최신 반영: 내 반려동물 단일 버튼 적용 -->
+      <a th:href="@{/pet-management}" class="pet-btn">내 반려동물</a>
     </div>
   </header>
 
@@ -91,7 +95,8 @@
 
         <!-- 버튼 영역 -->
         <div class="form-actions">
-          <a href="main.html" class="btn outline-btn">취소</a>
+          <!-- 🌟 취소 시 /main으로 이동 -->
+          <a th:href="@{/main}" class="btn outline-btn">취소</a>
           <button type="submit" class="btn primary-btn">문의 보내기</button>
         </div>
       </form>
@@ -105,12 +110,12 @@
     </div>
   </footer>
 
-  <!-- 전송 완료 안내 스크립트 예시 -->
-  <script>
+  <!-- 전송 완료 안내 스크립트 (타임리프 URL 연동) -->
+  <script th:inline="javascript">
     document.getElementById('contactForm').addEventListener('submit', function (e) {
       e.preventDefault();
       alert('문의가 성공적으로 접수되었습니다. 빠르게 확인 후 답변해 드리겠습니다!');
-      window.location.href = 'main.html';
+      window.location.href = /*[[@{/main}]]*/ '/main';
     });
   </script>
 

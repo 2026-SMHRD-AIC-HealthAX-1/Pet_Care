@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
@@ -494,15 +494,17 @@ ul { list-style: none; }
 
   <!-- 네비게이션 -->
   <header class="navbar">
-    <a href="main.html">
-      <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+    <!-- 🌟 메인 연결 -->
+    <a th:href="@{/main}">
+      <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
     </a>
     <nav class="nav-menu">
-      <a href="about.html">서비스 소개</a>
-      <a href="signUp.html">서비스 가입</a>
-      <a href="pricing.html" class="active">요금 안내</a>
+      <a th:href="@{/serviceIntro}">서비스 소개</a>
+      <a th:href="@{/service-signup}">서비스 가입</a>
+      <a th:href="@{/servicePrice}" class="active">요금 안내</a>
     </nav>
-    <a href="login.html" class="nav-login-btn">로그인</a>
+    <!-- 🌟 로그인 연결 -->
+    <a th:href="@{/login}" class="nav-login-btn">로그인</a>
   </header>
 
   <!-- 헤더 -->
@@ -539,7 +541,7 @@ ul { list-style: none; }
           <li class="off">행동 리포트</li>
           <li class="off">우선 고객 지원</li>
         </ul>
-        <a href="signUp.html" class="btn btn-outline">무료로 시작하기</a>
+        <a th:href="@{/service-signup}" class="btn btn-outline">무료로 시작하기</a>
       </div>
 
       <!-- 스탠다드 -->
@@ -562,7 +564,7 @@ ul { list-style: none; }
           <li>주간 행동 리포트</li>
           <li class="off">우선 고객 지원</li>
         </ul>
-        <a href="signUp.html" class="btn btn-primary">스탠다드 시작하기</a>
+        <a th:href="@{/service-signup}" class="btn btn-primary">스탠다드 시작하기</a>
       </div>
 
       <!-- 프리미엄 -->
@@ -584,7 +586,7 @@ ul { list-style: none; }
           <li>일간 · 주간 행동 리포트</li>
           <li>24시간 우선 고객 지원</li>
         </ul>
-        <a href="signUp.html" class="btn btn-outline">프리미엄 시작하기</a>
+        <a th:href="@{/service-signup}" class="btn btn-outline">프리미엄 시작하기</a>
       </div>
 
     </div>
@@ -656,7 +658,8 @@ ul { list-style: none; }
     <div class="cta-box">
       <h2>어떤 플랜이 맞을지 고민되신다면</h2>
       <p>무료 베이직 플랜으로 먼저 사용해보고 결정하셔도 좋아요.</p>
-      <a href="signUp.html" class="btn">무료로 시작하기</a>
+      <!-- 🌟 서비스 가입 연결 -->
+      <a th:href="@{/service-signup}" class="btn">무료로 시작하기</a>
     </div>
   </section>
 

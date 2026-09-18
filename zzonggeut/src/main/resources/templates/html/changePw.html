@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>비밀번호 변경 - 쫑긋</title>
-  <link rel="stylesheet" href="../css/dashboardStyle.css">
+  <!-- 🌟 정적 CSS 경로 타임리프 적용 -->
+  <link rel="stylesheet" th:href="@{/css/dashboardStyle.css}">
   <style>
     /* 전체 기본 설정 및 레이아웃 보장 */
     * {
@@ -263,7 +264,7 @@
       background-color: #f5f5f5;
     }
 
-    /* 내 반려동물 단일 버튼 CSS */
+    /* 내 반려동물 단일 버튼 CSS (프론트 반영) */
     .pet-btn {
       padding: 8px 16px;
       border-radius: 8px;
@@ -287,19 +288,19 @@
   <!-- 1. 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <a href="/main">
-        <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      <a th:href="@{/main}">
+        <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
     <nav class="nav-links">
-      <a href="/dashboard">대시보드</a>
-      <a href="/report">리포트</a>
+      <a th:href="@{/main}">대시보드</a>
+      <a th:href="@{/report}">리포트</a>
     </nav>
     <div class="nav-utils">
       <button class="icon-btn" id="alarmBtn">🔔</button>
-      <button class="icon-btn" id="profileBtn">👤</button>
-      <!-- 단일 버튼 1개로 교체 -->
-      <a href="petManagement.html" class="pet-btn">내 반려동물</a>
+      <a th:href="@{/mypage}" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+      <!-- 🌟 최신 프론트 디자인 반영: 내 반려동물 단일 버튼 -->
+      <a th:href="@{/pet-management}" class="pet-btn">내 반려동물</a>
     </div>
   </header>
 
@@ -311,7 +312,7 @@
         <div class="user-avatar">👤</div>
         <div class="user-details">
           <h2>
-          	<span th:text="${session.loginUser.name}"></span> 님 
+          	<span th:text="${session.loginUser.name}">사용자</span> 님 
           	<span class="badge">PRO 멤버십</span>
           </h2>
           <p>
@@ -338,11 +339,11 @@
 
       <!-- 좌측: 사이드 메뉴 -->
       <aside class="mypage-menu">
-        <a href="/mypage" class="menu-btn active">👤 계정 관리 & 회원정보</a>
-        <a href="myPage.html#notification" class="menu-btn">🔔 알림 설정</a>
-        <a href="myPage.html#subscription" class="menu-btn">💳 구독 관리</a>
-        <a href="myPage.html#notice" class="menu-btn">📢 공지사항</a>
-        <a href="myPage.html#activity" class="menu-btn">📝 나의 활동 & 문의</a>
+        <a th:href="@{/mypage}" class="menu-btn active">👤 계정 관리 & 회원정보</a>
+        <a th:href="@{/mypage}" class="menu-btn">🔔 알림 설정</a>
+        <a th:href="@{/mypage}" class="menu-btn">💳 구독 관리</a>
+        <a th:href="@{/notice}" class="menu-btn">📢 공지사항</a>
+        <a th:href="@{/mypage}" class="menu-btn">📝 나의 활동 & 문의</a>
       </aside>
 
       <!-- 우측: 비밀번호 변경 폼 영역 -->
@@ -362,7 +363,8 @@
               </ul>
             </div>
 
-            <form id="passwordForm" action="/api/users/password/update" method="post">
+            <!-- 🌟 UserController의 비밀번호 변경 처리 경로로 설정 -->
+            <form id="passwordForm" th:action="@{/api/users/password/update}" method="post">
               <div class="form-group">
                 <label for="currentPassword">현재 비밀번호</label>
                 <input type="password" id="currentPassword" name="currentPassword" class="form-input" placeholder="현재 비밀번호를 입력해 주세요" required>
@@ -381,7 +383,7 @@
               </div>
 
               <div class="form-actions">
-                <a href="/mypage" class="btn outline-btn" style="text-decoration: none;">취소</a>
+                <a th:href="@{/mypage}" class="btn outline-btn" style="text-decoration: none;">취소</a>
                 <button type="submit" class="btn primary-btn">비밀번호 변경 완료</button>
               </div>
             </form>
@@ -427,14 +429,13 @@
         duplicateMsg.className = 'validation-msg';
       }
 
-      // 2. 새 비밀번호 확인란 검사 (여기가 핵심!)
+      // 2. 새 비밀번호 확인란 검사
       if (!confirmPw.value) {
-        matchMsg.style.display = 'none'; // 입력값이 없으면 숨김
+        matchMsg.style.display = 'none'; 
         matchMsg.textContent = '';
         return;
       }
 
-      // 값이 있다면 무조건 보이게 하고 일치 여부 판단
       matchMsg.style.display = 'block'; 
       if (newPw.value === confirmPw.value) {
         matchMsg.textContent = '✓ 비밀번호가 일치합니다.';

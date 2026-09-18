@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
@@ -425,7 +425,7 @@
     .plan-compare-link:hover { text-decoration: underline; }
 
     /* 반려동물 선택 */
-    .pet-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+    .pet-list { display: flex; flex-direction: column; gap: 10px; }
 
     .pet-card {
       display: flex;
@@ -524,6 +524,19 @@
       font-weight: 600;
     }
 
+    /* 반려동물이 없을 때 안내 박스 */
+    .no-pet-box {
+      background: #faf8f5;
+      border: 1.5px dashed var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      color: var(--text-sub);
+      font-size: 14px;
+    }
+
+    .no-pet-box p { margin-bottom: 12px; }
+
     /* 선택 비활성화 상태 */
     .pet-list.disabled { opacity: 0.45; pointer-events: none; }
 
@@ -610,8 +623,6 @@
       opacity: 0;
       visibility: hidden;
       transition: all 0.25s ease;
-
-      /* 화면이 작아서 모달이 화면보다 커질 경우 스크롤 가능 */
       overflow-y: auto;
       padding: 20px;
     }
@@ -632,14 +643,11 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
       transform: translateY(20px);
       transition: transform 0.25s ease;
-
-      /* 작은 화면에서도 모달 안쪽 내용이 잘리지 않도록 */
       overflow: hidden;
       flex-shrink: 0;
       min-height: 0;
     }
 
-    /* 반려동물 등록 폼이 모달 높이를 억지로 늘리지 않게 설정 */
     #petRegisterForm {
       display: flex;
       flex-direction: column;
@@ -685,8 +693,6 @@
       font-size: 14.5px;
       line-height: 1.7;
       color: #444;
-
-      /* 모달 높이를 넘는 내용은 이 영역에서 스크롤 */
       min-height: 0;
       flex: 1 1 auto;
     }
@@ -716,7 +722,6 @@
       font-size: 14px;
     }
 
-    /* 성별 라디오 라벨 스타일 */
     .gender-radio-group {
       display: flex;
       gap: 10px;
@@ -798,13 +803,13 @@
 
   <!-- 네비게이션 -->
   <header class="navbar">
-    <a href="main.html"><img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img"></a>
+    <a th:href="@{/main}"><img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img"></a>
     <nav class="nav-menu">
-      <a href="about.html">서비스 소개</a>
-      <a href="signUp.html" class="active">서비스 가입</a>
-      <a href="pricing.html">요금 안내</a>
+      <a th:href="@{/serviceIntro}">서비스 소개</a>
+      <a th:href="@{/service-signup}" class="active">서비스 가입</a>
+      <a th:href="@{/servicePrice}">요금 안내</a>
     </nav>
-    <a href="login.html" class="nav-login-btn">로그인</a>
+    <a th:href="@{/login}" class="nav-login-btn">로그인</a>
   </header>
 
   <main class="signup-wrap">
@@ -815,10 +820,10 @@
         <p>플랜을 고르고 우리 아이를 등록하면 바로 시작할 수 있어요.</p>
       </div>
 
-      <!-- 계정 안내 -->
-      <div class="login-notice">
-        서비스 가입은 로그인 후 진행됩니다. 아직 계정이 없으시다면
-        <a href="join.html">회원가입</a>을 먼저 해주세요.
+      <!-- 🌟 로그인 상태에 따른 안내 배너 (Thymeleaf 조건식 적용) -->
+      <div class="login-notice" th:if="${session.loginUser == null}">
+        서비스 가입은 로그인 후 진행됩니다. 계정이 없으시다면
+        <a th:href="@{/signup}">회원가입</a>을 먼저 해주세요. (또는 <a th:href="@{/login}">로그인</a>)
       </div>
 
       <!-- 진행 단계 -->
@@ -831,7 +836,8 @@
       </div>
 
       <div class="signup-card">
-        <form class="signup-form">
+        <!-- 🌟 폼 전송 경로 지정: /service-signup (POST) -->
+        <form class="signup-form" th:action="@{/service-signup}" method="post">
 
           <!-- 1. 플랜 선택 -->
           <div class="form-section">
@@ -874,22 +880,42 @@
               </label>
             </div>
 
-            <!-- servicePrice.html 로 이동 연결 -->
-            <a href="servicePrice.html" class="plan-compare-link">플랜 자세히 비교하기 →</a>
+            <a th:href="@{/servicePrice}" class="plan-compare-link">플랜 자세히 비교하기 →</a>
           </div>
 
           <!-- 2. 반려동물 선택 -->
           <div class="form-section">
             <div class="form-section-title"><span class="ico">🐶</span> 반려동물 선택</div>
-            <p class="section-lead">등록된 반려동물 중 이 서비스로 지켜볼 아이를 골라주세요. 여러 마리도 선택할 수 있어요.</p>
-<label class="skip-option">
-              <input type="checkbox" id="petSkip">
-              <span>지금은 선택하지 않고, 가입 후에 지정할게요</span>
-            </label>
+            <p class="section-lead">등록된 반려동물 중 이 서비스로 지켜볼 아이를 골라주세요.</p>
 
-            <div class="pet-list" id="petList"></div>
+            <!-- 🌟 등록된 반려동물이 있는 경우 (Thymeleaf 반복문) -->
+            <div class="pet-list" id="petList" th:if="${petList != null and !#lists.isEmpty(petList)}">
+              <label class="pet-card" th:each="pet, iterStat : ${petList}">
+                <input type="checkbox" class="pet-check" th:value="${pet.id}" th:data-name="${pet.name}" th:checked="${iterStat.first}">
+                <span class="pet-avatar" th:text="${pet.species == '고양이' ? '🐱' : '🐶'}">🐶</span>
+                <span class="pet-info">
+                  <strong th:text="${pet.name}">초코</strong>
+                  <span th:text="${pet.species + ' · ' + pet.gender + ' · ' + pet.age + '살'}">강아지 · 남아 · 3살</span>
+                </span>
+                <span class="pet-mark">✓</span>
+              </label>
+            </div>
 
-            <div class="pet-footer">
+            <!-- 🌟 등록된 반려동물이 없는 경우 안내 및 등록 버튼 유도 -->
+            <div class="no-pet-box" th:if="${petList == null or #lists.isEmpty(petList)}">
+              <p>아직 등록된 반려동물이 없어요.<br>새로운 아이를 먼저 등록해 주세요!</p>
+              <button type="button" class="btn btn-primary" id="openPetModalBtnEmpty" style="padding: 10px 20px; font-size: 14px;">+ 새 반려동물 등록하기</button>
+            </div>
+
+            <!-- 반려동물이 있을 때만 표시되는 스킵 옵션 및 하단 추가 버튼 -->
+            <div th:if="${petList != null and !#lists.isEmpty(petList)}">
+              <label class="skip-option">
+                <input type="checkbox" id="petSkip">
+                <span>지금은 선택하지 않고, 가입 후에 지정할게요</span>
+              </label>
+            </div>
+
+            <div class="pet-footer" th:if="${petList != null and !#lists.isEmpty(petList)}">
               <span class="form-hint" id="petCount">1마리 선택됨</span>
               <button type="button" class="pet-add-btn" id="openPetModalBtn">+ 새 반려동물 등록하기</button>
             </div>
@@ -903,7 +929,7 @@
             <div class="form-row">
               <div class="form-group">
                 <label for="camType">카메라 종류</label>
-                <select id="camType">
+                <select id="camType" name="camType">
                   <option value="">선택하세요</option>
                   <option value="homecam">가정용 홈캠</option>
                   <option value="webcam">PC · 노트북 웹캠</option>
@@ -913,7 +939,7 @@
               </div>
               <div class="form-group">
                 <label for="camPlace">설치 위치</label>
-                <select id="camPlace">
+                <select id="camPlace" name="camPlace">
                   <option value="">선택하세요</option>
                   <option value="living">거실</option>
                   <option value="room">방</option>
@@ -925,7 +951,7 @@
 
             <div class="form-group">
               <label for="camName">기기 이름</label>
-              <input type="text" id="camName" placeholder="예) 거실 홈캠">
+              <input type="text" id="camName" name="camName" placeholder="예) 거실 홈캠">
               <span class="form-hint">여러 대를 등록할 때 구분하기 위한 이름이에요.</span>
             </div>
           </div>
@@ -987,23 +1013,22 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary submit-btn">서비스 시작하기</button>
+          <!-- 🌟 만약 로그인 안 되어 있다면 버튼을 비활성화하거나 로그인 유도 가능 -->
+          <button type="submit" class="btn btn-primary submit-btn" th:disabled="${session.loginUser == null}" th:style="${session.loginUser == null ? 'background-color: #ccc; cursor: not-allowed;' : ''}">서비스 시작하기</button>
         </form>
       </div>
 
     </div>
   </main>
 
-  <!-- 약관 보기 모달 (팝업) -->
+  <!-- 약관 보기 모달 -->
   <div class="modal-overlay" id="termsModal">
     <div class="modal-card">
       <div class="modal-header">
         <h3 id="modalTitle">약관 상세보기</h3>
         <button type="button" class="modal-close-btn" id="modalClose">&times;</button>
       </div>
-      <div class="modal-body" id="modalContent">
-        <!-- 약관 내용 동적 삽입 -->
-      </div>
+      <div class="modal-body" id="modalContent"></div>
       <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--line);">
         <button type="button" class="btn btn-primary" id="modalConfirm">동의</button>
       </div>
@@ -1037,12 +1062,8 @@
           <div class="form-group">
             <label>성별 <span class="req">*</span></label>
             <div class="gender-radio-group">
-              <label>
-                <input type="radio" name="newPetGender" value="남아" checked> 남아
-              </label>
-              <label>
-                <input type="radio" name="newPetGender" value="여아"> 여아
-              </label>
+              <label><input type="radio" name="newPetGender" value="남아" checked> 남아</label>
+              <label><input type="radio" name="newPetGender" value="여아"> 여아</label>
             </div>
           </div>
 
@@ -1051,7 +1072,6 @@
             <input type="number" id="newPetAge" min="0" max="30" placeholder="예) 2" required>
           </div>
 
-          <!-- 입력 양식 바로 밑에 버튼배치하여 위치 상향 조정 -->
           <div class="modal-footer">
             <button type="button" class="btn btn-outline" id="petModalCancel">취소</button>
             <button type="submit" class="btn btn-primary">등록하기</button>
@@ -1071,58 +1091,22 @@
     const termsData = {
       terms: {
         title: "서비스 이용약관 동의 (필수)",
-        content: `
-          <p>본 약관은 주식회사 쫑긋(이하 "회사"라 합니다)이 제공하는 AI 기반 반려동물 탐지 및 행동 분석 서비스(이하 "서비스"라 합니다)의 이용과 관련하여 회사와 회원의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.</p>
-          <ul>
-            <li><strong>용어의 정의:</strong> "서비스"란 회사가 제공하는 AI 영상 기반 반려동물 위치/행동 탐지, 실시간 모니터링, 이상행동 분석 리포트, 알림 등 제반 서비스를 의미하며, "회원"이란 본 약관에 동의하고 서비스를 이용하는 고객을 말합니다.</li>
-            <li><strong>약관의 효력 및 개정:</strong> 회사는 본 약관을 서비스 화면에 게시하며, 관련 법령을 위배하지 않는 범위에서 약관을 개정할 수 있습니다. 약관 개정 시 적용일자 7일 전부터 공지사항을 통해 고지합니다.</li>
-            <li><strong>서비스 이용계약의 성립:</strong> 이용계약은 회원이 본 필수 약관에 동의하고 회사가 승낙함으로써 체결됩니다.</li>
-          </ul>
-        `
+        content: `<p>본 약관은 회사와 회원의 권리 및 의무를 규정합니다.</p>`
       },
       video: {
         title: "영상 정보 수집 및 처리 동의 (필수)",
-        content: `
-          <p>회사는 AI 기반 반려동물 행동 분석 및 실시간 모니터링 서비스 제공을 위해 회원이 연결한 영상기기(IP카메라, 모바일 카메라 등)로부터 영상 데이터를 수집하고 처리합니다.</p>
-          <ul>
-            <li><strong>수집 및 처리 목적:</strong> 반려동물 행동 패턴 학습, 위치/이상행동 감지, 맞춤형 AI 리포트 생성 및 품질 개선</li>
-            <li><strong>처리하는 영상 정보:</strong> 연결된 영상기기를 통해 촬영되는 실시간 및 녹화 영상 데이터</li>
-            <li><strong>보유 및 이용 기간:</strong> 회원 탈퇴 시 또는 서비스 이용 종료 시까지 (단, 관계 법령에 의거하여 보존할 필요가 있는 경우 해당 기간 동안 보관)</li>
-            <li><strong>영상기기 설치 및 회원 의무:</strong> 회원은 영상기기 설치 시 타인의 초상권 및 사생활이 침해되지 않도록 주의해야 하며, 무단 촬영으로 발생하는 모든 법적 책임은 회원 본인에게 있습니다.</li>
-          </ul>
-        `
+        content: `<p>AI 행동 분석을 위해 영상 데이터를 수집합니다.</p>`
       },
       payment: {
         title: "유료 결제 및 자동 갱신 동의 (필수)",
-        content: `
-          <p>회사는 유료 구독 서비스(스탠다드 플랜 등) 이용 회원에게 아래와 같은 결제 및 자동 갱신 조건 정책을 적용합니다.</p>
-          <ul>
-            <li><strong>결제 방식 및 주기:</strong> 회원은 월간 또는 연간 단위의 정기 결제 플랜을 이용할 수 있으며, 지정된 결제 수단으로 서비스 이용 요금이 자동으로 청구됩니다.</li>
-            <li><strong>자동 갱신 조건:</strong> 정기 결제 서비스는 회원이 직접 해지 신청을 하기 전까지 동일한 조건으로 매월/매년 자동 갱신 및 결제됩니다.</li>
-            <li><strong>청약철회 및 환불 정책:</strong>
-              <ul>
-                <li>결제 후 7일 이내에 서비스를 전혀 이용하지 않은 경우 전액 환불이 가능합니다.</li>
-                <li>결제 후 서비스를 이용했거나 7일이 경과한 경우, 당월 이용 금액을 차감한 잔여 기간에 대한 기준에 따라 환불 처리됩니다.</li>
-              </ul>
-            </li>
-            <li><strong>구독 해지 안내:</strong> 회원은 [마이페이지 > 구독 관리] 메뉴를 통해 언제든지 자동 결제 해지를 신청할 수 있으며, 해지 시에도 기존 결제 주기의 남은 기간 동안은 서비스를 계속 이용할 수 있습니다.</li>
-          </ul>
-        `
+        content: `<p>정기 결제 및 자동 갱신 조건에 대한 안내입니다.</p>`
       },
       marketing: {
         title: "서비스 소식 및 혜택 수신 동의 (선택)",
-        content: `
-          <p>회사는 회원이 동의한 경우에 한하여 각종 서비스 업데이트 소식, 이벤트 및 마케팅 혜택 정보를 제공합니다.</p>
-          <ul>
-            <li><strong>수신 항목:</strong> 앱 푸시 알림, 이메일, SMS/LMS 메시지</li>
-            <li><strong>제공 내용:</strong> 신규 기능 안내, 할인이벤트 및 프로모션 소식, 주간 케어 팁, 회원 맞춤 혜택 안내</li>
-            <li><strong>동의 철회:</strong> 본 동의는 선택 사항이며, 동의하지 않더라도 서비스 이용에는 제한이 없습니다. 동의 후에도 [마이페이지 > 알림 설정] 메뉴에서 언제든지 수신 여부를 변경할 수 있습니다.</li>
-          </ul>
-        `
+        content: `<p>이벤트 및 혜택 정보를 받아보실 수 있습니다.</p>`
       }
     };
 
-    // 모달 엘리먼트 및 상태 관리
     const modalOverlay = document.getElementById('termsModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalContent = document.getElementById('modalContent');
@@ -1151,28 +1135,20 @@
       viewBtn.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
-        const modalKey = viewBtn.getAttribute('data-modal');
-        openModal(modalKey);
+        openModal(viewBtn.getAttribute('data-modal'));
       });
     });
 
     modalClose.addEventListener('click', closeModal);
-    modalOverlay.addEventListener('click', e => {
-      if (e.target === modalOverlay) closeModal();
-    });
-
+    modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
     modalConfirm.addEventListener('click', () => {
       if (currentKey) {
-        const targetCheckbox = document.getElementById(`agree-${currentKey}`);
-        if (targetCheckbox) {
-          targetCheckbox.checked = true;
-          checkAllAgreed();
-        }
+        const target = document.getElementById(`agree-${currentKey}`);
+        if (target) { target.checked = true; checkAllAgreed(); }
       }
       closeModal();
     });
 
-    // 전체 동의 체크박스
     const agreeAll = document.getElementById('agreeAll');
     const agreeChecks = document.querySelectorAll('.agree-check');
 
@@ -1183,10 +1159,7 @@
     agreeAll.addEventListener('change', () => {
       agreeChecks.forEach(chk => chk.checked = agreeAll.checked);
     });
-
-    agreeChecks.forEach(chk => {
-      chk.addEventListener('change', checkAllAgreed);
-    });
+    agreeChecks.forEach(chk => chk.addEventListener('change', checkAllAgreed));
 
     // 플랜 선택
     const planRadios = document.querySelectorAll('input[name="plan"]');
@@ -1209,13 +1182,14 @@
     planRadios.forEach(r => r.addEventListener('change', updatePlan));
     updatePlan();
 
-    // 반려동물 선택 및 모달 관리
+    // 반려동물 선택 및 모달 관리 (데이터가 있을 때만 안전하게 실행)
     const petList = document.getElementById('petList');
     const petSkip = document.getElementById('petSkip');
     const petCount = document.getElementById('petCount');
     const sumPets = document.getElementById('sumPets');
 
     function updatePets() {
+      if (!petList) return;
       const petChecks = document.querySelectorAll('.pet-check');
       petChecks.forEach(chk => {
         chk.closest('.pet-card').classList.toggle('selected', chk.checked);
@@ -1223,101 +1197,77 @@
 
       const picked = [...petChecks].filter(c => c.checked).map(c => c.dataset.name);
 
-      if (petCount) {
-        petCount.textContent = petSkip.checked
-          ? '가입 후에 지정합니다'
-          : picked.length + '마리 선택됨';
-      }
-
-      if (petSkip.checked) {
-        sumPets.textContent = '가입 후 지정';
+      if (petSkip && petSkip.checked) {
+        if(petCount) petCount.textContent = '가입 후에 지정합니다';
+        if(sumPets) sumPets.textContent = '가입 후 지정';
       } else {
-        sumPets.textContent = picked.length ? picked.join(', ') : '선택 안 함';
+        if(petCount) petCount.textContent = picked.length + '마리 선택됨';
+        if(sumPets) sumPets.textContent = picked.length ? picked.join(', ') : '선택 안 함';
       }
     }
 
-    petList.addEventListener('change', e => {
-      if (e.target.classList.contains('pet-check')) {
-        updatePets();
-      }
-    });
+    if (petList) {
+      petList.addEventListener('change', e => {
+        if (e.target.classList.contains('pet-check')) {
+          updatePets();
+        }
+      });
+    }
 
-    petSkip.addEventListener('change', () => {
-      const skip = petSkip.checked;
-      petSkip.closest('.skip-option').classList.toggle('on', skip);
-      petList.classList.toggle('disabled', skip);
-      if (skip) {
-        document.querySelectorAll('.pet-check').forEach(c => c.checked = false);
-      }
-      updatePets();
-    });
+    if (petSkip) {
+      petSkip.addEventListener('change', () => {
+        const skip = petSkip.checked;
+        petSkip.closest('.skip-option').classList.toggle('on', skip);
+        petList.classList.toggle('disabled', skip);
+        if (skip) {
+          document.querySelectorAll('.pet-check').forEach(c => c.checked = false);
+        }
+        updatePets();
+      });
+    }
 
     // 새 반려동물 등록 모달 처리
     const petRegisterModal = document.getElementById('petRegisterModal');
     const openPetModalBtn = document.getElementById('openPetModalBtn');
+    const openPetModalBtnEmpty = document.getElementById('openPetModalBtnEmpty');
     const petModalClose = document.getElementById('petModalClose');
     const petModalCancel = document.getElementById('petModalCancel');
     const petRegisterForm = document.getElementById('petRegisterForm');
 
     function openPetModal() {
-      petRegisterModal.classList.add('active');
-      document.body.style.overflow = 'hidden';
+      if(petRegisterModal) {
+        petRegisterModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
     }
 
     function closePetModal() {
-      petRegisterModal.classList.remove('active');
-      document.body.style.overflow = '';
-      petRegisterForm.reset();
-    }
-
-    openPetModalBtn.addEventListener('click', openPetModal);
-    petModalClose.addEventListener('click', closePetModal);
-    petModalCancel.addEventListener('click', closePetModal);
-
-    petRegisterModal.addEventListener('click', e => {
-      if (e.target === petRegisterModal) closePetModal();
-    });
-
-    function getPetIcon(species) {
-      if (species === '강아지') return '🐶';
-      if (species === '고양이') return '🐱';
-      return '🐾';
-    }
-
-    petRegisterForm.addEventListener('submit', e => {
-      e.preventDefault();
-
-      const name = document.getElementById('newPetName').value.trim();
-      const species = document.getElementById('newPetSpecies').value;
-      const gender = document.querySelector('input[name="newPetGender"]:checked').value;
-      const age = document.getElementById('newPetAge').value;
-
-      if (!name || !species || !age) return;
-
-      const icon = getPetIcon(species);
-
-      const label = document.createElement('label');
-      label.className = 'pet-card selected';
-      label.innerHTML = `
-        <input type="checkbox" class="pet-check" data-name="${name}" checked>
-        <span class="pet-avatar">${icon}</span>
-        <span class="pet-info">
-          <strong>${name}</strong>
-          <span>${species} · ${gender} · ${age}살</span>
-        </span>
-        <span class="pet-mark">✓</span>
-      `;
-
-      if (petSkip.checked) {
-        petSkip.checked = false;
-        petSkip.closest('.skip-option').classList.remove('on');
-        petList.classList.remove('disabled');
+      if(petRegisterModal) {
+        petRegisterModal.classList.remove('active');
+        document.body.style.overflow = '';
+        if(petRegisterForm) petRegisterForm.reset();
       }
+    }
 
-      petList.appendChild(label);
-      updatePets();
-      closePetModal();
-    });
+    if(openPetModalBtn) openPetModalBtn.addEventListener('click', openPetModal);
+    if(openPetModalBtnEmpty) openPetModalBtnEmpty.addEventListener('click', openPetModal);
+    if(petModalClose) petModalClose.addEventListener('click', closePetModal);
+    if(petModalCancel) petModalCancel.addEventListener('click', closePetModal);
+
+    if(petRegisterModal) {
+      petRegisterModal.addEventListener('click', e => {
+        if (e.target === petRegisterModal) closePetModal();
+      });
+    }
+
+    if(petRegisterForm) {
+      petRegisterForm.addEventListener('submit', e => {
+        e.preventDefault();
+        alert('반려동물이 등록되었습니다! (연동 필요)');
+        closePetModal();
+        location.reload();
+      });
+    }
 
     updatePets();
   </script>

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>쫑긋 - 이용약관</title>
-  <link rel="stylesheet" href="../css/mainStyle.css">
+  <!-- 🌟 정적 CSS 경로 타임리프 적용 -->
+  <link rel="stylesheet" th:href="@{/css/mainStyle.css}">
   <style>
     .legal-container {
       max-width: 900px;
@@ -105,6 +106,23 @@
       font-size: 14px;
       color: #555;
     }
+
+    /* '내 반려동물' 버튼 디자인 (프론트 반영) */
+    .pet-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      background-color: #0b8484;
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.2s;
+    }
+
+    .pet-btn:hover {
+      background-color: #086868;
+    }
   </style>
 </head>
 
@@ -113,18 +131,22 @@
   <!-- 1. 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <a href="main.html">
-        <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      <!-- 🌟 로그인 후 메인인 /main으로 연결 -->
+      <a th:href="@{/main}">
+        <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
     <nav class="nav-links">
-      <a href="dashboard.html">대시보드</a>
-      <a href="activity-report.html">리포트</a>
+      <a th:href="@{/dashboard}">대시보드</a>
+      <!-- 리포트 경로 연동 -->
+      <a th:href="@{/report}">리포트</a>
     </nav>
     <div class="nav-utils">
       <button class="icon-btn" id="alarmBtn">🔔</button>
-      <a href="myPage.html" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
-      <a href="petManagement.html" class="btn primary-btn">내 반려동물</a>
+      <!-- 🌟 마이페이지 연결 -->
+      <a th:href="@{/mypage}" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+      <!-- 🌟 프론트 최신 반영: 내 반려동물 단일 버튼 적용 -->
+      <a th:href="@{/pet-management}" class="pet-btn">내 반려동물</a>
     </div>
   </header>
 
@@ -206,28 +228,29 @@
   <footer class="footer">
     <div class="footer-top">
       <div class="footer-brand">
-        <a href="main.html">
-          <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="footer-logo-img">
+        <!-- 🌟 메인 연결 -->
+        <a th:href="@{/main}">
+          <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="footer-logo-img">
         </a>
         <p>평소를 알고, 변화를 알려주는 펫케어 서비스</p>
       </div>
       <div class="footer-links">
         <div class="col">
           <h4>서비스</h4>
-          <a href="#">서비스 소개</a>
-          <a href="#">서비스 가입</a>
-          <a href="#">요금 안내</a>
+          <a th:href="@{/serviceIntro}">서비스 소개</a>
+          <a th:href="@{/service-signup}">서비스 가입</a>
+          <a th:href="@{/servicePrice}">요금 안내</a>
         </div>
         <div class="col">
           <h4>고객센터</h4>
-          <a href="notice.html">공지사항</a>
-          <a href="#">자주 묻는 질문</a>
-          <a href="contact.html">문의하기</a>
+          <a th:href="@{/notice}">공지사항</a>
+          <a th:href="@{/fnq}">자주 묻는 질문</a>
+          <a th:href="@{/contact}">문의하기</a>
         </div>
         <div class="col">
           <h4>기타</h4>
-          <a href="privacy.html">개인정보처리방침</a>
-          <a href="use.html">이용약관</a>
+          <a th:href="@{/privacy}">개인정보처리방침</a>
+          <a th:href="@{/use}">이용약관</a>
         </div>
       </div>
     </div>

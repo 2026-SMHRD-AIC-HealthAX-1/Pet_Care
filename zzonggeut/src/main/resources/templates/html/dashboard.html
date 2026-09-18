@@ -1,28 +1,16 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>통합 대시보드 - 쫑긋</title>
-  <link rel="stylesheet" href="../css/dashboardStyle.css">
+  <!-- 🌟 정적 CSS 경로 타임리프 적용 -->
+  <link rel="stylesheet" th:href="@{/css/dashboardStyle.css}">
   <style>
-    /* 반려동물 선택 드롭다운 (모서리 곡률 8px 및 포인트 컬러 적용) */
-    .pet-select {
-      padding: 6px 12px;
-      border-radius: 8px;
-      border: 1.5px solid #0b8484;
-      color: #0b8484;
-      font-weight: bold;
-      outline: none;
-      background-color: #fff;
-      cursor: pointer;
-    }
-
-    /* '내 반려동물' 버튼 설정 */
+    /* '내 반려동물' 버튼 설정 (프론트 반영) */
     .pet-btn {
       padding: 8px 16px;
-      /* 기존 10px 18px -> 8px 16px로 수정 */
       border-radius: 8px;
       background-color: #0b8484;
       color: #fff;
@@ -32,6 +20,10 @@
       display: inline-block;
       transition: background-color 0.2s;
     }
+
+    .pet-btn:hover {
+      background-color: #086868;
+    }
   </style>
 </head>
 
@@ -40,26 +32,27 @@
   <!-- 1. 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <a href="main.html">
-        <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      <!-- 🌟 로그인 후 메인인 /main으로 연결 -->
+      <a th:href="@{/main}">
+        <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
     <nav class="nav-links">
-      <a href="dashboard.html">대시보드</a>
-      <a href="activity-report.html">리포트</a>
+      <a th:href="@{/dashboard}" class="active">대시보드</a>
+      <!-- 리포트 경로 연동 -->
+      <a th:href="@{/report}">리포트</a>
     </nav>
 
-    <!-- 우측 유틸 영역: 종(🔔) -> 사람(👤) -> 내 반려동물 선택창 순서 배치 -->
+    <!-- 우측 유틸 영역: 알림(🔔) -> 마이페이지(👤) -> 내 반려동물 버튼 순서 배치 -->
     <div class="nav-utils" style="display: flex; align-items: center; gap: 12px;">
       <!-- 1) 알림 종 버튼 -->
       <button class="icon-btn" id="alarmBtn">🔔</button>
 
-      <!-- 2) 사람 프로필 버튼 -->
-      <a href="#" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+      <!-- 2) 마이페이지 프로필 버튼 -->
+      <a th:href="@{/mypage}" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
 
-      <!-- 단일 버튼 1개로 교체 -->
-      <a href="petManagement.html" class="pet-btn">내 반려동물</a>
-
+      <!-- 3) 내 반려동물 관리 버튼 (프론트 최신 반영) -->
+      <a th:href="@{/pet-management}" class="pet-btn">내 반려동물</a>
     </div>
   </header>
 
@@ -110,7 +103,8 @@
           </div>
         </div>
         <div class="card-footer-btns">
-          <button class="btn outline-btn">⚙️ 카메라 설정</button>
+          <!-- 🌟 관심영역(ROI) 설정 페이지로 연결되는 버튼 (필요시 th:href 지정 가능) -->
+          <a th:href="@{/roi-select}" class="btn outline-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">⚙️ 관심영역(ROI) 설정</a>
           <button class="btn primary-btn">🔍 AI 행동 분석 실행</button>
         </div>
       </div>

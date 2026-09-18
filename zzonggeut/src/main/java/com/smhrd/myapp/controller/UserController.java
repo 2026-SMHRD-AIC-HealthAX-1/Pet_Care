@@ -223,7 +223,7 @@ public class UserController {
 
         // 성공 시
         rttr.addFlashAttribute("errorMessage", "비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인해주세요.");
-        return "redirect:/login"; 
+        return "redirect:/signup"; 
     }
  
 }

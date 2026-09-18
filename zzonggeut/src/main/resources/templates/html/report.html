@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>주간 반려동물 행동 분석 리포트 - 쫑긋</title>
-    <link rel="stylesheet" href="../css/dashboardStyle.css">
+    <!-- 🌟 정적 CSS 경로 타임리프 적용 -->
+    <link rel="stylesheet" th:href="@{/css/dashboardStyle.css}">
     <style>
         /* 리포트 서류(A4 문서) 전용 스타일 */
         .report-wrapper {
@@ -240,6 +241,23 @@
             color: #94a3b8;
         }
 
+        /* '내 반려동물' 버튼 디자인 (프론트 반영) */
+        .pet-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background-color: #0b8484;
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+
+        .pet-btn:hover {
+            background-color: #086868;
+        }
+
         /* 인쇄 시 버튼 숨김 설정 */
         @media print {
             .navbar, .footer, .no-print {
@@ -261,18 +279,22 @@
     <!-- 상단 네비게이션 바 -->
     <header class="navbar">
         <div class="logo">
-            <a href="main.html">
-                <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+            <!-- 🌟 로그인 후 메인인 /main으로 연결 -->
+            <a th:href="@{/main}">
+                <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
             </a>
         </div>
         <nav class="nav-links">
-            <a href="dashboard.html">대시보드</a>
-            <a href="activity-report.html" class="active">리포트</a>
+            <a th:href="@{/dashboard}">대시보드</a>
+            <!-- 🌟 리포트 페이지 경로 연결 -->
+            <a th:href="@{/report}" class="active">리포트</a>
         </nav>
         <div class="nav-utils">
             <button class="icon-btn" id="alarmBtn">🔔</button>
-            <a href="myPage.html" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
-            <a href="petManagement.html" class="btn primary-btn" style="text-decoration: none; padding: 8px 16px; font-size: 14px;">내 반려동물</a>
+            <!-- 🌟 마이페이지 링크 연결 -->
+            <a th:href="@{/mypage}" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+            <!-- 🌟 프론트 최신 반영: 내 반려동물 단일 버튼 적용 -->
+            <a th:href="@{/pet-management}" class="pet-btn">내 반려동물</a>
         </div>
     </header>
 

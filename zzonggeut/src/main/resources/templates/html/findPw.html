@@ -146,8 +146,9 @@
   <!-- 1. 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <a href="main.html">
-        <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+      <!-- 🌟 로그인 전 메인인 /로 연결 -->
+      <a th:href="@{/}">
+        <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
   </header>
@@ -160,15 +161,15 @@
         <p>아이디와 전화번호를 입력 후 새 비밀번호를 설정하세요.</p>
       </div>
 
-      <!-- 백엔드로 데이터를 보내도록 action과 method 추가 -->
-      <form class="login-form" action="/api/users/find-pw/process" method="POST">
+      <!-- 🌟 /api/users를 제외한 깔끔한 경로로 action 설정 -->
+      <form class="login-form" th:action="@{/find-pw/process}" method="POST">
         <!-- 아이디 입력 -->
         <div class="form-group">
           <label for="userId">아이디</label>
           <input type="text" id="userId" name="id" placeholder="아이디를 입력하세요" required>
         </div>
 
-        <!-- 전화번호 입력 (Entity에 저장된 필드명에 맞춤) -->
+        <!-- 전화번호 입력 -->
         <div class="form-group">
           <label for="userPhone">전화번호</label>
           <input type="text" id="userPhone" name="phone" placeholder="'-' 없이 번호만 입력" required>
@@ -186,7 +187,7 @@
 
       <!-- 로그인으로 돌아가기 -->
       <div class="login-utils">
-        <a href="/login">로그인으로 돌아가기</a>
+        <a th:href="@{/login}">로그인으로 돌아가기</a>
       </div>
     </div>
   </main>

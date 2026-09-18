@@ -38,4 +38,13 @@ public class UserEntity implements Persistable<String>{
     public boolean isNew() {
         return true;
     }
+    
+    private String plan = "basic";
+    public String getPlan() {
+        return plan != null ? plan : "basic"; // 값이 없으면 기본 'basic' 반환
+    }
+
+    public void setPlan(String plan) {
+        this.plan = plan;
+    }
 }

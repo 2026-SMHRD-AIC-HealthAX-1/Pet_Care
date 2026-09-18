@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
@@ -85,22 +85,19 @@ ul { list-style: none; }
   font-weight: 700;
 }
 
-/* 새로 추가된 pet-btn 스타일 */
-.pet-btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  background-color: #0b8484;
+.nav-login-btn {
+  padding: 10px 24px;
+  background-color: var(--primary);
   color: #fff !important;
-  font-weight: bold;
-  font-size: 14px;
-  text-decoration: none;
-  display: inline-block;
-  transition: background-color 0.2s;
-  margin-left: auto; /* 상단 네비게이션 좌우 우측 정렬 유지 */
+  border-radius: 999px;
+  font-weight: 600;
+  transition: all 0.2s;
+  margin-left: auto; /* 좌우 균형 유지 */
 }
 
-.pet-btn:hover {
+.nav-login-btn:hover {
   background-color: var(--primary-dark);
+  transform: translateY(-1px);
 }
 
 /* ---------- 공통 버튼 ---------- */
@@ -200,7 +197,7 @@ ul { list-style: none; }
   .navbar { padding: 14px 20px; position: relative; }
   .nav-menu { position: static; transform: none; gap: 14px; }
   .nav-menu a { font-size: 14px; }
-  .pet-btn { margin-left: 0; }
+  .nav-login-btn { padding: 8px 16px; margin-left: 0; }
   .section { padding: 60px 20px; }
   .section-title { font-size: 24px; }
 }
@@ -496,16 +493,17 @@ ul { list-style: none; }
 
   <!-- 네비게이션 -->
   <header class="navbar">
-    <a href="main.html">
-      <img src="/zzonggeut/src/main/resources/static/assets/logo.png" alt="쫑긋 로고" class="logo-img">
+    <!-- 🌟 메인 연결 -->
+    <a th:href="@{/main}">
+      <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
     </a>
     <nav class="nav-menu">
-      <a href="serviceIntro.html" class="active">서비스 소개</a>
-      <a href="serviceSignUp.html">서비스 가입</a>
-      <a href="servicePrice.html">요금 안내</a>
+      <a th:href="@{/serviceIntro}" class="active">서비스 소개</a>
+      <a th:href="@{/service-signup}">서비스 가입</a>
+      <a th:href="@{/servicePrice}">요금 안내</a>
     </nav>
-    <!-- 로그인 버튼 클래스 변경 -->
-    <a href="login.html" class="pet-btn">로그인</a>
+    <!-- 🌟 로그인 연결 -->
+    <a th:href="@{/login}" class="nav-login-btn">로그인</a>
   </header>
 
   <!-- Hero -->
@@ -523,8 +521,8 @@ ul { list-style: none; }
         평소와 다른 행동이 반복되면 바로 알려드립니다.
       </p>
       <div class="hero-btns">
-        <a href="serviceSignUp.html" class="btn btn-primary">무료로 시작하기</a>
-        <a href="servicePrice.html" class="btn btn-outline">요금 살펴보기</a>
+        <a th:href="@{/service-signup}" class="btn btn-primary">무료로 시작하기</a>
+        <a th:href="@{/servicePrice}" class="btn btn-outline">요금 살펴보기</a>
       </div>
       <p class="hero-note">카드 등록 없이 바로 시작 · 언제든 해지 가능</p>
     </div>
@@ -679,7 +677,8 @@ ul { list-style: none; }
     <div class="cta-box">
       <h2>오늘부터 우리 아이 하루를 기록해보세요</h2>
       <p>가입은 1분이면 충분하고, 베이직 플랜은 계속 무료입니다.</p>
-      <a href="signUp.html" class="btn">서비스 가입하기</a>
+      <!-- 🌟 서비스 가입 연결 -->
+      <a th:href="@{/service-signup}" class="btn">서비스 가입하기</a>
     </div>
   </section>
 
@@ -688,6 +687,6 @@ ul { list-style: none; }
     <p class="footer-copy">© 2026 쫑긋. All rights reserved.</p>
   </footer>
 
-</body>
+--></body>
 
 </html>

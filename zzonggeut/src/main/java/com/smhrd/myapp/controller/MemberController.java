@@ -70,8 +70,20 @@ public class MemberController {
     }
     
     // 9. 메인 화면
-    @GetMapping("/main")
+    @GetMapping({"/", "main"})
     public String mainPage() {
         return "html/main"; // templates/html/main.html 파일을 띄움
+    }
+    
+    // 메인 화면
+    @GetMapping({"/petmanagement", "petManagement.html"})
+    public String petmanagementPage() {
+        return "html/petManagement"; // templates/html/petManagement.html 파일을 띄움
+    }
+    
+    // 메인 화면
+    @GetMapping({"/roiselect", "roiSelect.html"})
+    public String roiselectPage() {
+        return "html/roiSelect"; // templates/html/roiSelect.html 파일을 띄움
     }
 }

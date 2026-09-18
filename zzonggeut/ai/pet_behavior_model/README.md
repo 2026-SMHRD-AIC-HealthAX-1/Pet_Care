@@ -95,13 +95,77 @@ result = analyzer.analyze(
 
 Schema 1.2에서는 기존 ROI 집계값과 함께 접근 이벤트별 `visit_events`를 반환합니다. 정상 이탈은 `end_reason="EXIT"`, 영상 종료 시 ROI 내부에 남아 있는 이벤트는 `end_reason="VIDEO_END"`로 표현합니다.
 
-현재 master에는 `FramePacket`, `AnalysisContext`, `FrameSource`, `UploadFrameSource`가 포함되어 있지 않습니다. 향후 공통 프레임 입력 구조가 병합되면 public interface의 입력 계층에서 `video_path`를 `UploadFrameSource`로 변환하는 방식으로 연결하며, 이번 UPLOAD 인터페이스에는 LIVE 처리를 포함하지 않습니다.
+## UPLOAD/LIVE 공통 입력 구조
+
+- `FramePacket`: 디코딩된 BGR 프레임과 `timestamp_sec`
+- `AnalysisContext`: 분석 ID, 반려동물, 카메라, 종, 촬영시각과 ROI
+- `FrameSource`: timestamp가 있는 프레임 입력 공통 인터페이스
+- `UploadFrameSource`: 기존 영상 파일을 `FramePacket`으로 읽는 구현
+
+기존 `PetBehaviorAnalyzer.analyze()` UPLOAD 호출은 그대로 유지됩니다.
+
+## LIVE Python 메소드 호출
+
+백엔드는 분석별로 하나의 세션을 만들고 프레임을 순서대로 전달한 뒤 종료합니다.
+
+```python
+from src import AnalysisContext, LivePetBehaviorAnalyzer
+
+live_analyzer = LivePetBehaviorAnalyzer()
+session = live_analyzer.start_session(
+    context=AnalysisContext(
+        analysis_id="ANL-LIVE-001",
+        pet_id="PET-001",
+        video_id="VID-LIVE-001",
+        camera_id="CAM-001",
+        species="DOG",
+        recorded_at="2026-09-17T15:00:00+09:00",
+        roi_data={
+            "camera_id": "CAM-001",
+            "roi_areas": [
+                {
+                    "roi_id": "ROI-FOOD-001",
+                    "roi_name": "FOOD_BOWL",
+                    "roi_type": "RECTANGLE",
+                    "x": 0.1,
+                    "y": 0.6,
+                    "width": 0.2,
+                    "height": 0.2,
+                }
+            ],
+        },
+    ),
+    expected_fps=10.0,
+)
+
+try:
+    session.push_frame(frame_bgr, timestamp_sec=0.0)
+    session.push_frame(next_frame_bgr, timestamp_sec=0.1)
+    result = session.finish()
+except Exception:
+    session.abort()
+    raise
+```
+
+`frame_bgr`는 OpenCV 형식의 3채널 BGR 배열입니다. timestamp는 세션 안에서
+엄격하게 증가해야 하며 첫 timestamp를 기준으로 상대 시간이 유지됩니다. 빠진 시간 슬롯은
+검은 프레임으로 기록하여 기존 Tracking이 탐지 누락으로 관찰하게 합니다. 해상도 변경,
+빈 세션, 역순·중복 timestamp, 허용 범위를 넘는 긴 프레임 중단은 예외로 처리합니다.
+
+`finish()`는 임시 LIVE 영상을 닫고 기존 `PetBehaviorAnalyzer.analyze()`를 호출합니다.
+따라서 DOG/CAT Tracking, 5초 피처, ROI, 변화 감지, Schema 1.2 결과 생성은 기존 경로를
+그대로 재사용하며 별도 YOLO/Tracking 구현을 만들지 않습니다. 임시 LIVE 영상은 성공과
+실패 모두에서 제거됩니다.
+
+현재 LIVE 연결은 프레임을 수신하면서 임시 영상으로 버퍼링하고 세션 종료 후 전체 분석을
+실행하는 1차 구현입니다. 프레임마다 YOLO 결과나 5초 중간 결과를 즉시 반환하는 스트리밍
+추론은 포함하지 않습니다.
 
 ## Spring 전달 설정
 
 기본 전달 주소:
 
-http://localhost:8081/api/ai/analysis-results
+http://localhost:9090/api/ai/analysis-results
 
 다른 Spring 서버를 사용할 경우 모델 서버 실행 전에 다음 환경변수를 설정합니다.
 
@@ -200,4 +264,5 @@ Spring 복구 후 동일한 analysis_id, pet_id, video_id, species로 다시 요
 - 프론트엔드 화면 연결
 - 사용자 인증
 - 알림 발송
-- LIVE 프레임 입력 및 세션 관리
+- LIVE WebSocket/HTTP 전송 API와 세션 저장소
+- 프레임별 즉시 Tracking 오버레이 및 5초 중간 결과 push

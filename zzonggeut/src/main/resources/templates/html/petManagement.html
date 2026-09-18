@@ -7,7 +7,7 @@
     <title>반려동물 관리 - 쫑긋</title>
     <link rel="stylesheet" href="../css/dashboardStyle.css">
     <style>
-        /* 반려동물 관리 전용 스타일 추가 */
+        /* 반려동물 관리 전용 스타일 */
         .pet-manage-grid {
             display: grid;
             grid-template-columns: 320px 1fr;
@@ -18,7 +18,14 @@
         .pet-list-section {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .pet-card-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .pet-item-card {
@@ -52,21 +59,19 @@
             color: #666;
         }
 
-        .pet-btn-group {
-            margin-top: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
         .btn-full {
             width: 100%;
             padding: 12px;
         }
 
+        /* 카드 클릭(active) 시에만 표시되는 수정/삭제 버튼 그룹 */
         .btn-row {
-            display: flex;
+            display: none; /* 기본 상태: 안 보임 */
             gap: 10px;
+        }
+
+        .pet-card-wrapper.show-actions .btn-row {
+            display: flex; /* 선택 시 보임 */
         }
 
         .btn-row .btn {
@@ -131,7 +136,6 @@
             min-height: 100px;
         }
 
-        /* 라디오 / 체크박스 인라인 그룹 */
         .radio-group {
             display: flex;
             gap: 16px;
@@ -155,7 +159,6 @@
             height: 16px;
         }
 
-        /* 예방접종 1~3차 박스 스타일 */
         .vaccine-container {
             display: flex;
             gap: 12px;
@@ -202,7 +205,6 @@
 
 <body>
 
-    <!-- 1. 상단 네비게이션 바 -->
     <header class="navbar">
         <div class="logo">
             <a href="main.html">
@@ -223,38 +225,25 @@
         </div>
     </header>
 
-    <!-- 메인 컨테이너 -->
     <main class="dashboard-container">
 
         <div class="pet-manage-grid">
 
-            <!-- [좌측] 1. 등록 반려동물 목록 & 관리 버튼 -->
-            <aside class="dash-card">
-                <div class="card-header">
+            <!-- [좌측] 등록 반려동물 목록 -->
+            <aside class="dash-card" id="leftAside">
+                <div class="card-header" style="margin-bottom: 16px;">
                     <h3>🐾 등록 반려동물 목록</h3>
                 </div>
 
-                <div class="pet-list-section">
-                    <!-- 신규 입력 모드 또는 단일 등록 상태 예시 -->
-                    <div class="pet-item-card active">
-                        <div class="pet-item-name">새 반려동물 입력</div>
-                        <div class="pet-item-desc">정보를 입력해주세요</div>
-                    </div>
+                <div class="pet-btn-group">
+                    <button class="btn primary-btn btn-full" id="resetFormBtn">+ 반려동물 등록</button>
                 </div>
 
-                <div class="pet-btn-group">
-                    <!-- 5. 반려동물 등록 버튼 -->
-                    <button class="btn primary-btn btn-full">+ 반려동물 등록</button>
-
-                    <!-- 6. 수정/삭제 버튼 -->
-                    <div class="btn-row">
-                        <button class="btn outline-btn">수정</button>
-                        <button class="btn btn-secondary">삭제</button>
-                    </div>
+                <div class="pet-list-section" id="petListSection">
                 </div>
             </aside>
 
-            <!-- [우측] 2~4. 반려동물 상세 정보 및 사전정보 입력 폼 -->
+            <!-- [우측] 반려동물 상세 정보 폼 -->
             <section class="dash-card">
                 <div class="card-header">
                     <h3>📋 반려동물 상세 정보</h3>
@@ -262,21 +251,20 @@
 
                 <form id="petDetailForm">
 
-                    <!-- 2. 기본 정보 영역 -->
                     <h4 class="form-section-title">📌 기본 정보</h4>
                     <div class="form-grid-3">
                         <div class="form-group">
                             <label for="petName">이름</label>
-                            <input type="text" id="petName" class="form-control" placeholder="예: 몽이">
+                            <input type="text" id="petName" class="form-control" placeholder="예: 몽이" required>
                         </div>
 
                         <div class="form-group">
                             <label for="petType">종 (분류)</label>
-                            <select id="petType" class="form-control">
+                            <select id="petType" class="form-control" required>
                                 <option value="" disabled selected>선택하세요 (예: 강아지)</option>
-                                <option value="dog">강아지</option>
-                                <option value="cat">고양이</option>
-                                <option value="other">기타</option>
+                                <option value="강아지">강아지</option>
+                                <option value="고양이">고양이</option>
+                                <option value="기타">기타</option>
                             </select>
                         </div>
 
@@ -284,10 +272,10 @@
                             <label for="petGender">성별</label>
                             <div class="radio-group">
                                 <label class="radio-label">
-                                    <input type="radio" name="gender" value="male"> 수컷
+                                    <input type="radio" name="gender" value="수컷" checked> 수컷
                                 </label>
                                 <label class="radio-label">
-                                    <input type="radio" name="gender" value="female"> 암컷
+                                    <input type="radio" name="gender" value="암컷"> 암컷
                                 </label>
                             </div>
                         </div>
@@ -296,7 +284,7 @@
                     <div class="form-grid-2">
                         <div class="form-group">
                             <label for="petAge">나이 (세)</label>
-                            <input type="number" id="petAge" class="form-control" placeholder="예: 3">
+                            <input type="number" id="petAge" class="form-control" placeholder="예: 3" required>
                         </div>
 
                         <div class="form-group">
@@ -305,7 +293,6 @@
                         </div>
                     </div>
 
-                    <!-- 3. 특이사항 / 중성화 / 예방접종 영역 -->
                     <h4 class="form-section-title">🏥 건강 및 상태 정보</h4>
                     <div class="form-grid-2">
                         <div class="form-group">
@@ -315,17 +302,15 @@
                                     <input type="radio" name="neutered" value="yes"> 완료
                                 </label>
                                 <label class="radio-label">
-                                    <input type="radio" name="neutered" value="no"> 미완료
+                                    <input type="radio" name="neutered" value="no" checked> 미완료
                                 </label>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 예방접종 1~3차 O/X 선택 영역 -->
                     <div class="form-group" style="margin-bottom: 24px;">
                         <label>예방접종 여부</label>
                         <div class="vaccine-container">
-                            <!-- 1차 접종 -->
                             <div class="vaccine-item">
                                 <span>1차 : </span>
                                 <div class="vaccine-options">
@@ -333,11 +318,10 @@
                                         <input type="radio" name="vaccine1" value="O"> O
                                     </label>
                                     <label class="radio-label">
-                                        <input type="radio" name="vaccine1" value="X"> X
+                                        <input type="radio" name="vaccine1" value="X" checked> X
                                     </label>
                                 </div>
                             </div>
-                            <!-- 2차 접종 -->
                             <div class="vaccine-item">
                                 <span>2차 : </span>
                                 <div class="vaccine-options">
@@ -345,11 +329,10 @@
                                         <input type="radio" name="vaccine2" value="O"> O
                                     </label>
                                     <label class="radio-label">
-                                        <input type="radio" name="vaccine2" value="X"> X
+                                        <input type="radio" name="vaccine2" value="X" checked> X
                                     </label>
                                 </div>
                             </div>
-                            <!-- 3차 접종 -->
                             <div class="vaccine-item">
                                 <span>3차 : </span>
                                 <div class="vaccine-options">
@@ -357,7 +340,7 @@
                                         <input type="radio" name="vaccine3" value="O"> O
                                     </label>
                                     <label class="radio-label">
-                                        <input type="radio" name="vaccine3" value="X"> X
+                                        <input type="radio" name="vaccine3" value="X" checked> X
                                     </label>
                                 </div>
                             </div>
@@ -369,7 +352,6 @@
                         <input type="text" id="specialNotes" class="form-control" placeholder="예: 닭고기 알레르기 유, 소리에 민감함">
                     </div>
 
-                    <!-- 4. 사전정보 (글자 입력) 영역 -->
                     <h4 class="form-section-title">📝 사전 정보 (생활환경 및 참고사항)</h4>
                     <div class="form-group" style="margin-bottom: 24px;">
                         <label for="preInfo">평소 생활환경 및 행동 특징</label>
@@ -377,9 +359,8 @@
                             placeholder="예: 평소 거실 소파 밑에서 휴식하는 것을 좋아하며, 외부인 방문 시 약 10분간 경계하는 편입니다."></textarea>
                     </div>
 
-                    <!-- 하단 저장 버튼 -->
                     <div class="form-actions">
-                        <button type="button" class="btn btn-secondary">취소</button>
+                        <button type="button" class="btn btn-secondary" id="cancelBtn">취소</button>
                         <button type="submit" class="btn primary-btn">저장하기</button>
                     </div>
 
@@ -390,12 +371,195 @@
 
     </main>
 
-    <!-- 하단 푸터 -->
     <footer class="footer">
         <div class="footer-bottom">
             <p>© 2026 쫑긋. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const petForm = document.getElementById('petDetailForm');
+            const petListSection = document.getElementById('petListSection');
+            const resetFormBtn = document.getElementById('resetFormBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const leftAside = document.getElementById('leftAside');
+
+            let petDataList = [];
+            let activePetId = null;
+
+            // 목록 상단으로 부드럽게 이동
+            function scrollToTopList() {
+                leftAside.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // 폼 데이터 읽기
+            function getFormData() {
+                const name = document.getElementById('petName').value.trim();
+                const type = document.getElementById('petType').value;
+                const gender = document.querySelector('input[name="gender"]:checked')?.value || '수컷';
+                const age = document.getElementById('petAge').value;
+                const weight = document.getElementById('petWeight').value;
+                const neutered = document.querySelector('input[name="neutered"]:checked')?.value || 'no';
+                const vaccine1 = document.querySelector('input[name="vaccine1"]:checked')?.value || 'X';
+                const vaccine2 = document.querySelector('input[name="vaccine2"]:checked')?.value || 'X';
+                const vaccine3 = document.querySelector('input[name="vaccine3"]:checked')?.value || 'X';
+                const specialNotes = document.getElementById('specialNotes').value;
+                const preInfo = document.getElementById('preInfo').value;
+
+                return { name, type, gender, age, weight, neutered, vaccine1, vaccine2, vaccine3, specialNotes, preInfo };
+            }
+
+            // 폼 필드 데이터 채우기
+            function setFormData(data) {
+                document.getElementById('petName').value = data.name || '';
+                document.getElementById('petType').value = data.type || '';
+                document.getElementById('petAge').value = data.age || '';
+                document.getElementById('petWeight').value = data.weight || '';
+                document.getElementById('specialNotes').value = data.specialNotes || '';
+                document.getElementById('preInfo').value = data.preInfo || '';
+
+                if (data.gender) {
+                    const el = document.querySelector(`input[name="gender"][value="${data.gender}"]`);
+                    if (el) el.checked = true;
+                }
+                if (data.neutered) {
+                    const el = document.querySelector(`input[name="neutered"][value="${data.neutered}"]`);
+                    if (el) el.checked = true;
+                }
+                if (data.vaccine1) {
+                    const el = document.querySelector(`input[name="vaccine1"][value="${data.vaccine1}"]`);
+                    if (el) el.checked = true;
+                }
+                if (data.vaccine2) {
+                    const el = document.querySelector(`input[name="vaccine2"][value="${data.vaccine2}"]`);
+                    if (el) el.checked = true;
+                }
+                if (data.vaccine3) {
+                    const el = document.querySelector(`input[name="vaccine3"][value="${data.vaccine3}"]`);
+                    if (el) el.checked = true;
+                }
+            }
+
+            // 카드 목록 렌더링
+            function renderPetList() {
+                petListSection.innerHTML = '';
+
+                petDataList.forEach(pet => {
+                    const wrapper = document.createElement('div');
+                    const isActive = pet.id === activePetId;
+
+                    // 활성화(클릭된) 상태일 때만 show-actions 클래스 추가
+                    wrapper.className = `pet-card-wrapper ${isActive ? 'show-actions' : ''}`;
+
+                    const cardHtml = `
+                        <div class="pet-item-card ${isActive ? 'active' : ''}" data-id="${pet.id}">
+                            <div class="pet-item-name">${pet.name}</div>
+                            <div class="pet-item-desc">${pet.type} · ${pet.gender} · ${pet.age}살</div>
+                        </div>
+                    `;
+
+                    // 수정/삭제 버튼 영역 구조 생성
+                    const actionBtnHtml = `
+                        <div class="btn-row">
+                            <button type="button" class="btn outline-btn edit-btn" data-id="${pet.id}">수정</button>
+                            <button type="button" class="btn btn-secondary delete-btn" data-id="${pet.id}">삭제</button>
+                        </div>
+                    `;
+
+                    wrapper.innerHTML = cardHtml + actionBtnHtml;
+                    petListSection.appendChild(wrapper);
+                });
+
+                bindEvents();
+            }
+
+            // 이벤트 바인딩
+            function bindEvents() {
+                // 동물의 이름 카드 클릭 시 실행
+                document.querySelectorAll('.pet-item-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const petId = Number(card.getAttribute('data-id'));
+                        
+                        // 이미 선택된 카드를 클릭하면 선택 해제(숨김) 가능하도록 처리
+                        if (activePetId === petId) {
+                            resetToNewMode();
+                            return;
+                        }
+
+                        activePetId = petId;
+                        const targetPet = petDataList.find(p => p.id === petId);
+
+                        if (targetPet) {
+                            setFormData(targetPet);
+                        }
+                        renderPetList();
+                    });
+                });
+
+                // 수정 버튼 클릭
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        document.getElementById('petName').focus();
+                    });
+                });
+
+                // 삭제 버튼 클릭
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const petId = Number(btn.getAttribute('data-id'));
+                        if (confirm('해당 반려동물 정보를 삭제하시겠습니까?')) {
+                            petDataList = petDataList.filter(p => p.id !== petId);
+                            resetToNewMode();
+                        }
+                    });
+                });
+            }
+
+            // 폼 초기화 및 추가 모드로 복귀
+            function resetToNewMode() {
+                activePetId = null;
+                petForm.reset();
+                renderPetList();
+            }
+
+            // 폼 저장 (Submit)
+            petForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = getFormData();
+
+                if (!formData.name || !formData.age || !formData.type) {
+                    alert("필수 입력 항목(이름, 종, 나이)을 확인해주세요.");
+                    return;
+                }
+
+                if (activePetId !== null) {
+                    const index = petDataList.findIndex(p => p.id === activePetId);
+                    if (index !== -1) {
+                        petDataList[index] = { id: activePetId, ...formData };
+                    }
+                } else {
+                    const newId = Date.now();
+                    petDataList.push({ id: newId, ...formData });
+                    activePetId = newId;
+                }
+
+                renderPetList();
+                scrollToTopList();
+            });
+
+            // 취소 버튼
+            cancelBtn.addEventListener('click', () => {
+                resetToNewMode();
+                scrollToTopList();
+            });
+
+            // '+ 반려동물 등록' 버튼 클릭
+            resetFormBtn.addEventListener('click', resetToNewMode);
+        });
+    </script>
 
 </body>
 

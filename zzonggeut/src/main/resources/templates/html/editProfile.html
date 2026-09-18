@@ -265,6 +265,19 @@
       background-color: #0b8484;
       color: #fff;
     }
+
+    .pet-btn {
+      padding: 8px 16px;
+      /* 기존 10px 18px -> 8px 16px로 수정 */
+      border-radius: 8px;
+      background-color: #0b8484;
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.2s;
+    }
   </style>
 </head>
 
@@ -278,19 +291,14 @@
       </a>
     </div>
     <nav class="nav-links">
-      <a href="/dashboard">대시보드</a>
-      <a href="live-view.html">실시간 모니터링</a>
-      <a href="behavior-log.html">행동 분석</a>
-      <a href="pet-management.html">반려동물 관리</a>
-      <a href="activity-report.html">리포트</a>
+      <a href="dashboard.html">대시보드</a>
+      <a href="report.html">리포트</a>
     </nav>
     <div class="nav-utils">
       <button class="icon-btn" id="alarmBtn">🔔</button>
       <a href="/mypage" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
-      <select class="pet-select">
-        <option value="1">우리 강아지 🐶</option>
-        <option value="2">우리 고양이 🐱</option>
-      </select>
+      <!-- 단일 버튼 1개로 교체 -->
+      <a href="petManagement.html" class="pet-btn">내 반려동물</a>
     </div>
   </header>
 
@@ -302,13 +310,13 @@
         <div class="user-avatar">👤</div>
         <div class="user-details">
           <h2>
-          	<span th:text="${loginUser.name}"></span> 님
-          	<span class="badge">PRO 멤버십</span>
+            <span th:text="${loginUser.name}"></span> 님
+            <span class="badge">PRO 멤버십</span>
           </h2>
           <p>
-          	<span th:text="${loginUser.id}"></span> &nbsp;·&nbsp; 
+            <span th:text="${loginUser.id}"></span> &nbsp;·&nbsp;
             <span th:text="${loginUser.phone}"></span>
-		  </p>
+          </p>
         </div>
       </div>
 
@@ -362,7 +370,8 @@
               <div class="form-group">
                 <label for="userPhone">휴대폰 번호</label>
                 <div class="input-with-btn">
-                  <input type="tel" id="userPhone" name="phone" class="form-input" th:value="${loginUser.phone}" required>
+                  <input type="tel" id="userPhone" name="phone" class="form-input" th:value="${loginUser.phone}"
+                    required>
                   <button type="button" class="btn sub-btn" id="verifyPhoneBtn">본인 인증</button>
                 </div>
                 <div class="input-hint">번호 변경 시 휴대폰 본인 인증이 필요합니다.</div>

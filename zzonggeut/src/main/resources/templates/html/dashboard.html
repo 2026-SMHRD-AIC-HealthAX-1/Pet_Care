@@ -6,6 +6,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>통합 대시보드 - 쫑긋</title>
   <link rel="stylesheet" href="../css/dashboardStyle.css">
+  <style>
+    /* 반려동물 선택 드롭다운 (모서리 곡률 8px 및 포인트 컬러 적용) */
+    .pet-select {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1.5px solid #0b8484;
+      color: #0b8484;
+      font-weight: bold;
+      outline: none;
+      background-color: #fff;
+      cursor: pointer;
+    }
+
+    /* '내 반려동물' 버튼 설정 */
+    .pet-btn {
+      padding: 8px 16px;
+      /* 기존 10px 18px -> 8px 16px로 수정 */
+      border-radius: 8px;
+      background-color: #0b8484;
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.2s;
+    }
+  </style>
 </head>
 
 <body>
@@ -18,21 +45,26 @@
       </a>
     </div>
     <nav class="nav-links">
-      <a href="dashboard.html" class="active">대시보드</a>
+      <a href="dashboard.html">대시보드</a>
       <a href="activity-report.html">리포트</a>
     </nav>
-    <div class="nav-utils">
+
+    <!-- 우측 유틸 영역: 종(🔔) -> 사람(👤) -> 내 반려동물 선택창 순서 배치 -->
+    <div class="nav-utils" style="display: flex; align-items: center; gap: 12px;">
+      <!-- 1) 알림 종 버튼 -->
       <button class="icon-btn" id="alarmBtn">🔔</button>
-      <button class="icon-btn" id="profileBtn">👤</button>
-      <select class="pet-select">
-        <option value="1">우리 강아지 🐶</option>
-        <option value="2">우리 고양이 🐱</option>
-      </select>
+
+      <!-- 2) 사람 프로필 버튼 -->
+      <a href="#" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
+
+      <!-- 단일 버튼 1개로 교체 -->
+      <a href="petManagement.html" class="pet-btn">내 반려동물</a>
+
     </div>
   </header>
 
   <main class="dashboard-container">
-    
+
     <!-- SECTION 1: 최상단 핵심 수치 요약 (KPI 카드 4종) -->
     <section class="kpi-grid">
       <div class="kpi-card">
@@ -89,38 +121,60 @@
           <h3>📊 주간 활동량 추이</h3>
           <input type="text" class="date-input" value="2026.08.26 ~ 09.01" readonly>
         </div>
-        
+
         <!-- 차트 영역 (그래프 시각화) -->
         <div class="bar-chart-container">
-          <div class="bar-group"><div class="bar" style="height: 40%;"></div><span>월</span></div>
-          <div class="bar-group"><div class="bar" style="height: 55%;"></div><span>화</span></div>
-          <div class="bar-group"><div class="bar" style="height: 45%;"></div><span>수</span></div>
-          <div class="bar-group"><div class="bar" style="height: 80%;"></div><span>목</span></div>
-          <div class="bar-group"><div class="bar" style="height: 65%;"></div><span>금</span></div>
-          <div class="bar-group"><div class="bar" style="height: 90%;"></div><span>토</span></div>
-          <div class="bar-group"><div class="bar" style="height: 50%;"></div><span>일</span></div>
+          <div class="bar-group">
+            <div class="bar" style="height: 40%;"></div><span>월</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 55%;"></div><span>화</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 45%;"></div><span>수</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 80%;"></div><span>목</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 65%;"></div><span>금</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 90%;"></div><span>토</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 50%;"></div><span>일</span>
+          </div>
         </div>
 
         <h4 class="sub-title">⏰ 시간대별 활동 비율</h4>
         <div class="time-activity-list">
           <div class="time-item">
             <span>오전</span>
-            <div class="progress-bar"><div class="fill" style="width: 40%;"></div></div>
+            <div class="progress-bar">
+              <div class="fill" style="width: 40%;"></div>
+            </div>
             <span class="percent">40%</span>
           </div>
           <div class="time-item">
             <span>새벽</span>
-            <div class="progress-bar"><div class="fill" style="width: 30%;"></div></div>
+            <div class="progress-bar">
+              <div class="fill" style="width: 30%;"></div>
+            </div>
             <span class="percent">30%</span>
           </div>
           <div class="time-item">
             <span>오후</span>
-            <div class="progress-bar"><div class="fill" style="width: 20%;"></div></div>
+            <div class="progress-bar">
+              <div class="fill" style="width: 20%;"></div>
+            </div>
             <span class="percent">20%</span>
           </div>
           <div class="time-item">
             <span>야간</span>
-            <div class="progress-bar"><div class="fill" style="width: 10%;"></div></div>
+            <div class="progress-bar">
+              <div class="fill" style="width: 10%;"></div>
+            </div>
             <span class="percent">10%</span>
           </div>
         </div>
@@ -138,40 +192,40 @@
             <option>최근 30일</option>
           </select>
         </div>
-        
+
         <table class="data-table">
-  <thead>
-    <tr>
-      <th>발생 일시</th>
-      <th>변화 내용</th>
-      <th>평소 대비</th>
-      <th>상태</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>09/01 14:20</td>
-      <td>활동량 감소</td>
-      <!-- 음수: 빨간색 -->
-      <td class="negative-text">-30%</td>
-      <td><span class="tag tag-ok">확인</span></td>
-    </tr>
-    <tr>
-      <td>08/30 11:05</td>
-      <td>활동량 증가</td>
-      <!-- 양수: 파란색 -->
-      <td class="positive-text">+25%</td>
-      <td><span class="tag tag-ok">확인</span></td>
-    </tr>
-    <tr>
-      <td>08/28 18:40</td>
-      <td>체류시간 증가</td>
-      <!-- 양수: 파란색 -->
-      <td class="positive-text">+35%</td>
-      <td><span class="tag tag-ok">확인</span></td>
-    </tr>
-  </tbody>
-</table>
+          <thead>
+            <tr>
+              <th>발생 일시</th>
+              <th>변화 내용</th>
+              <th>평소 대비</th>
+              <th>상태</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>09/01 14:20</td>
+              <td>활동량 감소</td>
+              <!-- 음수: 빨간색 -->
+              <td class="negative-text">-30%</td>
+              <td><span class="tag tag-ok">확인</span></td>
+            </tr>
+            <tr>
+              <td>08/30 11:05</td>
+              <td>활동량 증가</td>
+              <!-- 양수: 파란색 -->
+              <td class="positive-text">+25%</td>
+              <td><span class="tag tag-ok">확인</span></td>
+            </tr>
+            <tr>
+              <td>08/28 18:40</td>
+              <td>체류시간 증가</td>
+              <!-- 양수: 파란색 -->
+              <td class="positive-text">+35%</td>
+              <td><span class="tag tag-ok">확인</span></td>
+            </tr>
+          </tbody>
+        </table>
 
       </div>
 

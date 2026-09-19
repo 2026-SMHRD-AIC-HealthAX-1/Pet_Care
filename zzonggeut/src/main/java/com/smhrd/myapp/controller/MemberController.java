@@ -186,15 +186,13 @@ public class MemberController {
         return "html/fnq"; 
     }
     
-    @GetMapping("/pet-management")
-    public String petManagementPage(HttpSession session, Model model) {
-        UserEntity loginUser = (UserEntity) session.getAttribute("loginUser");
-        if (loginUser == null) {
-            return "redirect:/login";
-        }
-        model.addAttribute("loginUser", loginUser);
-        return "html/petManagement"; // templates/html/petManagement.html
-    }
+	/*
+	 * @GetMapping("/pet-management") public String petManagementPage(HttpSession
+	 * session, Model model) { UserEntity loginUser = (UserEntity)
+	 * session.getAttribute("loginUser"); if (loginUser == null) { return
+	 * "redirect:/login"; } model.addAttribute("loginUser", loginUser); return
+	 * "html/petManagement"; // templates/html/petManagement.html }
+	 */
     
     @GetMapping("/privacy")
     public String privacyPage(HttpSession session, Model model) {
@@ -215,7 +213,7 @@ public class MemberController {
         return "html/report"; // templates/html/report.html
     }
     
-    @GetMapping("/roi-select")
+    @GetMapping({"/roiselect", "roi-select"})
     public String roiSelectPage(HttpSession session, Model model) {
         UserEntity loginUser = (UserEntity) session.getAttribute("loginUser");
         if (loginUser == null) {

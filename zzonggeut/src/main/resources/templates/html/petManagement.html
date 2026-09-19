@@ -273,16 +273,19 @@
                 <!-- 🌟 백엔드 전송 경로 및 메서드 설정 -->
                 <form id="petDetailForm" th:action="@{/petinsert}" method="post">
 
+					<!-- 🌟 수정 및 식별을 위한 seq 히든 필드 추가 -->
+					<input type="hidden" id="petSeq" name="seq">
+    
                     <h4 class="form-section-title">📌 기본 정보</h4>
                     <div class="form-grid-3">
                         <div class="form-group">
                             <label for="petName">이름</label>
-                            <input type="text" id="petName" name="name" class="form-control" placeholder="예: 몽이" required>
+                            <input type="text" id="petName" name="pName" class="form-control" placeholder="예: 몽이" required>
                         </div>
 
                         <div class="form-group">
                             <label for="petType">종 (분류)</label>
-                            <select id="petType" name="type" class="form-control" required>
+                            <select id="petType" name="pSpecies" class="form-control" required>
                                 <option value="" disabled selected>선택하세요 (예: 강아지)</option>
                                 <option value="강아지">강아지</option>
                                 <option value="고양이">고양이</option>
@@ -294,10 +297,10 @@
                             <label for="petGender">성별</label>
                             <div class="radio-group">
                                 <label class="radio-label">
-                                    <input type="radio" name="gender" value="수컷" checked> 수컷
+                                    <input type="radio" name="pGender" value="수컷" checked> 수컷
                                 </label>
                                 <label class="radio-label">
-                                    <input type="radio" name="gender" value="암컷"> 암컷
+                                    <input type="radio" name="pGender" value="암컷"> 암컷
                                 </label>
                             </div>
                         </div>
@@ -306,7 +309,7 @@
                     <div class="form-grid-2">
                         <div class="form-group">
                             <label for="petAge">나이 (세)</label>
-                            <input type="number" id="petAge" name="age" class="form-control" placeholder="예: 3" required>
+                            <input type="number" id="petAge" name="pAge" class="form-control" placeholder="예: 3" required>
                         </div>
 
                         <div class="form-group">
@@ -337,10 +340,10 @@
                                 <span>1차 : </span>
                                 <div class="vaccine-options">
                                     <label class="radio-label">
-                                        <input type="radio" name="vaccine1" value="O"> O
+                                        <input type="radio" name="isVaccin1" value="O"> O
                                     </label>
                                     <label class="radio-label">
-                                        <input type="radio" name="vaccine1" value="X" checked> X
+                                        <input type="radio" name="isVaccin1" value="X" checked> X
                                     </label>
                                 </div>
                             </div>
@@ -348,10 +351,10 @@
                                 <span>2차 : </span>
                                 <div class="vaccine-options">
                                     <label class="radio-label">
-                                        <input type="radio" name="vaccine2" value="O"> O
+                                        <input type="radio" name="isVaccin2" value="O"> O
                                     </label>
                                     <label class="radio-label">
-                                        <input type="radio" name="vaccine2" value="X" checked> X
+                                        <input type="radio" name="isVaccin2" value="X" checked> X
                                     </label>
                                 </div>
                             </div>
@@ -359,10 +362,10 @@
                                 <span>3차 : </span>
                                 <div class="vaccine-options">
                                     <label class="radio-label">
-                                        <input type="radio" name="vaccine3" value="O"> O
+                                        <input type="radio" name="isVaccin3" value="O"> O
                                     </label>
                                     <label class="radio-label">
-                                        <input type="radio" name="vaccine3" value="X" checked> X
+                                        <input type="radio" name="isVaccin3" value="X" checked> X
                                     </label>
                                 </div>
                             </div>
@@ -399,7 +402,7 @@
         </div>
     </footer>
 
-    <script>
+    <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', () => {
             const petForm = document.getElementById('petDetailForm');
             const petListSection = document.getElementById('petListSection');
@@ -407,9 +410,13 @@
             const cancelBtn = document.getElementById('cancelBtn');
             const leftAside = document.getElementById('leftAside');
 
-            let petDataList = [];
+            let serverPetList = /*[[${petList}]]*/ [];
+            let petDataList = serverPetList || [];
             let activePetId = null;
 
+         	// 🌟 여기에 직접 작성해 두기
+            console.log("받아온 리스트:", serverPetList);
+         
             // 목록 상단으로 부드럽게 이동
             function scrollToTopList() {
                 leftAside.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -434,31 +441,34 @@
 
             // 폼 필드 데이터 채우기
             function setFormData(data) {
-                document.getElementById('petName').value = data.name || '';
-                document.getElementById('petType').value = data.type || '';
-                document.getElementById('petAge').value = data.age || '';
-                document.getElementById('petWeight').value = data.weight || '';
-                document.getElementById('specialNotes').value = data.specialNotes || '';
-                document.getElementById('preInfo').value = data.preInfo || '';
+            	// 히든 seq 필드 세팅
+                document.getElementById('petSeq').value = data.seq || '';
+            	
+                document.getElementById('petName').value = data.pName || '';
+                document.getElementById('petType').value = data.pSpecies || '';
+                document.getElementById('petAge').value = data.pAge || '';
+                document.getElementById('petWeight').value = data.pWeight || '';
+                document.getElementById('specialNotes').value = data.pSpec || '';
+                document.getElementById('preInfo').value = data.beforeData || '';
 
-                if (data.gender) {
-                    const el = document.querySelector(`input[name="gender"][value="${data.gender}"]`);
+                if (data.pGender) {
+                    const el = document.querySelector(`input[name="pGender"][value="${data.pGender}"]`);
                     if (el) el.checked = true;
                 }
                 if (data.neutered) {
                     const el = document.querySelector(`input[name="neutered"][value="${data.neutered}"]`);
                     if (el) el.checked = true;
                 }
-                if (data.vaccine1) {
-                    const el = document.querySelector(`input[name="vaccine1"][value="${data.vaccine1}"]`);
+                if (data.isVaccin1) {
+                    const el = document.querySelector(`input[name="isVaccin1"][value="${data.isVaccin1}"]`);
                     if (el) el.checked = true;
                 }
-                if (data.vaccine2) {
-                    const el = document.querySelector(`input[name="vaccine2"][value="${data.vaccine2}"]`);
+                if (data.isVaccin2) {
+                    const el = document.querySelector(`input[name="isVaccin2"][value="${data.isVaccin2}"]`);
                     if (el) el.checked = true;
                 }
-                if (data.vaccine3) {
-                    const el = document.querySelector(`input[name="vaccine3"][value="${data.vaccine3}"]`);
+                if (data.isVaccin3) {
+                    const el = document.querySelector(`input[name="isVaccin3"][value="${data.isVaccin3}"]`);
                     if (el) el.checked = true;
                 }
             }
@@ -467,25 +477,30 @@
             function renderPetList() {
                 petListSection.innerHTML = '';
 
+                if (petDataList.length === 0) {
+                    petListSection.innerHTML = '<p style="text-align:center; color:#999; font-size:13px; margin-top:20px;">등록된 반려동물이 없습니다.</p>';
+                    return;
+                }
+                
                 petDataList.forEach(pet => {
                     const wrapper = document.createElement('div');
-                    const isActive = pet.id === activePetId;
+                    const isActive = pet.seq === activePetId;
 
                     // 활성화(클릭된) 상태일 때만 show-actions 클래스 추가
                     wrapper.className = `pet-card-wrapper ${isActive ? 'show-actions' : ''}`;
 
                     const cardHtml = `
-                        <div class="pet-item-card ${isActive ? 'active' : ''}" data-id="${pet.id}">
-                            <div class="pet-item-name">${pet.name}</div>
-                            <div class="pet-item-desc">${pet.type} · ${pet.gender} · ${pet.age}살</div>
+                        <div class="pet-item-card ${isActive ? 'active' : ''}" data-id="${pet.seq}">
+                            <div class="pet-item-name">${pet.pName}</div>
+                            <div class="pet-item-desc">${pet.pSpecies} · ${pet.pGender} · ${pet.pAge}살</div>
                         </div>
                     `;
 
                     // 수정/삭제 버튼 영역 구조 생성
                     const actionBtnHtml = `
                         <div class="btn-row">
-                            <button type="button" class="btn outline-btn edit-btn" data-id="${pet.id}">수정</button>
-                            <button type="button" class="btn btn-secondary delete-btn" data-id="${pet.id}">삭제</button>
+                            <button type="button" class="btn outline-btn edit-btn" data-id="${pet.seq}">수정</button>
+                            <button type="button" class="btn btn-secondary delete-btn" data-id="${pet.seq}">삭제</button>
                         </div>
                     `;
 
@@ -510,7 +525,7 @@
                         }
 
                         activePetId = petId;
-                        const targetPet = petDataList.find(p => p.id === petId);
+                        const targetPet = petDataList.find(p => p.seq === petId);
 
                         if (targetPet) {
                             setFormData(targetPet);
@@ -521,9 +536,31 @@
 
                 // 수정 버튼 클릭
                 document.querySelectorAll('.edit-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
+                	btn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        document.getElementById('petName').focus();
+                        
+                        const petId = Number(btn.getAttribute('data-id'));
+                        
+                        // 1. 현재 히든 seq 필드에 수정할 대상 번호 세팅
+                        document.getElementById('petSeq').value = petId;
+
+                        // 2. 필수값 검증 (이름, 종, 나이가 채워져 있는지)
+                        const nameVal = document.getElementById('petName').value.trim();
+                        const ageVal = document.getElementById('petAge').value;
+                        const typeVal = document.getElementById('petType').value;
+
+                        if (!nameVal || !ageVal || !typeVal) {
+                            alert("필수 항목(이름, 종, 나이)을 입력해 주세요.");
+                            return;
+                        }
+
+                        // 3. 수정 여부 확인 후 전송
+                        if (confirm('수정한 내용으로 반려동물 정보를 업데이트하시겠습니까?')) {
+                            // 전송 목적지를 /petupdate 로 지정
+                            petForm.action = '/petupdate';
+                            petForm.method = 'post';
+                            petForm.submit();
+                        }
                     });
                 });
 
@@ -533,8 +570,7 @@
                         e.stopPropagation();
                         const petId = Number(btn.getAttribute('data-id'));
                         if (confirm('해당 반려동물 정보를 삭제하시겠습니까?')) {
-                            petDataList = petDataList.filter(p => p.id !== petId);
-                            resetToNewMode();
+                        	location.href = `/petdelete?seq=${petId}`;
                         }
                     });
                 });
@@ -542,8 +578,13 @@
 
             // 폼 초기화 및 추가 모드로 복귀
             function resetToNewMode() {
-                activePetId = null;
+            	activePetId = null;
                 petForm.reset();
+                document.getElementById('petSeq').value = '';
+                
+                // 신규 등록 경로로 폼 액션 원복
+                petForm.action = '/petinsert';
+                
                 renderPetList();
             }
 
@@ -568,7 +609,11 @@
 
             // '+ 반려동물 등록' 버튼 클릭
             resetFormBtn.addEventListener('click', resetToNewMode);
+            
+            // 초기 실행: 서버에서 받아온 목록 화면에 즉시 렌더링
+            renderPetList();
         });
+        
     </script>
 
 </body>

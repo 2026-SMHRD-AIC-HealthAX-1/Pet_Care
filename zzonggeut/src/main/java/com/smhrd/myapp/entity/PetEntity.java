@@ -3,10 +3,12 @@ package com.smhrd.myapp.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "PET_INFO")
 @Getter
+@Setter
 @NoArgsConstructor
 public class PetEntity {
 
@@ -16,7 +18,7 @@ public class PetEntity {
     private Integer seq;
 
     @Column(name = "USER_SEQ")
-    private Integer user_seq;
+    private String user_seq;
     
     @Column(name = "P_NAME", length = 50)
     private String pName;

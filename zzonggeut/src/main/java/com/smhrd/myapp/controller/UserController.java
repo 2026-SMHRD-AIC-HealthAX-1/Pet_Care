@@ -225,5 +225,15 @@ public class UserController {
         rttr.addFlashAttribute("errorMessage", "비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인해주세요.");
         return "redirect:/signup"; 
     }
+    
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        // 세션 전체를 무효화하여 저장된 모든 회원 정보(세션 데이터) 삭제
+        session.invalidate();
+        
+        // 로그아웃 후 이동할 페이지 (로그인 전 화면 또는 메인/로그인 페이지 주소로 지정)
+        // 예시: 로그인 페이지나 첫 화면 주소가 "/" 이거나 "/login"인 경우 맞춰서 수정 가능합니다.
+        return "redirect:/"; 
+    }
  
 }

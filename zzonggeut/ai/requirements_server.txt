@@ -1,0 +1,4 @@
+﻿-r pet_behavior_model/requirements.txt
+aiortc
+av
+httpx

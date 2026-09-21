@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 
+    주의: namespace 경로는 방금 만든 PetAnalysisMapper.java 인터페이스의 
+    전체 패키지 경로와 정확히 일치해야 합니다.
+-->
+<mapper namespace="com.smhrd.myapp.mapper.PetAnalysisMapper">
+
+    <insert id="insertBehaviorMap" parameterType="map">
+        INSERT INTO RECEIVE_AI_DATA (
+        	input_dttm,
+            analysis_id, 
+            schema_version, 
+            pet_id, 
+            video_id, 
+            camera_id,
+            species, 
+            recorded_at, 
+            time_slot, 
+            analysis_status,
+            activity_level, 
+            stationary_ratio, 
+            normalized_travel_distance, 
+            normalized_moving_speed,
+            baseline_status, 
+            change_status, 
+            change_score
+        ) VALUES (
+        	#{recordedAt}, 
+            #{analysisId}, 
+            #{schemaVersion}, 
+            #{petId}, 
+            #{videoId}, 
+            #{cameraId},
+            #{species}, 
+            #{recordedAt}, 
+            #{timeSlot}, 
+            #{analysisStatus},
+            #{activityLevel}, 
+            #{stationaryRatio}, 
+            #{normalizedTravelDistance}, 
+            #{normalizedMovingSpeed},
+            #{baselineStatus}, 
+            #{changeStatus}, 
+            #{changeScore}
+        )
+    </insert>
+
+</mapper>

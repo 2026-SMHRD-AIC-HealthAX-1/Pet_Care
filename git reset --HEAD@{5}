@@ -1,0 +1,10 @@
+[33m5d89cf5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m HEAD@{0}: reset: moving to HEAD
+[33m5d89cf5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m HEAD@{1}: pull origin master: Fast-forward
+[33mf623364[m HEAD@{2}: reset: moving to HEAD
+[33mf623364[m HEAD@{3}: merge branch 'master' of https://github.com/2026-SMHRD-AIC-HealthAX-1/Pet_Care.git: Fast-forward
+[33m7a22fa2[m HEAD@{4}: merge branch 'master' of https://github.com/2026-SMHRD-AIC-HealthAX-1/Pet_Care.git: Fast-forward
+[33maa90d9f[m HEAD@{5}: commit: 오용준 - 관심영역지정 작업 완료(roiSelect) 및 해당작업을 위한 패키지 추가(com.smhrd.myapp.dto)
+[33m030b4d5[m HEAD@{6}: merge branch 'master' of https://github.com/2026-SMHRD-AIC-HealthAX-1/Pet_Care.git: Fast-forward
+[33m5de06d6[m HEAD@{7}: pull origin master: Fast-forward
+[33m76753ac[m HEAD@{8}: reset: moving to HEAD
+[33m76753ac[m HEAD@{9}: 

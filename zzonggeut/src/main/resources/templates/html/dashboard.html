@@ -24,6 +24,74 @@
     .pet-btn:hover {
       background-color: #086868;
     }
+
+    /* 🌟 STEP 2: 분석 상태 박스 스타일 */
+    .analysis-status-box {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      text-align: center;
+      display: none;
+    }
+    .status-loading {
+      background-color: #fef3c7;
+      color: #d97706;
+      border: 1px solid #fcd34d;
+    }
+    .status-success {
+      background-color: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
+    }
+    .status-error {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+    }
+
+    /* 🌟 STEP 3: AI 행동 분석 결과 카드 스타일 */
+    .ai-result-card {
+      margin-top: 16px;
+      padding: 16px;
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      display: none; /* 기본 숨김 */
+    }
+    .ai-result-header {
+      font-size: 15px;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ai-result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .ai-result-item {
+      background-color: #ffffff;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      text-align: center;
+    }
+    .ai-result-label {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+    .ai-result-value {
+      font-size: 14px;
+      font-weight: bold;
+      color: #0f172a;
+    }
   </style>
 </head>
 
@@ -102,10 +170,54 @@
             <p>실시간 스트리밍 영상 영역</p>
           </div>
         </div>
+        
         <div class="card-footer-btns">
-          <!-- 🌟 관심영역(ROI) 설정 페이지로 연결되는 버튼 (필요시 th:href 지정 가능) -->
-          <a th:href="@{/roi-select}" class="btn outline-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">⚙️ 관심영역(ROI) 설정</a>
-          <button class="btn primary-btn">🔍 AI 행동 분석 실행</button>
+          <!-- 🌟 관심영역(ROI) 설정 페이지로 연결되는 버튼 -->
+          <a th:href="@{/roi-select}" class="btn outline-btn"
+            style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">⚙️
+            관심영역(ROI) 설정</a>
+          <!-- 🌟 STEP 1: id="runAnalysisBtn" 부여 -->
+          <button class="btn primary-btn" id="runAnalysisBtn">
+            🔍 AI 행동 분석 실행
+          </button>
+        </div>
+
+        <!-- 🌟 STEP 2: 분석 상태 표시 영역 -->
+        <div id="analysisStatusBox" class="analysis-status-box">
+          <p id="analysisStatusText" style="margin: 0;"></p>
+        </div>
+
+        <!-- 🌟 STEP 3: AI 행동 분석 결과 영역 (Schema 1.2 기반) -->
+        <div id="aiResultCard" class="ai-result-card">
+          <div class="ai-result-header">
+            <span>🤖 AI 행동 분석 결과</span>
+          </div>
+          <div class="ai-result-grid">
+            <div class="ai-result-item">
+              <span class="ai-result-label">분석 상태</span>
+              <span class="ai-result-value" id="resAnalysisStatus">-</span>
+            </div>
+            <div class="ai-result-item">
+              <span class="ai-result-label">활동량</span>
+              <span class="ai-result-value" id="resActivityLevel">-</span>
+            </div>
+            <div class="ai-result-item">
+              <span class="ai-result-label">정지 비율</span>
+              <span class="ai-result-value" id="resStationaryRatio">-</span>
+            </div>
+            <div class="ai-result-item">
+              <span class="ai-result-label">이동 거리</span>
+              <span class="ai-result-value" id="resTravelDistance">-</span>
+            </div>
+            <div class="ai-result-item">
+              <span class="ai-result-label">이동 속도</span>
+              <span class="ai-result-value" id="resMovingSpeed">-</span>
+            </div>
+            <div class="ai-result-item">
+              <span class="ai-result-label">변화 상태</span>
+              <span class="ai-result-value" id="resChangeStatus">-</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -274,6 +386,91 @@
       <p>© 2026 쫑긋. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- 🌟 STEP 4 & 5: AI 분석 실행 및 상태 변경 스크립트 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const runAnalysisBtn = document.getElementById('runAnalysisBtn');
+      const analysisStatusBox = document.getElementById('analysisStatusBox');
+      const analysisStatusText = document.getElementById('analysisStatusText');
+      const aiResultCard = document.getElementById('aiResultCard');
+
+      // 지시서에 명시된 Schema 1.2 샘플 데이터
+      const sampleResult = {
+        analysis_status: "COMPLETED",
+        features_overall: {
+          activity_level: 0.043682,
+          stationary_ratio: 0.708108,
+          normalized_travel_distance: 1.010126,
+          normalized_moving_speed: 0.14965
+        },
+        change_detection: {
+          change_status: "NOT_EVALUATED"
+        }
+      };
+
+      runAnalysisBtn.addEventListener('click', () => {
+        // 1) 분석 중 UI 상태로 변경 및 버튼 비활성화
+        runAnalysisBtn.disabled = true;
+        aiResultCard.style.display = 'none';
+        
+        analysisStatusBox.style.display = 'block';
+        analysisStatusBox.className = 'analysis-status-box status-loading';
+        analysisStatusText.textContent = '⏳ AI가 행동을 분석 중입니다...';
+
+        // 2) STEP 5: 백엔드 분석 시작 API 호출 (Network 탭 확인용)
+        fetch('/api/monitoring/run-ai', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          // POST 요청 자체의 정상 여부 확인
+          if (!response.ok) {
+            throw new Error('API 요청 실패');
+          }
+          return response;
+        })
+        .then(() => {
+          // 3) 요청 성공 시 완료 상태 처리 및 결과 데이터 표시 (1~2초 시뮬레이션 후 연동 가능)
+          setTimeout(() => {
+            analysisStatusBox.className = 'analysis-status-box status-success';
+            analysisStatusText.textContent = '✓ 분석이 완료되었습니다.';
+            
+            // 데이터 바인딩
+            renderAiResult(sampleResult);
+            
+            // 버튼 재활성화
+            runAnalysisBtn.disabled = false;
+          }, 1500);
+        })
+        .catch(error => {
+          console.error('Error during AI analysis:', error);
+          
+          // 4) 실패 시 처리
+          analysisStatusBox.className = 'analysis-status-box status-error';
+          analysisStatusText.textContent = '❌ 분석 요청에 실패했습니다. 잠시 후 다시 시도해주세요.';
+          
+          // 버튼 재활성화
+          runAnalysisBtn.disabled = false;
+        });
+      });
+
+      // 결과를 화면 요소에 바인딩하는 함수
+      function renderAiResult(data) {
+        document.getElementById('resAnalysisStatus').textContent = data.analysis_status || '-';
+        document.getElementById('resActivityLevel').textContent = data.features_overall?.activity_level ?? '-';
+        document.getElementById('resStationaryRatio').textContent = data.features_overall?.stationary_ratio ?? '-';
+        document.getElementById('resTravelDistance').textContent = data.features_overall?.normalized_travel_distance ?? '-';
+        document.getElementById('resMovingSpeed').textContent = data.features_overall?.normalized_moving_speed ?? '-';
+        document.getElementById('resChangeStatus').textContent = data.change_detection?.change_status || '-';
+
+        // 결과 카드 출력
+        aiResultCard.style.display = 'block';
+      }
+    });
+  </script>
 
 </body>
 

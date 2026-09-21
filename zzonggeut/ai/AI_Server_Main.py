@@ -32,7 +32,8 @@ SPRING_MODE_NOTIFY_URL = "http://localhost:9090/api/ai/mode"
 SPRING_ANALYSIS_RESULT_URL = "http://localhost:9090/api/pet/analysis"
 
 # 분석 대상 영상 디렉토리 또는 특정 파일 경로
-TARGET_VIDEO_PATH = os.getenv("TARGET_VIDEO_PATH", str(Path(__file__).resolve().parent / "pet_behavior_model" / "data" / "inputs" / "example1.mp4"))
+# C:\Users\smhrd\Desktop\협력프로젝트\Corp_Project\pet_behavior_model
+TARGET_VIDEO_PATH = os.getenv("TARGET_VIDEO_PATH", "C:/Users/smhrd/Desktop/협력프로젝트/Corp_Project/pet_behavior_model/example1.mp4")
 
 # WebRTC 피어 관리
 active_tracks = {}

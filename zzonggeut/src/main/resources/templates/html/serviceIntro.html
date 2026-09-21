@@ -85,30 +85,30 @@ ul { list-style: none; }
   font-weight: 700;
 }
 
+/* 🌟 상단 로그인 버튼 수정 (알약형 -> 모서리가 약간 둥근 형태) 🌟 */
 .nav-login-btn {
-  padding: 10px 24px;
+  padding: 8px 16px;
   background-color: var(--primary);
   color: #fff !important;
-  border-radius: 999px;
+  border-radius: 8px;
   font-weight: 600;
-  transition: all 0.2s;
-  margin-left: auto; /* 좌우 균형 유지 */
+  transition: background 0.2s;
+  margin-left: auto;
 }
 
 .nav-login-btn:hover {
   background-color: var(--primary-dark);
-  transform: translateY(-1px);
 }
 
-/* ---------- 공통 버튼 ---------- */
+/* ---------- 🌟 공통 버튼 수정 (참고 코드의 border-radius: 8px 스타일 반영) ---------- */
 .btn {
   display: inline-block;
-  padding: 15px 38px;
-  border-radius: 999px;
+  padding: 14px 28px;
+  border-radius: 8px;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   text-align: center;
-  transition: all 0.2s ease;
+  transition: background 0.2s;
   cursor: pointer;
   border: none;
 }
@@ -116,21 +116,21 @@ ul { list-style: none; }
 .btn-primary {
   background-color: var(--primary);
   color: #fff;
-  box-shadow: 0 6px 18px rgba(11, 132, 132, 0.25);
 }
 
 .btn-primary:hover {
   background-color: var(--primary-dark);
-  transform: translateY(-2px);
 }
 
 .btn-outline {
-  background-color: #fff;
-  color: var(--primary);
-  border: 1.5px solid var(--primary);
+  background-color: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
 }
 
-.btn-outline:hover { background-color: var(--primary-light); }
+.btn-outline:hover {
+  background-color: #f1f5f9;
+}
 
 /* ---------- 공통 섹션 ---------- */
 .section {
@@ -146,7 +146,7 @@ ul { list-style: none; }
   font-size: 13px;
   font-weight: 700;
   padding: 7px 16px;
-  border-radius: 999px;
+  border-radius: 20px;
   margin-bottom: 16px;
 }
 
@@ -466,6 +466,7 @@ ul { list-style: none; }
 
     .cta-box p { font-size: 15.5px; opacity: 0.9; margin-bottom: 30px; }
 
+    /* 🌟 CTA 내부 흰색 버튼 스타일 조정 🌟 */
     .cta-box .btn {
       background: #fff;
       color: var(--primary);
@@ -687,6 +688,6 @@ ul { list-style: none; }
     <p class="footer-copy">© 2026 쫑긋. All rights reserved.</p>
   </footer>
 
---></body>
+</body>
 
 </html>

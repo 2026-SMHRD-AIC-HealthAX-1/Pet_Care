@@ -54,16 +54,19 @@
       text-align: center;
       display: none;
     }
+
     .status-loading {
       background-color: #fef3c7;
       color: #d97706;
       border: 1px solid #fcd34d;
     }
+
     .status-success {
       background-color: #dcfce7;
       color: #15803d;
       border: 1px solid #86efac;
     }
+
     .status-error {
       background-color: #fee2e2;
       color: #b91c1c;
@@ -77,8 +80,9 @@
       background-color: #f8fafc;
       border: 1px solid #e2e8f0;
       border-radius: 10px;
-      display: none; /* 기본 숨김 */
+      display: none !important;
     }
+
     .ai-result-header {
       font-size: 15px;
       font-weight: bold;
@@ -88,11 +92,13 @@
       align-items: center;
       gap: 6px;
     }
+
     .ai-result-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
     }
+
     .ai-result-item {
       background-color: #ffffff;
       padding: 12px;
@@ -100,16 +106,216 @@
       border: 1px solid #cbd5e1;
       text-align: center;
     }
+
     .ai-result-label {
       display: block;
       font-size: 12px;
       color: #64748b;
       margin-bottom: 4px;
     }
+
     .ai-result-value {
       font-size: 14px;
       font-weight: bold;
       color: #0f172a;
+    }
+
+    /* 🌟 [NEW] 공간별 체류 비율 전용 스타일 */
+    .stay-ratio-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 10px 0;
+      gap: 20px;
+    }
+
+    /* 원형 도넛 차트 */
+    .donut-chart-box {
+      position: relative;
+      width: 160px;
+      height: 160px;
+    }
+
+    .donut-chart-box svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+      border-radius: 50%;
+    }
+
+    .donut-chart-box circle {
+      fill: transparent;
+      stroke-width: 22;
+    }
+
+    .donut-center-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .donut-center-text .percent {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0b4f53;
+      display: block;
+      line-height: 1;
+    }
+
+    .donut-center-text .label {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* 공간별 데이터 표 */
+    .ratio-table {
+      width: 50%;
+      border-collapse: collapse;
+    }
+
+    .ratio-table tr {
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .ratio-table tr:last-child {
+      border-bottom: none;
+    }
+
+    .ratio-table td {
+      padding: 8px 4px;
+      font-size: 14px;
+    }
+
+    .color-dot-cell {
+      width: 24px;
+    }
+
+    .color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot-living { background-color: #0b6b71; }
+    .dot-bed { background-color: #9fe3de; }
+    .dot-kitchen { background-color: #c7e8ad; }
+    .dot-etc { background-color: #e2e8f0; }
+
+    .place-name {
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .place-val {
+      text-align: right;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    /* 하단 메시지 박스 */
+    .ratio-summary-box {
+      margin-top: 14px;
+      background-color: #f0fdf8;
+      border: 1px solid #d1fae5;
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ratio-summary-icon {
+      font-size: 24px;
+    }
+
+    .ratio-summary-text p {
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .ratio-summary-text .main-text {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #065f46;
+    }
+
+    .ratio-summary-text .sub-text {
+      font-size: 12px;
+      color: #047857;
+    }
+
+    /* 🚨 [NEW] 변화 감지 이력 리스트 & 알약(Pill) 뱃지 스타일 */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background-color: #f8fafc;
+      border: 1px solid #f1f5f9;
+      border-radius: 12px;
+    }
+
+    .history-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .history-date {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .history-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    /* 알약 모양 뱃지 공통 스타일 */
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 65px;
+      text-align: center;
+    }
+
+    /* 1) 음수값 (-10% 이상 감소): 파란색 계열 */
+    .pill-positive {
+      background-color: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+    }
+
+    /* 2) 양수값 (+10% 이상 증가): 빨간색 계열 */
+    .pill-negative {
+      background-color: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+
+    /* 3) 변화 없음 (절대값 10% 미만): 초록색 계열 */
+    .pill-neutral {
+      background-color: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #bbf7d0;
     }
   </style>
 </head>
@@ -183,7 +389,7 @@
             <p style="margin: 0;">아래 [영상 업로드] 버튼을 눌러 분석할 영상을 선택하세요.</p>
           </div>
         </div>
-        
+
         <div class="card-footer-btns" style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
           <!-- 🌟 1) 숨겨진 File Input 및 영상 업로드 버튼 -->
           <input type="file" id="videoFileInput" accept="video/*" style="display: none;">
@@ -250,43 +456,66 @@
         </div>
 
         <div class="bar-chart-container">
-          <div class="bar-group"><div class="bar" style="height: 40%;"></div><span>월</span></div>
-          <div class="bar-group"><div class="bar" style="height: 55%;"></div><span>화</span></div>
-          <div class="bar-group"><div class="bar" style="height: 45%;"></div><span>수</span></div>
-          <div class="bar-group"><div class="bar" style="height: 80%;"></div><span>목</span></div>
-          <div class="bar-group"><div class="bar" style="height: 65%;"></div><span>금</span></div>
-          <div class="bar-group"><div class="bar" style="height: 90%;"></div><span>토</span></div>
-          <div class="bar-group"><div class="bar" style="height: 50%;"></div><span>일</span></div>
+          <div class="bar-group">
+            <div class="bar" style="height: 40%;"></div><span>월</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 55%;"></div><span>화</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 45%;"></div><span>수</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 80%;"></div><span>목</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 65%;"></div><span>금</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 90%;"></div><span>토</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 50%;"></div><span>일</span>
+          </div>
         </div>
 
         <h4 class="sub-title">⏰ 시간대별 활동 비율</h4>
         <div class="time-activity-list">
           <div class="time-item">
             <span>오전</span>
-            <div class="progress-bar"><div class="fill" style="width: 40%;"></div></div>
+            <div class="progress-bar">
+              <div class="fill" style="width: 40%;"></div>
+            </div>
             <span class="percent">40%</span>
           </div>
           <div class="time-item">
             <span>새벽</span>
-            <div class="progress-bar"><div class="fill" style="width: 30%;"></div></div>
+            <div class="progress-bar">
+              <div class="fill" style="width: 30%;"></div>
+            </div>
             <span class="percent">30%</span>
           </div>
           <div class="time-item">
             <span>오후</span>
-            <div class="progress-bar"><div class="fill" style="width: 20%;"></div></div>
+            <div class="progress-bar">
+              <div class="fill" style="width: 20%;"></div>
+            </div>
             <span class="percent">20%</span>
           </div>
           <div class="time-item">
             <span>야간</span>
-            <div class="progress-bar"><div class="fill" style="width: 10%;"></div></div>
+            <div class="progress-bar">
+              <div class="fill" style="width: 10%;"></div>
+            </div>
             <span class="percent">10%</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- SECTION 3: 상세 이력 & 기록 관리 -->
+    <!-- SECTION 3: 상세 이력 & 공간별 체류 비율 -->
     <section class="bottom-grid">
+      <!-- 🚨 [교체 완료] 변화 감지 이력 카드 (리스트 형태 + 알약 뱃지) -->
       <div class="dash-card">
         <div class="card-header">
           <h3>🚨 변화 감지 이력</h3>
@@ -295,77 +524,97 @@
             <option>최근 30일</option>
           </select>
         </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>발생 일시</th>
-              <th>변화 내용</th>
-              <th>평소 대비</th>
-              <th>상태</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>09/01 14:20</td>
-              <td>활동량 감소</td>
-              <td class="negative-text">-30%</td>
-              <td><span class="tag tag-ok">확인</span></td>
-            </tr>
-            <tr>
-              <td>08/30 11:05</td>
-              <td>활동량 증가</td>
-              <td class="positive-text">+25%</td>
-              <td><span class="tag tag-ok">확인</span></td>
-            </tr>
-            <tr>
-              <td>08/28 18:40</td>
-              <td>체류시간 증가</td>
-              <td class="positive-text">+35%</td>
-              <td><span class="tag tag-ok">확인</span></td>
-            </tr>
-          </tbody>
-        </table>
+
+        <div class="history-list">
+          <!-- 1) 음수값 (-30%): 빨간색 글씨 + 빨간계열 뱃지 -->
+          <div class="history-item">
+            <div class="history-info">
+              <span class="history-date">09/01 14:20</span>
+              <span class="history-title">활동량이 평소보다 감소했어요.</span>
+            </div>
+            <span class="pill-badge pill-negative">-30%</span>
+          </div>
+
+          <!-- 2) 양수값 (+25%): 파란색 글씨 + 파란계열 뱃지 -->
+          <div class="history-item">
+            <div class="history-info">
+              <span class="history-date">08/30 11:05</span>
+              <span class="history-title">활동량이 평소보다 많았어요</span>
+            </div>
+            <span class="pill-badge pill-positive">+45%</span>
+          </div>
+
+          <!-- 3) 양수값 (+35%): 초록색 글씨 + 초록계열 뱃지 -->
+          <div class="history-item">
+            <div class="history-info">
+              <span class="history-date">08/28 18:40</span>
+              <span class="history-title">평소와 비슷한 행동 패턴을 보였어요.</span>
+            </div>
+            <span class="pill-badge pill-neutral">평소와 비슷</span>
+          </div>
+        </div>
       </div>
 
+      <!-- 공간별 체류 비율 카드 -->
       <div class="dash-card">
         <div class="card-header">
-          <h3>📝 최근 행동 기록 목록</h3>
-          <select class="small-select">
-            <option>행동 전체</option>
-            <option>활동만</option>
-            <option>휴식만</option>
-          </select>
+          <h3>📍 공간별 체류 비율</h3>
         </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>날짜/시간</th>
-              <th>행동</th>
-              <th>지속 시간</th>
-              <th>상세</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>09/01 14:25</td>
-              <td><span class="badge-action act">활동</span></td>
-              <td>15분 32초</td>
-              <td><button class="btn-sm">보기</button></td>
-            </tr>
-            <tr>
-              <td>09/01 13:40</td>
-              <td><span class="badge-action rest">휴식</span></td>
-              <td>1시간 12분</td>
-              <td><button class="btn-sm">보기</button></td>
-            </tr>
-            <tr>
-              <td>09/01 12:10</td>
-              <td><span class="badge-action act">활동</span></td>
-              <td>8분 45초</td>
-              <td><button class="btn-sm">보기</button></td>
-            </tr>
-          </tbody>
-        </table>
+        
+        <div class="stay-ratio-container">
+          <!-- 도넛 차트 -->
+          <div class="donut-chart-box">
+            <svg viewBox="0 0 100 100">
+              <!-- 기타 (9%) -->
+              <circle cx="50" cy="50" r="35" stroke="#e2e8f0" stroke-dasharray="219.9" stroke-dashoffset="0" />
+              <!-- 주방 (12%) -->
+              <circle cx="50" cy="50" r="35" stroke="#c7e8ad" stroke-dasharray="219.9" stroke-dashoffset="19.8" />
+              <!-- 침실 (31%) -->
+              <circle cx="50" cy="50" r="35" stroke="#9fe3de" stroke-dasharray="219.9" stroke-dashoffset="46.2" />
+              <!-- 거실 (48%) -->
+              <circle cx="50" cy="50" r="35" stroke="#0b6b71" stroke-dasharray="219.9" stroke-dashoffset="114.3" />
+            </svg>
+            <div class="donut-center-text">
+              <span class="percent">48%</span>
+              <span class="label">거실</span>
+            </div>
+          </div>
+
+          <!-- 공간별 데이터 표 -->
+          <table class="ratio-table">
+            <tbody>
+              <tr>
+                <td class="color-dot-cell"><span class="color-dot dot-living"></span></td>
+                <td class="place-name">거실</td>
+                <td class="place-val">48%</td>
+              </tr>
+              <tr>
+                <td class="color-dot-cell"><span class="color-dot dot-bed"></span></td>
+                <td class="place-name">침실</td>
+                <td class="place-val">31%</td>
+              </tr>
+              <tr>
+                <td class="color-dot-cell"><span class="color-dot dot-kitchen"></span></td>
+                <td class="place-name">주방</td>
+                <td class="place-val">12%</td>
+              </tr>
+              <tr>
+                <td class="color-dot-cell"><span class="color-dot dot-etc"></span></td>
+                <td class="place-name">기타</td>
+                <td class="place-val">9%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 하단 메시지 박스 -->
+        <div class="ratio-summary-box">
+          <div class="ratio-summary-icon">🐾</div>
+          <div class="ratio-summary-text">
+            <p class="main-text">우리 아이는 주로 거실에서 시간을 보내고 있어요.</p>
+            <p class="sub-text">평소와 비슷한 공간 활용 패턴을 보이고 있습니다.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -385,7 +634,7 @@
       const videoFileInput = document.getElementById('videoFileInput');
       const videoContainer = document.getElementById('videoContainer');
       const liveBadge = document.getElementById('liveBadge');
-      
+
       const runAnalysisBtn = document.getElementById('runAnalysisBtn');
       const analysisStatusBox = document.getElementById('analysisStatusBox');
       const analysisStatusText = document.getElementById('analysisStatusText');
@@ -394,7 +643,7 @@
       let selectedFile = null; // 선택된 동영상 파일 저장 변수
 
       // AI 결과 샘플 데이터
-/*       const sampleResult = {
+      const sampleResult = {
         analysis_status: "COMPLETED",
         features_overall: {
           activity_level: 0.043682,
@@ -405,7 +654,7 @@
         change_detection: {
           change_status: "NOT_EVALUATED"
         }
-      }; */
+      };
 
       // 🌟 [2. 영상 업로드 버튼 클릭 시 파일 선택창 열기]
       uploadVideoBtn.addEventListener('click', () => {
@@ -421,7 +670,7 @@
 
         // 파일 선택 후 URL 생성하여 비디오 태그 생성
         const fileUrl = URL.createObjectURL(file);
-        
+
         videoContainer.innerHTML = `
           <video id="uploadedVideo" controls autoplay loop style="width:100%; height:100%; object-fit:cover;">
             <source src="${fileUrl}" type="${file.type}">
@@ -440,7 +689,7 @@
       });
 
       // 🌟 [4. AI 행동 분석 실행 버튼 동작]
-      runAnalysisBtn.addEventListener('click', async () => {
+      runAnalysisBtn.addEventListener('click', () => {
         if (!selectedFile) {
           alert('먼저 분석할 영상을 업로드해주세요!');
           return;
@@ -448,91 +697,23 @@
 
         runAnalysisBtn.disabled = true;
         aiResultCard.style.display = 'none';
-        
+
         analysisStatusBox.style.display = 'block';
         analysisStatusBox.className = 'analysis-status-box status-loading';
         analysisStatusText.textContent = '⏳ AI가 동영상을 분석하고 있습니다...';
 
-        try {
-            // [단계 1] DB에서 현재 저장된 CAMERA_ROI_INFO 데이터 조회 (/roiget 호출)
-            let formattedRoiData = [];
-            try {
-              const roiResponse = await fetch('/roiget');
-              if (roiResponse.ok) {
-                const dbRoiList = await roiResponse.json();
-                console.log('[DB에서 가져온 원본 ROI]:', dbRoiList);
+        // 서버 전송을 위한 FormData 생성
+        const formData = new FormData();
+        formData.append('video', selectedFile);
 
-                // 파이썬 analyzer.analyze(roi_data=[...]) 포맷에 맞게 필드명 변환
-                if (Array.isArray(dbRoiList) && dbRoiList.length > 0) {
-                  formattedRoiData = dbRoiList.map(item => ({
-                    roi_name: item.roi_name || item.roiName,
-                    x: Number(item.x_start ?? item.xstart ?? 0),
-                    y: Number(item.y_start ?? item.ystart ?? 0),
-                    width: Number(item.width ?? 0),
-                    height: Number(item.height ?? 0)
-                  }));
-                }
-              }
-            } catch (err) {
-              console.warn('ROI 조회 중 오류 발생 (ROI 없이 계속 진행):', err);
-            }
+        // 시뮬레이션용 타이머 (1.5초 후 완료)
+        setTimeout(() => {
+          analysisStatusBox.className = 'analysis-status-box status-success';
+          analysisStatusText.textContent = '✓ 영상 분석이 완료되었습니다.';
 
-            console.log('[파이썬 규격으로 매핑된 roi_data]:', formattedRoiData);
-
-            // [단계 2] 서버 전송을 위한 FormData 생성
-            const formData = new FormData();
-            formData.append('video', selectedFile);
-            formData.append('pet_id', 'PET-001');
-            formData.append('species', 'DOG');
-
-            // 🌟 ROI 데이터를 JSON 문자열 형태로 FormData에 추가
-            formData.append('roi_data', JSON.stringify(formattedRoiData));
-
-            // [단계 3] 스프링 서버 엔드포인트 호출
-            const response = await fetch('/api/monitoring/run-video-ai', {
-              method: 'POST',
-              body: formData
-            });
-
-            if (!response.ok) {
-              throw new Error(`서버 응답 오류 (상태코드: ${response.status})`);
-            }
-
-            const result = await response.json();
-            console.log('[AI 분석 결과 수신]:', result);
-
-            // result.data 확인
-            if (!result.data) {
-              console.warn('응답에 data 필드가 없습니다. result 본문:', result);
-              return;
-            }
-
-            const analysisData = {
-              analysis_status: result.data.analysis_status,
-              features_overall: {
-                activity_level: result.data.features_overall?.activity_level,
-                stationary_ratio: result.data.features_overall?.stationary_ratio,
-                normalized_travel_distance: result.data.features_overall?.normalized_travel_distance,
-                normalized_moving_speed: result.data.features_overall?.normalized_moving_speed
-              },
-              change_detection: {
-                change_status: result.data.change_detection?.change_status
-              }
-            };
-            
-            analysisStatusBox.className = 'analysis-status-box status-success';
-            analysisStatusText.textContent = '✓ 분석 요청이 완료되었습니다.';
-            
-            renderAiResult(analysisData);
-
-        } catch (error) {
-            console.error('[분석 오류]:', error);
-            analysisStatusBox.className = 'analysis-status-box status-error';
-            analysisStatusText.textContent = `❌ 분석 실패: ${error.message}`;
-        } finally {
-            runAnalysisBtn.disabled = false;
-        }
-          
+          renderAiResult(sampleResult);
+          runAnalysisBtn.disabled = false;
+        }, 1500);
       });
 
       // AI 분석 결과 출력 함수

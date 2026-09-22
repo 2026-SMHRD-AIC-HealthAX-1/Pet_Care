@@ -25,7 +25,26 @@
       background-color: #086868;
     }
 
-    /* 🌟 STEP 2: 분석 상태 박스 스타일 */
+    /* 🌟 영상 컨테이너 및 비디오 스타일 */
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      background-color: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* 🌟 분석 상태 박스 스타일 */
     .analysis-status-box {
       margin-top: 16px;
       padding: 12px 16px;
@@ -51,7 +70,7 @@
       border: 1px solid #fca5a5;
     }
 
-    /* 🌟 STEP 3: AI 행동 분석 결과 카드 스타일 */
+    /* 🌟 AI 행동 분석 결과 카드 스타일 */
     .ai-result-card {
       margin-top: 16px;
       padding: 16px;
@@ -100,33 +119,25 @@
   <!-- 1. 상단 네비게이션 바 -->
   <header class="navbar">
     <div class="logo">
-      <!-- 🌟 로그인 후 메인인 /main으로 연결 -->
       <a th:href="@{/main}">
         <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
       </a>
     </div>
     <nav class="nav-links">
       <a th:href="@{/dashboard}" class="active">대시보드</a>
-      <!-- 리포트 경로 연동 -->
       <a th:href="@{/report}">리포트</a>
     </nav>
 
-    <!-- 우측 유틸 영역: 알림(🔔) -> 마이페이지(👤) -> 내 반려동물 버튼 순서 배치 -->
     <div class="nav-utils" style="display: flex; align-items: center; gap: 12px;">
-      <!-- 1) 알림 종 버튼 -->
       <button class="icon-btn" id="alarmBtn">🔔</button>
-
-      <!-- 2) 마이페이지 프로필 버튼 -->
       <a th:href="@{/mypage}" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
-
-      <!-- 3) 내 반려동물 관리 버튼 (프론트 최신 반영) -->
       <a th:href="@{/pet-management}" class="pet-btn">내 반려동물</a>
     </div>
   </header>
 
   <main class="dashboard-container">
 
-    <!-- SECTION 1: 최상단 핵심 수치 요약 (KPI 카드 4종) -->
+    <!-- SECTION 1: 최상단 핵심 수치 요약 -->
     <section class="kpi-grid">
       <div class="kpi-card">
         <span class="kpi-label">카메라 상태</span>
@@ -155,39 +166,49 @@
       <!-- 실시간 영상 영역 -->
       <div class="dash-card live-card">
         <div class="card-header">
-          <h3>🎥 실시간 모니터링</h3>
+          <h3>🎥 모니터링 화면</h3>
           <div class="header-controls">
-            <select class="small-select">
-              <option>거실 카메라</option>
-              <option>안방 카메라</option>
+            <select class="small-select" id="cameraSelect">
+              <option value="1">거실 카메라</option>
+              <option value="2">안방 카메라</option>
             </select>
-            <span class="badge live-badge">LIVE · 연결됨</span>
+            <span class="badge live-badge" id="liveBadge">대기중</span>
           </div>
         </div>
-        <div class="video-container">
-          <div class="video-placeholder">
-            <div class="play-icon">▶</div>
-            <p>실시간 스트리밍 영상 영역</p>
+
+        <!-- 🌟 비디오 출력 및 플레이스홀더 구역 -->
+        <div class="video-container" id="videoContainer">
+          <div class="video-placeholder" id="videoPlaceholder" style="text-align: center; color: #fff;">
+            <div class="play-icon" style="font-size: 32px; margin-bottom: 8px;">📁</div>
+            <p style="margin: 0;">아래 [영상 업로드] 버튼을 눌러 분석할 영상을 선택하세요.</p>
           </div>
         </div>
         
-        <div class="card-footer-btns">
-          <!-- 🌟 관심영역(ROI) 설정 페이지로 연결되는 버튼 -->
+        <div class="card-footer-btns" style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <!-- 🌟 1) 숨겨진 File Input 및 영상 업로드 버튼 -->
+          <input type="file" id="videoFileInput" accept="video/*" style="display: none;">
+          <button class="btn outline-btn" id="uploadVideoBtn">
+            📁 영상 업로드
+          </button>
+
+          <!-- 2) 관심영역(ROI) 설정 버튼 -->
           <a th:href="@{/roi-select}" class="btn outline-btn"
-            style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">⚙️
-            관심영역(ROI) 설정</a>
-          <!-- 🌟 STEP 1: id="runAnalysisBtn" 부여 -->
+            style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+            ⚙️ 관심영역(ROI) 설정
+          </a>
+
+          <!-- 3) AI 행동 분석 실행 버튼 -->
           <button class="btn primary-btn" id="runAnalysisBtn">
             🔍 AI 행동 분석 실행
           </button>
         </div>
 
-        <!-- 🌟 STEP 2: 분석 상태 표시 영역 -->
+        <!-- 분석 상태 표시 영역 -->
         <div id="analysisStatusBox" class="analysis-status-box">
           <p id="analysisStatusText" style="margin: 0;"></p>
         </div>
 
-        <!-- 🌟 STEP 3: AI 행동 분석 결과 영역 (Schema 1.2 기반) -->
+        <!-- AI 행동 분석 결과 영역 -->
         <div id="aiResultCard" class="ai-result-card">
           <div class="ai-result-header">
             <span>🤖 AI 행동 분석 결과</span>
@@ -228,59 +249,36 @@
           <input type="text" class="date-input" value="2026.08.26 ~ 09.01" readonly>
         </div>
 
-        <!-- 차트 영역 (그래프 시각화) -->
         <div class="bar-chart-container">
-          <div class="bar-group">
-            <div class="bar" style="height: 40%;"></div><span>월</span>
-          </div>
-          <div class="bar-group">
-            <div class="bar" style="height: 55%;"></div><span>화</span>
-          </div>
-          <div class="bar-group">
-            <div class="bar" style="height: 45%;"></div><span>수</span>
-          </div>
-          <div class="bar-group">
-            <div class="bar" style="height: 80%;"></div><span>목</span>
-          </div>
-          <div class="bar-group">
-            <div class="bar" style="height: 65%;"></div><span>금</span>
-          </div>
-          <div class="bar-group">
-            <div class="bar" style="height: 90%;"></div><span>토</span>
-          </div>
-          <div class="bar-group">
-            <div class="bar" style="height: 50%;"></div><span>일</span>
-          </div>
+          <div class="bar-group"><div class="bar" style="height: 40%;"></div><span>월</span></div>
+          <div class="bar-group"><div class="bar" style="height: 55%;"></div><span>화</span></div>
+          <div class="bar-group"><div class="bar" style="height: 45%;"></div><span>수</span></div>
+          <div class="bar-group"><div class="bar" style="height: 80%;"></div><span>목</span></div>
+          <div class="bar-group"><div class="bar" style="height: 65%;"></div><span>금</span></div>
+          <div class="bar-group"><div class="bar" style="height: 90%;"></div><span>토</span></div>
+          <div class="bar-group"><div class="bar" style="height: 50%;"></div><span>일</span></div>
         </div>
 
         <h4 class="sub-title">⏰ 시간대별 활동 비율</h4>
         <div class="time-activity-list">
           <div class="time-item">
             <span>오전</span>
-            <div class="progress-bar">
-              <div class="fill" style="width: 40%;"></div>
-            </div>
+            <div class="progress-bar"><div class="fill" style="width: 40%;"></div></div>
             <span class="percent">40%</span>
           </div>
           <div class="time-item">
             <span>새벽</span>
-            <div class="progress-bar">
-              <div class="fill" style="width: 30%;"></div>
-            </div>
+            <div class="progress-bar"><div class="fill" style="width: 30%;"></div></div>
             <span class="percent">30%</span>
           </div>
           <div class="time-item">
             <span>오후</span>
-            <div class="progress-bar">
-              <div class="fill" style="width: 20%;"></div>
-            </div>
+            <div class="progress-bar"><div class="fill" style="width: 20%;"></div></div>
             <span class="percent">20%</span>
           </div>
           <div class="time-item">
             <span>야간</span>
-            <div class="progress-bar">
-              <div class="fill" style="width: 10%;"></div>
-            </div>
+            <div class="progress-bar"><div class="fill" style="width: 10%;"></div></div>
             <span class="percent">10%</span>
           </div>
         </div>
@@ -289,7 +287,6 @@
 
     <!-- SECTION 3: 상세 이력 & 기록 관리 -->
     <section class="bottom-grid">
-      <!-- 변화 감지 이력 테이블 -->
       <div class="dash-card">
         <div class="card-header">
           <h3>🚨 변화 감지 이력</h3>
@@ -298,7 +295,6 @@
             <option>최근 30일</option>
           </select>
         </div>
-
         <table class="data-table">
           <thead>
             <tr>
@@ -312,30 +308,25 @@
             <tr>
               <td>09/01 14:20</td>
               <td>활동량 감소</td>
-              <!-- 음수: 빨간색 -->
               <td class="negative-text">-30%</td>
               <td><span class="tag tag-ok">확인</span></td>
             </tr>
             <tr>
               <td>08/30 11:05</td>
               <td>활동량 증가</td>
-              <!-- 양수: 파란색 -->
               <td class="positive-text">+25%</td>
               <td><span class="tag tag-ok">확인</span></td>
             </tr>
             <tr>
               <td>08/28 18:40</td>
               <td>체류시간 증가</td>
-              <!-- 양수: 파란색 -->
               <td class="positive-text">+35%</td>
               <td><span class="tag tag-ok">확인</span></td>
             </tr>
           </tbody>
         </table>
-
       </div>
 
-      <!-- 최근 행동 기록 목록 테이블 -->
       <div class="dash-card">
         <div class="card-header">
           <h3>📝 최근 행동 기록 목록</h3>
@@ -380,22 +371,29 @@
 
   </main>
 
-  <!-- 하단 푸터 -->
   <footer class="footer">
     <div class="footer-bottom">
       <p>© 2026 쫑긋. All rights reserved.</p>
     </div>
   </footer>
 
-  <!-- 🌟 STEP 4 & 5: AI 분석 실행 및 상태 변경 스크립트 -->
+  <!-- 🌟 자바스크립트 스크립트 -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // 1. 주요 DOM 엘리먼트 가져오기
+      const uploadVideoBtn = document.getElementById('uploadVideoBtn');
+      const videoFileInput = document.getElementById('videoFileInput');
+      const videoContainer = document.getElementById('videoContainer');
+      const liveBadge = document.getElementById('liveBadge');
+      
       const runAnalysisBtn = document.getElementById('runAnalysisBtn');
       const analysisStatusBox = document.getElementById('analysisStatusBox');
       const analysisStatusText = document.getElementById('analysisStatusText');
       const aiResultCard = document.getElementById('aiResultCard');
 
-      // 지시서에 명시된 Schema 1.2 샘플 데이터
+      let selectedFile = null; // 선택된 동영상 파일 저장 변수
+
+      // AI 결과 샘플 데이터
       const sampleResult = {
         analysis_status: "COMPLETED",
         features_overall: {
@@ -409,55 +407,76 @@
         }
       };
 
+      // 🌟 [2. 영상 업로드 버튼 클릭 시 파일 선택창 열기]
+      uploadVideoBtn.addEventListener('click', () => {
+        videoFileInput.click();
+      });
+
+      // 🌟 [3. 파일이 선택되었을 때 브라우저에 미리보기 화면 출력]
+      videoFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        selectedFile = file; // 백엔드 전송용 변수에 저장
+
+        // 파일 선택 후 URL 생성하여 비디오 태그 생성
+        const fileUrl = URL.createObjectURL(file);
+        
+        videoContainer.innerHTML = `
+          <video id="uploadedVideo" controls autoplay loop style="width:100%; height:100%; object-fit:cover;">
+            <source src="${fileUrl}" type="${file.type}">
+            브라우저가 동영상 재생을 지원하지 않습니다.
+          </video>
+        `;
+
+        // 상단 배지 및 버튼 텍스트 변경
+        if (liveBadge) {
+          liveBadge.textContent = '🎬 영상 로드됨';
+          liveBadge.style.backgroundColor = '#0b8484';
+          liveBadge.style.color = '#fff';
+        }
+
+        uploadVideoBtn.textContent = '🔄 다른 영상 선택';
+      });
+
+      // 🌟 [4. AI 행동 분석 실행 버튼 동작]
       runAnalysisBtn.addEventListener('click', () => {
-        // 1) 분석 중 UI 상태로 변경 및 버튼 비활성화
+        if (!selectedFile) {
+          alert('먼저 분석할 영상을 업로드해주세요!');
+          return;
+        }
+
         runAnalysisBtn.disabled = true;
         aiResultCard.style.display = 'none';
         
         analysisStatusBox.style.display = 'block';
         analysisStatusBox.className = 'analysis-status-box status-loading';
-        analysisStatusText.textContent = '⏳ AI가 행동을 분석 중입니다...';
+        analysisStatusText.textContent = '⏳ AI가 동영상을 분석하고 있습니다...';
 
-        // 2) STEP 5: 백엔드 분석 시작 API 호출 (Network 탭 확인용)
+        // 서버 전송을 위한 FormData 생성
+        const formData = new FormData();
+        formData.append('video', selectedFile);
+
+        /* 백엔드 연결 시 아래 fetch 사용:
         fetch('/api/monitoring/run-ai', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          body: formData
         })
-        .then(response => {
-          // POST 요청 자체의 정상 여부 확인
-          if (!response.ok) {
-            throw new Error('API 요청 실패');
-          }
-          return response;
-        })
-        .then(() => {
-          // 3) 요청 성공 시 완료 상태 처리 및 결과 데이터 표시 (1~2초 시뮬레이션 후 연동 가능)
-          setTimeout(() => {
-            analysisStatusBox.className = 'analysis-status-box status-success';
-            analysisStatusText.textContent = '✓ 분석이 완료되었습니다.';
-            
-            // 데이터 바인딩
-            renderAiResult(sampleResult);
-            
-            // 버튼 재활성화
-            runAnalysisBtn.disabled = false;
-          }, 1500);
-        })
-        .catch(error => {
-          console.error('Error during AI analysis:', error);
+        .then(response => response.json())
+        .then(data => { ... })
+        */
+
+        // 시뮬레이션용 타이머 (1.5초 후 완료)
+        setTimeout(() => {
+          analysisStatusBox.className = 'analysis-status-box status-success';
+          analysisStatusText.textContent = '✓ 영상 분석이 완료되었습니다.';
           
-          // 4) 실패 시 처리
-          analysisStatusBox.className = 'analysis-status-box status-error';
-          analysisStatusText.textContent = '❌ 분석 요청에 실패했습니다. 잠시 후 다시 시도해주세요.';
-          
-          // 버튼 재활성화
+          renderAiResult(sampleResult);
           runAnalysisBtn.disabled = false;
-        });
+        }, 1500);
       });
 
-      // 결과를 화면 요소에 바인딩하는 함수
+      // AI 분석 결과 출력 함수
       function renderAiResult(data) {
         document.getElementById('resAnalysisStatus').textContent = data.analysis_status || '-';
         document.getElementById('resActivityLevel').textContent = data.features_overall?.activity_level ?? '-';
@@ -466,7 +485,6 @@
         document.getElementById('resMovingSpeed').textContent = data.features_overall?.normalized_moving_speed ?? '-';
         document.getElementById('resChangeStatus').textContent = data.change_detection?.change_status || '-';
 
-        // 결과 카드 출력
         aiResultCard.style.display = 'block';
       }
     });

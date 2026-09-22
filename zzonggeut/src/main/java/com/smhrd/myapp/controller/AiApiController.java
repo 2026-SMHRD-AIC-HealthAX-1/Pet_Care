@@ -125,4 +125,15 @@ public class AiApiController
             return ResponseEntity.internalServerError().body("DB Error: " + e.getMessage());
         }
     }
+        @GetMapping("/api/pet/analysis/latest")
+    public ResponseEntity<?> getLatestAnalysis() {
+
+        Map<String, Object> result = petAnalysisMapper.selectLatestBehaviorMap();
+
+        if (result == null || result.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(result);
+    }
 }

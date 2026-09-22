@@ -48,4 +48,28 @@
         )
     </insert>
 
+        <select id="selectLatestBehaviorMap" resultType="map">
+        SELECT
+            input_dttm,
+            analysis_id,
+            schema_version,
+            pet_id,
+            video_id,
+            camera_id,
+            species,
+            recorded_at,
+            time_slot,
+            analysis_status,
+            activity_level,
+            stationary_ratio,
+            normalized_travel_distance,
+            normalized_moving_speed,
+            baseline_status,
+            change_status,
+            change_score
+        FROM RECEIVE_AI_DATA
+        ORDER BY input_dttm DESC
+        LIMIT 1
+    </select>
+
 </mapper>

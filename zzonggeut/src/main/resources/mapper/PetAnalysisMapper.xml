@@ -11,6 +11,7 @@
     <insert id="insertBehaviorMap" parameterType="map">
         INSERT INTO RECEIVE_AI_DATA (
         	input_dttm,
+        	gubun,
             analysis_id, 
             schema_version, 
             pet_id, 
@@ -29,6 +30,7 @@
             change_score
         ) VALUES (
         	#{recordedAt}, 
+        	#{gubun},
             #{analysisId}, 
             #{schemaVersion}, 
             #{petId}, 

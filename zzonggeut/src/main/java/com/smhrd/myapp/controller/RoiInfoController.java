@@ -26,14 +26,15 @@ public class RoiInfoController
 		this.repo = repo;
 	}
 	
-	@PostMapping("/roidelete") 
-	public String roidelete(Camera_Roi_Info roi, Model model) 
+	@PostMapping("/roidelete")
+	@ResponseBody // 🌟 뷰(HTML)를 찾지 않고 성공 응답 본문 리턴
+	public ResponseEntity<String> roidelete() 
 	{ 
-		repo.delete(roi);
+		repo.deleteAllInBatch();
 	  
-		model.addAttribute("model", model);
+		return ResponseEntity.ok("SUCCESS");
 	  
-		return "redirect:/petmanagement"; 
+		//return "redirect:/roiselect"; 
 	}
 	
 	// ==========================================

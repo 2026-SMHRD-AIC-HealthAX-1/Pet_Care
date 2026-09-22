@@ -65,9 +65,9 @@
       font-weight: 500;
     }
 
-    #sourceupload {
+/*     #sourceupload {
       display: none;
-    }
+    } */
 
     .form-section {
       margin-bottom: 20px;
@@ -325,10 +325,13 @@
     let pc = null; // WebRTC 연결 객체
 
     if (videoInput) {
-      videoInput.addEventListener("change", function () {
+      videoInput.addEventListener("change", async function () {
         const file = this.files[0];
         if (!file) return;
 
+     	// [추가] 실시간 WebRTC 스트리밍 종료 함수 호출
+        await EndVideo();
+     
         const url = URL.createObjectURL(file);
         video.src = url;
         video.load();
@@ -662,35 +665,52 @@
     saveButton.addEventListener("click", async function (e) {
       if (e) e.preventDefault();
 
-      const data = createJSON();
-      console.log("전송할 데이터:", data);
+      try 
+      {
+	        const data = createJSON();
+	        console.log("전송할 데이터:", data);
+	          
+	        if(data.rois.length == 0)
+	        {
+	        	const res = await fetch("/roidelete", {
+	                method: "POST" // 🌟 POST 방식으로 명시
+	            });
 
-      try {
-        const response = await fetch("/roiinsert", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`서버 오류 [${response.status}]: ${errorText}`);
-        }
-
-        jsonBox.textContent = JSON.stringify(data, null, 4);
-        jsonBox.style.display = "block";
-
-        alert("ROI 설정이 저장되었습니다.");
-
-        // 저장이 완료되면 대시보드나 관련 페이지로 이동
-        window.location.href = "/dashboard";
-
-      } catch (error) {
-        console.error("전송 실패 원인:", error);
-        alert("저장 실패: 콘솔 로그를 확인하세요.");
-      }
+	            if (res.ok) {
+	                alert("ROI 데이터가 삭제 되었습니다.");
+	                window.location.href = "/roi-select"; // 필요 시 페이지 이동
+	            } else {
+	                alert("삭제 실패: " + res.status);
+	            }
+	        	return;
+	        }
+	        
+	        const response = await fetch("/roiinsert", {
+	          method: "POST",
+	          headers: {
+	            "Content-Type": "application/json"
+	          },
+	          body: JSON.stringify(data)
+	        });
+	
+	        if (!response.ok) {
+	          const errorText = await response.text();
+	          throw new Error(`서버 오류 [${response.status}]: ${errorText}`);
+	        }
+	
+	        jsonBox.textContent = JSON.stringify(data, null, 4);
+	        jsonBox.style.display = "block";
+	
+	        alert("ROI 설정이 저장되었습니다.");
+	
+	        // 저장이 완료되면 대시보드나 관련 페이지로 이동
+	        //window.location.href = "/dashboard";
+	        window.location.href = "/roi-select";
+	
+	      } catch (error) {
+	        console.error("전송 실패 원인:", error);
+	        alert("저장 실패: 콘솔 로그를 확인하세요.");
+	      }
     });
 
     resizeCanvas();

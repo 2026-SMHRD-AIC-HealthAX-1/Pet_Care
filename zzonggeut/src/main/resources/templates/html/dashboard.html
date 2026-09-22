@@ -394,7 +394,7 @@
       let selectedFile = null; // 선택된 동영상 파일 저장 변수
 
       // AI 결과 샘플 데이터
-      const sampleResult = {
+/*       const sampleResult = {
         analysis_status: "COMPLETED",
         features_overall: {
           activity_level: 0.043682,
@@ -405,7 +405,7 @@
         change_detection: {
           change_status: "NOT_EVALUATED"
         }
-      };
+      }; */
 
       // 🌟 [2. 영상 업로드 버튼 클릭 시 파일 선택창 열기]
       uploadVideoBtn.addEventListener('click', () => {
@@ -440,7 +440,7 @@
       });
 
       // 🌟 [4. AI 행동 분석 실행 버튼 동작]
-      runAnalysisBtn.addEventListener('click', () => {
+      runAnalysisBtn.addEventListener('click', async () => {
         if (!selectedFile) {
           alert('먼저 분석할 영상을 업로드해주세요!');
           return;
@@ -453,27 +453,86 @@
         analysisStatusBox.className = 'analysis-status-box status-loading';
         analysisStatusText.textContent = '⏳ AI가 동영상을 분석하고 있습니다...';
 
-        // 서버 전송을 위한 FormData 생성
-        const formData = new FormData();
-        formData.append('video', selectedFile);
+        try {
+            // [단계 1] DB에서 현재 저장된 CAMERA_ROI_INFO 데이터 조회 (/roiget 호출)
+            let formattedRoiData = [];
+            try {
+              const roiResponse = await fetch('/roiget');
+              if (roiResponse.ok) {
+                const dbRoiList = await roiResponse.json();
+                console.log('[DB에서 가져온 원본 ROI]:', dbRoiList);
 
-        /* 백엔드 연결 시 아래 fetch 사용:
-        fetch('/api/monitoring/run-ai', {
-          method: 'POST',
-          body: formData
-        })
-        .then(response => response.json())
-        .then(data => { ... })
-        */
+                // 파이썬 analyzer.analyze(roi_data=[...]) 포맷에 맞게 필드명 변환
+                if (Array.isArray(dbRoiList) && dbRoiList.length > 0) {
+                  formattedRoiData = dbRoiList.map(item => ({
+                    roi_name: item.roi_name || item.roiName,
+                    x: Number(item.x_start ?? item.xstart ?? 0),
+                    y: Number(item.y_start ?? item.ystart ?? 0),
+                    width: Number(item.width ?? 0),
+                    height: Number(item.height ?? 0)
+                  }));
+                }
+              }
+            } catch (err) {
+              console.warn('ROI 조회 중 오류 발생 (ROI 없이 계속 진행):', err);
+            }
 
-        // 시뮬레이션용 타이머 (1.5초 후 완료)
-        setTimeout(() => {
-          analysisStatusBox.className = 'analysis-status-box status-success';
-          analysisStatusText.textContent = '✓ 영상 분석이 완료되었습니다.';
+            console.log('[파이썬 규격으로 매핑된 roi_data]:', formattedRoiData);
+
+            // [단계 2] 서버 전송을 위한 FormData 생성
+            const formData = new FormData();
+            formData.append('video', selectedFile);
+            formData.append('pet_id', 'PET-001');
+            formData.append('species', 'DOG');
+
+            // 🌟 ROI 데이터를 JSON 문자열 형태로 FormData에 추가
+            formData.append('roi_data', JSON.stringify(formattedRoiData));
+
+            // [단계 3] 스프링 서버 엔드포인트 호출
+            const response = await fetch('/api/monitoring/run-video-ai', {
+              method: 'POST',
+              body: formData
+            });
+
+            if (!response.ok) {
+              throw new Error(`서버 응답 오류 (상태코드: ${response.status})`);
+            }
+
+            const result = await response.json();
+            console.log('[AI 분석 결과 수신]:', result);
+
+            // result.data 확인
+            if (!result.data) {
+              console.warn('응답에 data 필드가 없습니다. result 본문:', result);
+              return;
+            }
+
+            const analysisData = {
+              analysis_status: result.data.analysis_status,
+              features_overall: {
+                activity_level: result.data.features_overall?.activity_level,
+                stationary_ratio: result.data.features_overall?.stationary_ratio,
+                normalized_travel_distance: result.data.features_overall?.normalized_travel_distance,
+                normalized_moving_speed: result.data.features_overall?.normalized_moving_speed
+              },
+              change_detection: {
+                change_status: result.data.change_detection?.change_status
+              }
+            };
+            
+            analysisStatusBox.className = 'analysis-status-box status-success';
+            analysisStatusText.textContent = '✓ 분석 요청이 완료되었습니다.';
+            
+            renderAiResult(analysisData);
+
+        } catch (error) {
+            console.error('[분석 오류]:', error);
+            analysisStatusBox.className = 'analysis-status-box status-error';
+            analysisStatusText.textContent = `❌ 분석 실패: ${error.message}`;
+        } finally {
+            runAnalysisBtn.disabled = false;
+        }
           
-          renderAiResult(sampleResult);
-          runAnalysisBtn.disabled = false;
-        }, 1500);
       });
 
       // AI 분석 결과 출력 함수

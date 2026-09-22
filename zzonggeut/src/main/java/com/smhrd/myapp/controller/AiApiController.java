@@ -92,7 +92,14 @@ public class AiApiController
             // 별도 DTO 없이 Map에 16개 데이터 직접 적재
             Map<String, Object> paramMap = new HashMap<>();
 
-            // (1) 기본 정보 (9개)
+            // (1) 기본 정보 (10개)
+            String mode = aiModeManager.getMode();
+            if (mode == null || mode.isBlank()) {
+                mode = "unknown"; // 안전 기본값 세팅
+            }
+            
+            paramMap.put("gubun", mode);
+            
             paramMap.put("analysisId", data.get("analysis_id"));
             paramMap.put("schemaVersion", data.get("schema_version"));
             paramMap.put("petId", data.get("pet_id"));

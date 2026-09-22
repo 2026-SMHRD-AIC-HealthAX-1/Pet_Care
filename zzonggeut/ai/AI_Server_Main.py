@@ -5,8 +5,10 @@ import os
 from pathlib import Path
 import shutil
 import uuid
+import time
 
 from aiortc import RTCPeerConnection, RTCSessionDescription, VideoStreamTrack
+from aiortc.mediastreams import MediaStreamError
 from av import VideoFrame
 import cv2
 from fastapi import FastAPI, Request, UploadFile, File, HTTPException
@@ -15,6 +17,8 @@ import httpx
 import uvicorn
 
 from pet_behavior_model.src.pet_behavior_analyzer import PetBehaviorAnalyzer
+from pet_behavior_model.src.frame_sources import AnalysisContext
+from pet_behavior_model.src.live_analyzer import LivePetBehaviorAnalyzer
 
 
 # ==========================================
@@ -68,9 +72,9 @@ async def notify_mode_to_spring(mode: str):
             print(f"[초기화 실패] Spring 모드 전송 실패: {e}")
 
 
-async def send_result_to_spring(result: dict):
+async def send_result_to_spring(result: dict, mode=None):
     payload = {
-        "mode": CURRENT_MODE,
+        "mode": mode or CURRENT_MODE,
         "analyzedAt": datetime.now(KST).isoformat(),
         "data": result
     }
@@ -312,18 +316,79 @@ async def analyze_upload(
 
 class CameraStreamTrack(VideoStreamTrack):
 
-    def __init__(self, camera_num=0):
+    def __init__(
+        self,
+        camera_num=0,
+        live_session=None,
+        analysis_fps=3.0,
+        video_path=None,
+    ):
         super().__init__()
 
         self.camera_num = camera_num
-        self.cap = cv2.VideoCapture(camera_num)
+        self.video_path = video_path
+        self.source_type = "video" if video_path else "camera"
+
+        if self.source_type == "video":
+            self.cap = cv2.VideoCapture(video_path)
+        else:
+            self.cap = cv2.VideoCapture(camera_num)
+
         self.running = True
 
+        self.live_session = live_session
+        self.analysis_fps = analysis_fps
+
+        self._analysis_period = 1.0 / analysis_fps
+        self._analysis_started_at = time.monotonic()
+        self._next_analysis_at = self._analysis_started_at
+        self._analysis_index = 0
+
+        self._analysis_queue = asyncio.Queue(maxsize=30)
+        self._analysis_worker_task = None
+        self._finished = False
+
         if not self.cap.isOpened():
+            source = video_path if video_path else camera_num
             raise RuntimeError(
-                f"카메라를 열 수 없습니다: "
-                f"{camera_num}"
+                f"LIVE 영상 소스를 열 수 없습니다: {source}"
             )
+
+        print(
+            f"[LIVE SOURCE] type={self.source_type}, "
+            f"source={self.video_path if self.video_path else self.camera_num}"
+        )
+
+        if self.live_session is not None:
+            self._analysis_worker_task = asyncio.create_task(
+                self._analysis_worker()
+            )
+
+    async def _analysis_worker(self):
+        while True:
+            item = await self._analysis_queue.get()
+
+            if item is None:
+                break
+
+            frame, timestamp_sec = item
+
+            try:
+                emitted = await asyncio.to_thread(
+                    self.live_session.push_frame,
+                    frame,
+                    timestamp_sec,
+                )
+
+                if emitted is not None:
+                    print(
+                        "[LIVE 5SEC] "
+                        f"{emitted.get('start_sec')}~"
+                        f"{emitted.get('end_sec')} sec"
+                    )
+
+            except Exception as e:
+                print(f"[LIVE 분석 오류] {e}")
 
     async def recv(self):
         pts, time_base = await self.next_timestamp()
@@ -331,17 +396,60 @@ class CameraStreamTrack(VideoStreamTrack):
         ret, frame = self.cap.read()
 
         if not ret:
-            raise RuntimeError(
-                "카메라 프레임을 읽지 못했습니다."
-            )
+            if self.source_type == "video":
+                print("[LIVE VIDEO] 영상 끝 도달 → LIVE 분석 종료")
+                self.running = False
 
-        frame = cv2.cvtColor(
+                await self.finish_live_analysis()
+
+                raise MediaStreamError
+            else:
+                raise RuntimeError(
+                    "카메라 프레임을 읽지 못했습니다."
+                )
+
+        # ------------------------------------------
+        # AI 분석은 analysis_fps 기준으로 샘플링
+        # WebRTC 영상은 원본 프레임 그대로 반환
+        # ------------------------------------------
+        if self.live_session is not None:
+            now = time.monotonic()
+
+            if now >= self._next_analysis_at:
+
+                # LIVE AI 타임라인은 analysis_fps 슬롯을 유지한다.
+                # 순차 timestamp로 분석 세션에 전달한다.
+                timestamp_sec = (
+                    self._analysis_index / self.analysis_fps
+                )
+
+                try:
+                    self._analysis_queue.put_nowait(
+                        (
+                            frame.copy(),
+                            timestamp_sec,
+                        )
+                    )
+
+                    self._analysis_index += 1
+
+                except asyncio.QueueFull:
+                    print(
+                        "[LIVE 경고] 분석 큐 한도 초과 "
+                        f"- analysis_fps={self.analysis_fps} 처리 성능 재확인 필요"
+                    )
+
+                while self._next_analysis_at <= now:
+                    self._next_analysis_at += self._analysis_period
+
+        # WebRTC 전송용 RGB 변환
+        rgb_frame = cv2.cvtColor(
             frame,
             cv2.COLOR_BGR2RGB
         )
 
         video_frame = VideoFrame.from_ndarray(
-            frame,
+            rgb_frame,
             format="rgb24"
         )
 
@@ -349,6 +457,47 @@ class CameraStreamTrack(VideoStreamTrack):
         video_frame.time_base = time_base
 
         return video_frame
+
+    async def finish_live_analysis(self):
+        if self._finished:
+            return None
+
+        self._finished = True
+        self.running = False
+
+        if self.cap.isOpened():
+            self.cap.release()
+
+        if self.live_session is None:
+            return None
+
+        if self._analysis_worker_task is not None:
+            await self._analysis_queue.put(None)
+            await self._analysis_worker_task
+
+        try:
+            result = await asyncio.to_thread(
+                self.live_session.finish
+            )
+
+            print(
+                "[LIVE 분석 완료] "
+                f"analysis_id={result.get('analysis_id')} "
+                f"status={result.get('analysis_status')}"
+            )
+
+            await send_result_to_spring(
+                result,
+                mode="live",
+            )
+
+            print("[LIVE → Spring] 결과 전송 완료")
+
+            return result
+
+        except Exception as e:
+            print(f"[LIVE 종료 처리 오류] {e}")
+            return None
 
     def release(self):
         self.running = False
@@ -365,6 +514,81 @@ class CameraStreamTrack(VideoStreamTrack):
 async def offer(request: Request):
     params = await request.json()
 
+    species = str(
+        params.get("species", "DOG")
+    ).strip().upper()
+
+    if species not in ("DOG", "CAT"):
+        raise HTTPException(
+            status_code=400,
+            detail="species는 DOG 또는 CAT만 가능합니다."
+        )
+
+    pet_id = str(
+        params.get("pet_id", "PET-LIVE-TEST-001")
+    )
+
+    camera_id = str(
+        params.get("camera_id", "CAM-001")
+    )
+
+    camera_num = int(
+        params.get("camera_num", 0)
+    )
+
+    source_type = str(
+        params.get("source_type", "camera")
+    ).strip().lower()
+
+    video_path = (
+        params.get("video_path")
+        or os.getenv("LIVE_DEMO_VIDEO_PATH")
+    )
+
+    if source_type == "video" and not video_path:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "source_type=video 인 경우 video_path 또는 "
+                "LIVE_DEMO_VIDEO_PATH 환경변수가 필요합니다."
+            )
+        )
+
+    roi_data = params.get("roi_data")
+
+    # ROI가 비어 있으면 ROI 분석을 사용하지 않음
+    if (
+        isinstance(roi_data, dict)
+        and not roi_data.get("roi_areas")
+    ):
+        roi_data = None
+
+    token = uuid.uuid4().hex[:10]
+
+    context = AnalysisContext(
+        analysis_id=f"ANL-LIVE-{token}",
+        pet_id=pet_id,
+        video_id=f"VID-LIVE-{token}",
+        camera_id=camera_id,
+        species=species,
+        recorded_at=datetime.now(KST).isoformat(),
+        roi_data=roi_data,
+    )
+
+    try:
+        live_session = (
+            LivePetBehaviorAnalyzer()
+            .start_session(
+                context=context,
+                expected_fps=3.0,
+            )
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"LIVE 분석 세션 생성 실패: {e}"
+        )
+
     offer = RTCSessionDescription(
         sdp=params["sdp"],
         type=params["type"]
@@ -373,15 +597,41 @@ async def offer(request: Request):
     pc = RTCPeerConnection()
     pcs.add(pc)
 
-    video_track = CameraStreamTrack(
-        params.get("camera_num", 0)
-    )
+    try:
+        video_track = CameraStreamTrack(
+            camera_num=camera_num,
+            live_session=live_session,
+            analysis_fps=3.0,
+            video_path=video_path if source_type == "video" else None,
+        )
+    except Exception as e:
+        pcs.discard(pc)
+        await pc.close()
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"카메라 Track 생성 실패: {e}"
+        )
 
     pc.addTrack(video_track)
     active_tracks[pc] = video_track
 
+    print(
+        "[LIVE 세션 시작] "
+        f"analysis_id={context.analysis_id}, "
+        f"pet_id={pet_id}, "
+        f"camera_id={camera_id}, "
+        f"species={species}, "
+        f"analysis_fps=3, source_type={source_type}"
+    )
+
     @pc.on("connectionstatechange")
     async def on_connectionstatechange():
+
+        print(
+            "[WebRTC 상태] "
+            f"{pc.connectionState}"
+        )
 
         if pc.connectionState in [
             "failed",
@@ -393,7 +643,7 @@ async def offer(request: Request):
             )
 
             if track:
-                track.release()
+                await track.finish_live_analysis()
 
             await pc.close()
             pcs.discard(pc)
@@ -406,7 +656,9 @@ async def offer(request: Request):
 
     return {
         "sdp": pc.localDescription.sdp,
-        "type": pc.localDescription.type
+        "type": pc.localDescription.type,
+        "analysis_id": context.analysis_id,
+        "analysis_fps": 3.0,
     }
 
 

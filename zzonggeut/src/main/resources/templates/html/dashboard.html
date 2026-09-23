@@ -408,10 +408,17 @@
                   th:each="pet : ${petList}"
                   th:value="${pet.seq}"
                   th:text="${pet.pName + ' · ' + pet.pSpecies}"
+                  th:data-species="${pet.pSpecies}"
                 >
                   반려동물
                 </option>
               </select>
+
+              <input
+                type="hidden"
+                id="loginUserSeq"
+                th:value="${loginUser != null ? loginUser.id : ''}"
+              >
 
               <select class="small-select" id="cameraSelect">
                 <option value="CAM-INTEGRATION-001">
@@ -454,6 +461,15 @@
           <!-- 3) AI 행동 분석 실행 버튼 -->
           <button class="btn primary-btn" id="runAnalysisBtn">
             🔍 AI 행동 분석 실행
+          </button>
+
+          <!-- 4) LIVE 시연 시작/종료 -->
+          <button class="btn outline-btn" id="startLiveBtn">
+            📡 LIVE 시작
+          </button>
+
+          <button class="btn outline-btn" id="stopLiveBtn" disabled>
+            ⏹ LIVE 종료
           </button>
         </div>
 
@@ -689,6 +705,10 @@
 
     const petSelect = document.getElementById('petSelect');
     const cameraSelect = document.getElementById('cameraSelect');
+    const loginUserSeq = document.getElementById('loginUserSeq');
+
+    const startLiveBtn = document.getElementById('startLiveBtn');
+    const stopLiveBtn = document.getElementById('stopLiveBtn');
 
     let selectedFile = null;
     let selectedFileUrl = null;
@@ -697,6 +717,11 @@
     let trackingCanvas = null;
     let trackingCtx = null;
     let animationFrameId = null;
+
+    let livePc = null;
+    let liveVideoElement = null;
+    let liveAnalysisId = null;
+    let liveRunning = false;
 
     function stopTrackingLoop() {
       if (animationFrameId) {
@@ -827,6 +852,718 @@
       render();
     }
 
+
+    function normalizeSpecies(rawSpecies) {
+      const value = String(rawSpecies || '')
+        .trim()
+        .toUpperCase();
+
+      if (
+        value === 'DOG'
+        || value === '개'
+        || value === '강아지'
+      ) {
+        return 'DOG';
+      }
+
+      if (
+        value === 'CAT'
+        || value === '고양이'
+      ) {
+        return 'CAT';
+      }
+
+      return null;
+    }
+
+    function getSelectedSpecies() {
+      const selectedOption =
+        petSelect?.selectedOptions?.[0];
+
+      return normalizeSpecies(
+        selectedOption?.dataset?.species
+        || ''
+      );
+    }
+
+    async function getLiveRoiData() {
+      const res = await fetch(
+        '/roiget',
+        {
+          method: 'GET',
+          cache: 'no-store'
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error(
+          'LIVE ROI 정보를 불러오지 못했습니다.'
+        );
+      }
+
+      const roiList = await res.json();
+
+      if (
+        !Array.isArray(roiList)
+        || roiList.length === 0
+      ) {
+        return null;
+      }
+
+      return {
+        camera_id:
+          cameraSelect?.value
+          || 'CAM-INTEGRATION-001',
+
+        roi_areas: roiList.map((roi) => ({
+          roi_id:
+            String(
+              roi.seq
+              ?? roi.roi_id
+              ?? roi.roiId
+              ?? ''
+            ),
+
+          roi_name:
+            roi.roi_name
+            ?? roi.roiName
+            ?? 'ROI',
+
+          roi_type:
+            'RECTANGLE',
+
+          x:
+            Number(
+              roi.x_start
+              ?? roi.xstart
+              ?? roi.x
+              ?? 0
+            ),
+
+          y:
+            Number(
+              roi.y_start
+              ?? roi.ystart
+              ?? roi.y
+              ?? 0
+            ),
+
+          width:
+            Number(
+              roi.width
+              ?? 0
+            ),
+
+          height:
+            Number(
+              roi.height
+              ?? 0
+            )
+        }))
+      };
+    }
+
+    function waitForIceGatheringComplete(
+      pc,
+      timeoutMs = 4000
+    ) {
+      if (
+        pc.iceGatheringState === 'complete'
+      ) {
+        return Promise.resolve();
+      }
+
+      return new Promise((resolve) => {
+        let resolved = false;
+
+        const finish = () => {
+          if (resolved) {
+            return;
+          }
+
+          resolved = true;
+
+          pc.removeEventListener(
+            'icegatheringstatechange',
+            checkState
+          );
+
+          resolve();
+        };
+
+        const checkState = () => {
+          if (
+            pc.iceGatheringState === 'complete'
+          ) {
+            finish();
+          }
+        };
+
+        pc.addEventListener(
+          'icegatheringstatechange',
+          checkState
+        );
+
+        setTimeout(
+          finish,
+          timeoutMs
+        );
+      });
+    }
+
+    function setLiveUiState(isRunning) {
+      liveRunning = isRunning;
+
+      if (startLiveBtn) {
+        startLiveBtn.disabled = isRunning;
+      }
+
+      if (stopLiveBtn) {
+        stopLiveBtn.disabled = !isRunning;
+      }
+
+      if (uploadVideoBtn) {
+        uploadVideoBtn.disabled = isRunning;
+      }
+
+      if (runAnalysisBtn) {
+        runAnalysisBtn.disabled = isRunning;
+      }
+
+      if (petSelect) {
+        petSelect.disabled = isRunning;
+      }
+
+      if (cameraSelect) {
+        cameraSelect.disabled = isRunning;
+      }
+    }
+
+    function renderLatestAnalysisResult(
+      latestResult
+    ) {
+      renderAiResult({
+        analysis_status:
+          latestResult?.analysis_status,
+
+        features_overall: {
+          activity_level:
+            latestResult?.activity_level,
+
+          stationary_ratio:
+            latestResult?.stationary_ratio,
+
+          normalized_travel_distance:
+            latestResult
+              ?.normalized_travel_distance,
+
+          normalized_moving_speed:
+            latestResult
+              ?.normalized_moving_speed
+        },
+
+        change_detection: {
+          change_status:
+            latestResult?.change_status
+        }
+      });
+    }
+
+    async function pollLiveResult(
+      targetAnalysisId,
+      maxAttempts = 30
+    ) {
+      for (
+        let attempt = 1;
+        attempt <= maxAttempts;
+        attempt++
+      ) {
+        try {
+          const res = await fetch(
+            '/api/pet/analysis/latest',
+            {
+              method: 'GET',
+              cache: 'no-store'
+            }
+          );
+
+          if (res.ok) {
+            const latestResult =
+              await res.json();
+
+            const resultAnalysisId =
+              latestResult?.analysis_id
+              ?? latestResult?.analysisId
+              ?? null;
+
+            console.log(
+              '[LIVE 최신 DB 결과 확인]',
+              {
+                attempt,
+                targetAnalysisId,
+                resultAnalysisId,
+                latestResult
+              }
+            );
+
+            if (
+              resultAnalysisId === targetAnalysisId
+              || (
+                !resultAnalysisId
+                && attempt >= 3
+                && latestResult?.analysis_status
+              )
+            ) {
+              renderLatestAnalysisResult(
+                latestResult
+              );
+
+              analysisStatusBox.className =
+                'analysis-status-box status-success';
+
+              analysisStatusText.textContent =
+                targetAnalysisId
+                  ? `✓ LIVE 분석 및 DB 저장 완료 (${targetAnalysisId})`
+                  : '✓ LIVE 분석 및 DB 저장이 완료되었습니다.';
+
+              await loadTodayStayRatio();
+
+              return latestResult;
+            }
+          }
+        } catch (err) {
+          console.warn(
+            '[LIVE 결과 조회 재시도]',
+            err
+          );
+        }
+
+        await new Promise(
+          resolve =>
+            setTimeout(
+              resolve,
+              2000
+            )
+        );
+      }
+
+      throw new Error(
+        'LIVE 종료 후 DB 결과 저장 확인 시간이 초과되었습니다.'
+      );
+    }
+
+    async function startLiveSession() {
+      if (liveRunning) {
+        return;
+      }
+
+      if (
+        !petSelect
+        || !petSelect.value
+      ) {
+        alert(
+          'LIVE 분석할 반려동물을 먼저 선택해주세요.'
+        );
+        return;
+      }
+
+      const species =
+        getSelectedSpecies();
+
+      if (!species) {
+        alert(
+          '선택한 반려동물의 종 정보를 확인할 수 없습니다.'
+        );
+        return;
+      }
+
+      const userSeq =
+        String(
+          loginUserSeq?.value
+          || ''
+        ).trim();
+
+      if (!userSeq) {
+        alert(
+          '로그인 사용자 정보를 확인할 수 없습니다.'
+        );
+        return;
+      }
+
+      setLiveUiState(true);
+      stopTrackingLoop();
+      trackingData = [];
+
+      aiResultCard.style.display =
+        'none';
+
+      analysisStatusBox.style.display =
+        'block';
+
+      analysisStatusBox.className =
+        'analysis-status-box status-loading';
+
+      analysisStatusText.textContent =
+        '📡 LIVE 연결을 준비하고 있습니다...';
+
+      try {
+        const roiData =
+          await getLiveRoiData();
+
+        const pc =
+          new RTCPeerConnection();
+
+        livePc = pc;
+
+        pc.addTransceiver(
+          'video',
+          {
+            direction: 'recvonly'
+          }
+        );
+
+        videoContainer.innerHTML = `
+          <video
+            id="liveVideo"
+            autoplay
+            playsinline
+            muted
+            controls
+            style="
+              width:100%;
+              height:100%;
+              object-fit:contain;
+              background:#000;
+            "
+          ></video>
+        `;
+
+        liveVideoElement =
+          document.getElementById(
+            'liveVideo'
+          );
+
+        pc.ontrack = (event) => {
+          if (!liveVideoElement) {
+            return;
+          }
+
+          const stream =
+            event.streams?.[0]
+            || new MediaStream(
+              [event.track]
+            );
+
+          liveVideoElement.srcObject =
+            stream;
+
+          liveVideoElement
+            .play()
+            .catch(() => {});
+        };
+
+        pc.onconnectionstatechange = () => {
+          console.log(
+            '[LIVE WebRTC 상태]',
+            pc.connectionState
+          );
+
+          if (
+            pc.connectionState === 'connected'
+          ) {
+            if (liveBadge) {
+              liveBadge.textContent =
+                '🔴 LIVE 분석중';
+
+              liveBadge.style
+                .backgroundColor =
+                  '#dc2626';
+
+              liveBadge.style.color =
+                '#fff';
+            }
+
+            analysisStatusBox.className =
+              'analysis-status-box status-success';
+
+            analysisStatusText.textContent =
+              liveAnalysisId
+                ? `🔴 LIVE 분석중 · ${liveAnalysisId}`
+                : '🔴 LIVE 분석중';
+          }
+
+          if (
+            pc.connectionState === 'failed'
+          ) {
+            analysisStatusBox.className =
+              'analysis-status-box status-error';
+
+            analysisStatusText.textContent =
+              '❌ LIVE WebRTC 연결에 실패했습니다.';
+          }
+        };
+
+        const offer =
+          await pc.createOffer();
+
+        await pc.setLocalDescription(
+          offer
+        );
+
+        await waitForIceGatheringComplete(
+          pc
+        );
+
+        const response = await fetch(
+          'http://127.0.0.1:8000/offer',
+          {
+            method: 'POST',
+
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+
+            body: JSON.stringify({
+              sdp:
+                pc.localDescription.sdp,
+
+              type:
+                pc.localDescription.type,
+
+              pet_id:
+                String(
+                  petSelect.value
+                ),
+
+              camera_id:
+                cameraSelect?.value
+                || 'CAM-INTEGRATION-001',
+
+              species,
+
+              user_seq:
+                userSeq,
+
+              source_type:
+                'video',
+
+              camera_num:
+                0,
+
+              roi_data:
+                roiData
+            })
+          }
+        );
+
+        let answer = null;
+
+        try {
+          answer =
+            await response.json();
+        } catch (jsonError) {
+          throw new Error(
+            'AI LIVE 응답을 JSON으로 읽을 수 없습니다.'
+          );
+        }
+
+        if (!response.ok) {
+          throw new Error(
+            answer?.detail
+            || `AI LIVE 연결 오류 (${response.status})`
+          );
+        }
+
+        liveAnalysisId =
+          answer?.analysis_id
+          || null;
+
+        await pc.setRemoteDescription(
+          new RTCSessionDescription({
+            sdp:
+              answer.sdp,
+
+            type:
+              answer.type
+          })
+        );
+
+        console.log(
+          '[LIVE 시작 완료]',
+          {
+            analysisId:
+              liveAnalysisId,
+
+            petId:
+              petSelect.value,
+
+            cameraId:
+              cameraSelect?.value
+              || 'CAM-INTEGRATION-001',
+
+            species,
+
+            userSeq,
+
+            roiData
+          }
+        );
+
+        await renderRoiOverlay();
+
+      } catch (error) {
+        console.error(
+          '[LIVE 시작 오류]',
+          error
+        );
+
+        if (livePc) {
+          try {
+            livePc.close();
+          } catch (_) {}
+        }
+
+        livePc = null;
+        liveAnalysisId = null;
+        liveVideoElement = null;
+
+        setLiveUiState(false);
+
+        if (liveBadge) {
+          liveBadge.textContent =
+            '대기중';
+
+          liveBadge.style
+            .backgroundColor = '';
+
+          liveBadge.style.color = '';
+        }
+
+        analysisStatusBox.className =
+          'analysis-status-box status-error';
+
+        analysisStatusText.textContent =
+          '❌ LIVE 시작 실패: '
+          + (
+            error?.message
+            || '알 수 없는 오류'
+          );
+      }
+    }
+
+    async function stopLiveSession(
+      shouldPollResult = true
+    ) {
+      if (!livePc) {
+        setLiveUiState(false);
+        return;
+      }
+
+      const targetAnalysisId =
+        liveAnalysisId;
+
+      analysisStatusBox.style.display =
+        'block';
+
+      analysisStatusBox.className =
+        'analysis-status-box status-loading';
+
+      analysisStatusText.textContent =
+        '⏹ LIVE 종료 중 · 분석 결과 저장을 기다리고 있습니다...';
+
+      try {
+        const pc = livePc;
+
+        livePc = null;
+
+        try {
+          pc.getReceivers()
+            .forEach((receiver) => {
+              try {
+                receiver.track?.stop();
+              } catch (_) {}
+            });
+        } catch (_) {}
+
+        pc.close();
+
+        if (liveVideoElement) {
+          try {
+            const stream =
+              liveVideoElement.srcObject;
+
+            stream?.getTracks?.()
+              .forEach(
+                track => track.stop()
+              );
+          } catch (_) {}
+
+          liveVideoElement.srcObject =
+            null;
+        }
+
+        if (liveBadge) {
+          liveBadge.textContent =
+            '⏳ LIVE 결과 저장중';
+
+          liveBadge.style
+            .backgroundColor =
+              '#f59e0b';
+
+          liveBadge.style.color =
+            '#fff';
+        }
+
+        if (shouldPollResult) {
+          await new Promise(
+            resolve =>
+              setTimeout(
+                resolve,
+                1200
+              )
+          );
+
+          await pollLiveResult(
+            targetAnalysisId
+          );
+        }
+
+        if (liveBadge) {
+          liveBadge.textContent =
+            '✓ LIVE 완료';
+
+          liveBadge.style
+            .backgroundColor =
+              '#0b8484';
+
+          liveBadge.style.color =
+            '#fff';
+        }
+
+      } catch (error) {
+        console.error(
+          '[LIVE 종료 오류]',
+          error
+        );
+
+        analysisStatusBox.className =
+          'analysis-status-box status-error';
+
+        analysisStatusText.textContent =
+          '❌ LIVE 종료 결과 확인 실패: '
+          + (
+            error?.message
+            || '알 수 없는 오류'
+          );
+
+      } finally {
+        liveAnalysisId = null;
+        liveVideoElement = null;
+        setLiveUiState(false);
+      }
+    }
+
     async function renderRoiOverlay() {
       try {
         const res = await fetch('/roiget');
@@ -876,6 +1613,20 @@
         console.error('ROI 오버레이 렌더링 실패:', err);
       }
     }
+
+    startLiveBtn?.addEventListener(
+      'click',
+      async () => {
+        await startLiveSession();
+      }
+    );
+
+    stopLiveBtn?.addEventListener(
+      'click',
+      async () => {
+        await stopLiveSession(true);
+      }
+    );
 
     uploadVideoBtn.addEventListener('click', () => {
       videoFileInput.click();
@@ -1370,6 +2121,12 @@
     window.addEventListener('beforeunload', () => {
       stopTrackingLoop();
       resetVideoObjectUrl();
+
+      if (livePc) {
+        try {
+          livePc.close();
+        } catch (_) {}
+      }
     });
   });
   </script>

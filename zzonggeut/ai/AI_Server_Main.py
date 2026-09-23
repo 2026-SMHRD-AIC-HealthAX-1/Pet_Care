@@ -621,6 +621,7 @@ class CameraStreamTrack(
         live_session=None,
         analysis_fps=3.0,
         video_path=None,
+        user_seq=None,
     ):
         super().__init__()
 
@@ -630,6 +631,10 @@ class CameraStreamTrack(
 
         self.video_path = (
             video_path
+        )
+
+        self.user_seq = (
+            user_seq
         )
 
         self.source_type = (
@@ -916,6 +921,11 @@ class CameraStreamTrack(
                 )
             )
 
+            if self.user_seq is not None:
+                result["user_seq"] = (
+                    self.user_seq
+                )
+
             print(
                 "[LIVE 분석 완료] "
                 f"analysis_id="
@@ -1000,6 +1010,18 @@ async def offer(
             "camera_id",
             "CAM-001"
         )
+    )
+
+    user_seq = (
+        str(
+            params.get(
+                "user_seq"
+            )
+        ).strip()
+        if params.get(
+            "user_seq"
+        ) is not None
+        else None
     )
 
     camera_num = int(
@@ -1123,6 +1145,7 @@ async def offer(
                     if source_type == "video"
                     else None
                 ),
+                user_seq=user_seq,
             )
         )
 
@@ -1160,6 +1183,8 @@ async def offer(
         f"{camera_id}, "
         f"species="
         f"{species}, "
+        f"user_seq="
+        f"{user_seq}, "
         f"analysis_fps=3, "
         f"source_type="
         f"{source_type}"

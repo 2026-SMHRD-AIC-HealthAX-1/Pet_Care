@@ -1,4 +1,5 @@
 import asyncio
+import csv
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
 import json
@@ -178,11 +179,144 @@ def execute_video_analysis(
     if user_seq is not None:
         result["user_seq"] = user_seq
 
+    result = attach_tracking_points(
+        result,
+        video_path,
+    )
+
     print(
         "[분석 완료] "
         f"analysis_id="
         f"{unique_analysis_id}"
     )
+
+    return result
+
+
+def attach_tracking_points(
+    result: dict,
+    video_path: str,
+):
+    """
+    PetBehaviorAnalyzer가 생성한 tracking CSV를 읽어
+    대시보드 Canvas 표시용 tracking_points를 결과에 추가한다.
+    기존 분석/ROI/LIVE 계약은 변경하지 않는다.
+    """
+    if not isinstance(result, dict):
+        return result
+
+    try:
+        stem = Path(video_path).stem
+
+        base_dir = Path(
+            getattr(
+                analyzer,
+                "base_dir",
+                BASE_DIR / "pet_behavior_model"
+            )
+        )
+
+        tracking_csv_path = (
+            base_dir
+            / "data"
+            / "outputs"
+            / f"{stem}_tracking.csv"
+        )
+
+        tracking_points = []
+
+        if tracking_csv_path.is_file():
+            with tracking_csv_path.open(
+                "r",
+                encoding="utf-8",
+                newline=""
+            ) as csv_file:
+
+                reader = csv.DictReader(
+                    csv_file
+                )
+
+                for row in reader:
+                    raw_x = (
+                        row.get("raw_x")
+                        or row.get("center_x")
+                    )
+
+                    raw_y = (
+                        row.get("raw_y")
+                        or row.get("center_y")
+                    )
+
+                    time_sec = (
+                        row.get("time_sec")
+                    )
+
+                    if (
+                        raw_x is None
+                        or raw_y is None
+                        or time_sec is None
+                    ):
+                        continue
+
+                    raw_x = str(raw_x).strip()
+                    raw_y = str(raw_y).strip()
+                    time_sec = str(time_sec).strip()
+
+                    if (
+                        not raw_x
+                        or not raw_y
+                        or not time_sec
+                    ):
+                        continue
+
+                    point = {
+                        "time": float(time_sec),
+                        "x": float(raw_x),
+                        "y": float(raw_y),
+                        "status": (
+                            row.get("status")
+                            or "detected"
+                        ),
+                    }
+
+                    confidence = (
+                        row.get("confidence")
+                    )
+
+                    if (
+                        confidence is not None
+                        and str(confidence).strip()
+                    ):
+                        try:
+                            point["confidence"] = (
+                                float(confidence)
+                            )
+                        except ValueError:
+                            pass
+
+                    tracking_points.append(
+                        point
+                    )
+
+        result["tracking_points"] = (
+            tracking_points
+        )
+
+        print(
+            "[UPLOAD TRACKING] "
+            f"tracking_csv="
+            f"{tracking_csv_path}, "
+            f"tracking_points="
+            f"{len(tracking_points)}"
+        )
+
+    except Exception as e:
+        result["tracking_points"] = []
+
+        print(
+            "[UPLOAD TRACKING 경고] "
+            f"{type(e).__name__}: {e}"
+        )
 
     return result
 

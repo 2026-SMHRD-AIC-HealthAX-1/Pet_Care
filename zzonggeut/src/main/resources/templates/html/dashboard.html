@@ -317,6 +317,27 @@
       color: #16a34a;
       border: 1px solid #bbf7d0;
     }
+
+	.roi-overlay-box {
+	  position: absolute;
+	  border: 2px solid #2dd4bf;              /* 청록색 테두리 */
+	  background-color: rgba(45, 212, 191, 0.15); /* 살짝 투명한 배경 */
+	  box-sizing: border-box;
+	  pointer-events: none;                  /* 비디오 컨트롤바 조작 방해 금지 */
+	  z-index: 10;
+	}
+	
+	.roi-overlay-label {
+	  position: absolute;
+	  top: 2px;
+	  left: 4px;
+	  font-size: 11px;
+	  font-weight: bold;
+	  color: #2dd4bf;
+	  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+	  white-space: nowrap;
+	}
+	
   </style>
 </head>
 
@@ -648,27 +669,73 @@
 	    });
 
 	    // 3. 파일이 선택되었을 때 브라우저에 미리보기 화면 출력
-	    videoFileInput.addEventListener('change', (e) => {
-	      const file = e.target.files[0];
-	      if (!file) return;
+	    videoFileInput.addEventListener('change', async (e) => {
+	    	const file = e.target.files[0];
+	    	  if (!file) return;
 
-	      selectedFile = file;
-	      const fileUrl = URL.createObjectURL(file);
+	    	  selectedFile = file;
+	    	  const fileUrl = URL.createObjectURL(file);
 
-	      videoContainer.innerHTML = `
-	        <video id="uploadedVideo" controls autoplay loop style="width:100%; height:100%; object-fit:cover;">
-	          <source src="${fileUrl}" type="${file.type}">
-	          브라우저가 동영상 재생을 지원하지 않습니다.
-	        </video>
-	      `;
+	    	  // 1) 비디오 태그 출력
+	    	  videoContainer.innerHTML = `
+	    	    <video id="uploadedVideo" controls autoplay loop style="width:100%; height:100%; object-fit:contain;">
+	    	      <source src="${fileUrl}" type="${file.type}">
+	    	      브라우저가 동영상 재생을 지원하지 않습니다.
+	    	    </video>
+	    	  `;
 
-	      if (liveBadge) {
-	        liveBadge.textContent = '🎬 영상 로드됨';
-	        liveBadge.style.backgroundColor = '#0b8484';
-	        liveBadge.style.color = '#fff';
-	      }
+	    	  if (liveBadge) {
+	    	    liveBadge.textContent = '🎬 영상 로드됨';
+	    	    liveBadge.style.backgroundColor = '#0b8484';
+	    	    liveBadge.style.color = '#fff';
+	    	  }
 
-	      uploadVideoBtn.textContent = '🔄 다른 영상 선택';
+	    	  uploadVideoBtn.textContent = '🔄 다른 영상 선택';
+
+	    	  // 🌟 2) DB에서 CAMERA_ROI_INFO 가져와서 비디오 위에 박스 표시
+	    	  try {
+	    	    const res = await fetch('/roiget');
+	    	    if (!res.ok) return;
+
+	    	    const roiList = await res.json();
+	    	    console.log('[화면 표시용 ROI 목록]:', roiList);
+
+	    	    if (Array.isArray(roiList) && roiList.length > 0) {
+	    	      roiList.forEach(roi => {
+	    	        // 필드명 호환 (카멜케이스 / 스네이크케이스 모두 지원)
+	    	        const name = roi.roi_name || roi.roiName || 'ROI';
+	    	        const x = Number(roi.x_start ?? roi.xstart ?? 0);
+	    	        const y = Number(roi.y_start ?? roi.ystart ?? 0);
+	    	        const w = Number(roi.width ?? 0);
+	    	        const h = Number(roi.height ?? 0);
+
+	    	        // 표시할 한글 라벨 매핑 (선택사항)
+	    	        let displayName = name;
+	    	        if (name === 'BED') displayName = '침대 (BED)';
+	    	        else if (name === 'FOOD_BOWL') displayName = '밥그릇 (FOOD_BOWL)';
+
+	    	        // 박스 엘리먼트 생성
+	    	        const box = document.createElement('div');
+	    	        box.className = 'roi-overlay-box';
+
+	    	        // 0.0 ~ 1.0 비율 값을 % 단위로 변환해 위치 지정
+	    	        box.style.left = `${(x * 100).toFixed(2)}%`;
+	    	        box.style.top = `${(y * 100).toFixed(2)}%`;
+	    	        box.style.width = `${(w * 100).toFixed(2)}%`;
+	    	        box.style.height = `${(h * 100).toFixed(2)}%`;
+
+	    	        // 라벨 생성
+	    	        const label = document.createElement('span');
+	    	        label.className = 'roi-overlay-label';
+	    	        label.textContent = displayName;
+
+	    	        box.appendChild(label);
+	    	        videoContainer.appendChild(box);
+	    	      });
+	    	    }
+	    	  } catch (err) {
+	    	    console.error('ROI 오버레이 렌더링 실패:', err);
+	    	  }
 	    });
 
 	    // 4. AI 행동 분석 실행 버튼 동작

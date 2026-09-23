@@ -38,8 +38,13 @@
       line-height: 1.6;
     }
 
-    a { text-decoration: none; }
-    ul { list-style: none; }
+    a {
+      text-decoration: none;
+    }
+
+    ul {
+      list-style: none;
+    }
 
     /* ---------- Navbar ---------- */
     .navbar {
@@ -62,11 +67,12 @@
     }
 
     .nav-menu {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 30px;
-      flex: 1;
     }
 
     .nav-menu a {
@@ -76,7 +82,9 @@
       transition: color 0.2s;
     }
 
-    .nav-menu a:hover { color: var(--primary); }
+    .nav-menu a:hover {
+      color: var(--primary);
+    }
 
     .nav-menu a.active {
       color: var(--primary);
@@ -128,7 +136,9 @@
       border: 1.5px solid var(--primary);
     }
 
-    .btn-outline:hover { background-color: var(--primary-light); }
+    .btn-outline:hover {
+      background-color: var(--primary-light);
+    }
 
     /* ---------- 공통 섹션 ---------- */
     .section {
@@ -164,7 +174,9 @@
       margin-bottom: 52px;
     }
 
-    .center { text-align: center; }
+    .center {
+      text-align: center;
+    }
 
     /* ---------- Footer ---------- */
     .footer {
@@ -181,12 +193,49 @@
 
     /* ---------- 반응형 ---------- */
     @media (max-width: 880px) {
-      .navbar { padding: 14px 20px; }
-      .nav-menu { gap: 14px; }
-      .nav-menu a { font-size: 14px; }
-      .nav-login-btn { padding: 8px 16px; }
-      .section { padding: 60px 20px; }
-      .section-title { font-size: 24px; }
+      .navbar {
+        padding: 14px 20px;
+        position: relative;
+      }
+
+      .nav-menu {
+        position: static;
+        transform: none;
+        gap: 14px;
+      }
+
+      .nav-menu a {
+        font-size: 14px;
+      }
+
+      .nav-login-btn {
+        padding: 8px 16px;
+      }
+
+      .section {
+        padding: 60px 20px;
+      }
+
+      .section-title {
+        font-size: 24px;
+      }
+    }
+
+    .nav-menu a {
+      font-size: 14px;
+    }
+
+    .nav-login-btn {
+      padding: 8px 16px;
+    }
+
+    .section {
+      padding: 60px 20px;
+    }
+
+    .section-title {
+      font-size: 24px;
+    }
     }
   </style>
   <style>
@@ -197,9 +246,15 @@
       padding: 54px 24px 80px;
     }
 
-    .signup-inner { max-width: 620px; margin: 0 auto; }
+    .signup-inner {
+      max-width: 620px;
+      margin: 0 auto;
+    }
 
-    .signup-head { text-align: center; margin-bottom: 30px; }
+    .signup-head {
+      text-align: center;
+      margin-bottom: 30px;
+    }
 
     .signup-head h1 {
       font-size: 30px;
@@ -208,7 +263,10 @@
       margin-bottom: 10px;
     }
 
-    .signup-head p { font-size: 15px; color: var(--text-sub); }
+    .signup-head p {
+      font-size: 15px;
+      color: var(--text-sub);
+    }
 
     /* 로그인 안내 배너 */
     .login-notice {
@@ -252,7 +310,8 @@
     }
 
     .progress-step .dot {
-      width: 24px; height: 24px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       background: #e4e0d9;
       color: #fff;
@@ -263,10 +322,19 @@
       font-weight: 700;
     }
 
-    .progress-step.on { color: var(--primary); }
-    .progress-step.on .dot { background: var(--primary); }
+    .progress-step.on {
+      color: var(--primary);
+    }
 
-    .progress-line { width: 26px; height: 2px; background: #e4e0d9; }
+    .progress-step.on .dot {
+      background: var(--primary);
+    }
+
+    .progress-line {
+      width: 26px;
+      height: 2px;
+      background: #e4e0d9;
+    }
 
     /* 카드 */
     .signup-card {
@@ -277,7 +345,9 @@
       box-shadow: var(--shadow);
     }
 
-    .form-section { margin-bottom: 32px; }
+    .form-section {
+      margin-bottom: 32px;
+    }
 
     .form-section-title {
       display: flex;
@@ -291,7 +361,9 @@
       border-bottom: 1px solid var(--line);
     }
 
-    .form-section-title .ico { font-size: 18px; }
+    .form-section-title .ico {
+      font-size: 18px;
+    }
 
     .section-lead {
       font-size: 13.5px;
@@ -313,7 +385,10 @@
       color: var(--text);
     }
 
-    .form-group label .req { color: #e05555; margin-left: 2px; }
+    .form-group label .req {
+      color: #e05555;
+      margin-left: 2px;
+    }
 
     .form-group input,
     .form-group select {
@@ -330,7 +405,9 @@
       font-family: inherit;
     }
 
-    .form-group input::placeholder { color: #bdb8b0; }
+    .form-group input::placeholder {
+      color: #bdb8b0;
+    }
 
     .form-group input:focus,
     .form-group select:focus {
@@ -339,7 +416,10 @@
       box-shadow: 0 0 0 4px rgba(11, 132, 132, 0.09);
     }
 
-    .form-hint { font-size: 12.5px; color: var(--text-light); }
+    .form-hint {
+      font-size: 12.5px;
+      color: var(--text-light);
+    }
 
     .form-row {
       display: grid;
@@ -348,7 +428,11 @@
     }
 
     /* 플랜 선택 */
-    .plan-options { display: flex; flex-direction: column; gap: 12px; }
+    .plan-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
     .plan-option {
       display: flex;
@@ -363,10 +447,13 @@
       position: relative;
     }
 
-    .plan-option:hover { border-color: #bcd9d9; }
+    .plan-option:hover {
+      border-color: #bcd9d9;
+    }
 
     .plan-option input[type="radio"] {
-      width: 18px; height: 18px;
+      width: 18px;
+      height: 18px;
       accent-color: var(--primary);
       margin-top: 3px;
       flex-shrink: 0;
@@ -379,7 +466,10 @@
       box-shadow: 0 0 0 4px rgba(11, 132, 132, 0.08);
     }
 
-    .plan-option-body { flex: 1; min-width: 0; }
+    .plan-option-body {
+      flex: 1;
+      min-width: 0;
+    }
 
     .plan-option-top {
       display: flex;
@@ -389,7 +479,11 @@
       flex-wrap: wrap;
     }
 
-    .plan-option-name { font-size: 15.5px; font-weight: 800; color: var(--text); }
+    .plan-option-name {
+      font-size: 15.5px;
+      font-weight: 800;
+      color: var(--text);
+    }
 
     .plan-tag {
       background: var(--accent);
@@ -400,7 +494,11 @@
       border-radius: 999px;
     }
 
-    .plan-option-desc { font-size: 13.5px; color: var(--text-sub); line-height: 1.6; }
+    .plan-option-desc {
+      font-size: 13.5px;
+      color: var(--text-sub);
+      line-height: 1.6;
+    }
 
     .plan-option-price {
       font-size: 15px;
@@ -411,7 +509,11 @@
       padding-left: 10px;
     }
 
-    .plan-option-price small { font-size: 12px; font-weight: 500; color: var(--text-light); }
+    .plan-option-price small {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-light);
+    }
 
     .plan-compare-link {
       display: block;
@@ -422,10 +524,16 @@
       margin-top: 12px;
     }
 
-    .plan-compare-link:hover { text-decoration: underline; }
+    .plan-compare-link:hover {
+      text-decoration: underline;
+    }
 
     /* 반려동물 선택 */
-    .pet-list { display: flex; flex-direction: column; gap: 10px; }
+    .pet-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
     .pet-card {
       display: flex;
@@ -440,12 +548,15 @@
       min-width: 0;
     }
 
-    .pet-card:hover { border-color: #bcd9d9; }
+    .pet-card:hover {
+      border-color: #bcd9d9;
+    }
 
     .pet-card input[type="checkbox"] {
       position: absolute;
       opacity: 0;
-      width: 0; height: 0;
+      width: 0;
+      height: 0;
     }
 
     .pet-card.selected {
@@ -455,7 +566,8 @@
     }
 
     .pet-avatar {
-      width: 46px; height: 46px;
+      width: 46px;
+      height: 46px;
       border-radius: 50%;
       background: #fff;
       border: 1px solid var(--line);
@@ -466,13 +578,28 @@
       flex-shrink: 0;
     }
 
-    .pet-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-    .pet-info strong { font-size: 15.5px; font-weight: 800; color: var(--text); }
-    .pet-info span { font-size: 13px; color: var(--text-sub); }
+    .pet-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .pet-info strong {
+      font-size: 15.5px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .pet-info span {
+      font-size: 13px;
+      color: var(--text-sub);
+    }
 
     .pet-mark {
       margin-left: auto;
-      width: 24px; height: 24px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       border: 1.5px solid #ddd8d0;
       background: #fff;
@@ -507,10 +634,13 @@
       transition: all 0.2s;
     }
 
-    .skip-option:hover { border-color: #cfc9c0; }
+    .skip-option:hover {
+      border-color: #cfc9c0;
+    }
 
     .skip-option input[type="checkbox"] {
-      width: 17px; height: 17px;
+      width: 17px;
+      height: 17px;
       accent-color: var(--primary);
       cursor: pointer;
       flex-shrink: 0;
@@ -535,10 +665,15 @@
       font-size: 14px;
     }
 
-    .no-pet-box p { margin-bottom: 12px; }
+    .no-pet-box p {
+      margin-bottom: 12px;
+    }
 
     /* 선택 비활성화 상태 */
-    .pet-list.disabled { opacity: 0.45; pointer-events: none; }
+    .pet-list.disabled {
+      opacity: 0.45;
+      pointer-events: none;
+    }
 
     .pet-footer {
       display: flex;
@@ -559,7 +694,9 @@
       padding: 0;
     }
 
-    .pet-add-btn:hover { text-decoration: underline; }
+    .pet-add-btn:hover {
+      text-decoration: underline;
+    }
 
     /* 약관 동의 */
     .agree-box {
@@ -580,7 +717,8 @@
     }
 
     .agree-item input[type="checkbox"] {
-      width: 18px; height: 18px;
+      width: 18px;
+      height: 18px;
       accent-color: var(--primary);
       cursor: pointer;
       flex-shrink: 0;
@@ -595,8 +733,15 @@
       margin-bottom: 6px;
     }
 
-    .agree-item .required { color: var(--primary); font-size: 13px; }
-    .agree-item .optional { color: var(--text-light); font-size: 13px; }
+    .agree-item .required {
+      color: var(--primary);
+      font-size: 13px;
+    }
+
+    .agree-item .optional {
+      color: var(--text-light);
+      font-size: 13px;
+    }
 
     .agree-item .view {
       margin-left: auto;
@@ -606,7 +751,9 @@
       cursor: pointer;
     }
 
-    .agree-item .view:hover { color: var(--primary); }
+    .agree-item .view:hover {
+      color: var(--primary);
+    }
 
     /* 모달 팝업 스타일 (공통) */
     .modal-overlay {
@@ -684,7 +831,9 @@
       padding: 4px;
     }
 
-    .modal-close-btn:hover { color: var(--text); }
+    .modal-close-btn:hover {
+      color: var(--text);
+    }
 
     .modal-body {
       padding: 20px 24px;
@@ -769,8 +918,14 @@
       padding: 6px 0;
     }
 
-    .summary-row span:first-child { color: var(--text-sub); }
-    .summary-row span:last-child { font-weight: 700; color: var(--text); }
+    .summary-row span:first-child {
+      color: var(--text-sub);
+    }
+
+    .summary-row span:last-child {
+      font-weight: 700;
+      color: var(--text);
+    }
 
     .summary-row.total {
       border-top: 1px solid #cfe5e5;
@@ -779,7 +934,11 @@
       font-size: 16px;
     }
 
-    .summary-row.total span:last-child { color: var(--primary); font-size: 19px; font-weight: 800; }
+    .summary-row.total span:last-child {
+      color: var(--primary);
+      font-size: 19px;
+      font-weight: 800;
+    }
 
     .submit-btn {
       width: 100%;
@@ -789,12 +948,32 @@
     }
 
     @media (max-width: 880px) {
-      .signup-wrap { padding: 36px 16px 60px; }
-      .signup-card { padding: 28px 22px; border-radius: 20px; }
-      .signup-head h1 { font-size: 24px; }
-      .form-row { grid-template-columns: minmax(0, 1fr); gap: 0; }
-      .progress-step span:not(.dot) { display: none; }
-      .plan-option-price { margin-left: 0; padding-left: 0; }
+      .signup-wrap {
+        padding: 36px 16px 60px;
+      }
+
+      .signup-card {
+        padding: 28px 22px;
+        border-radius: 20px;
+      }
+
+      .signup-head h1 {
+        font-size: 24px;
+      }
+
+      .form-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+      }
+
+      .progress-step span:not(.dot) {
+        display: none;
+      }
+
+      .plan-option-price {
+        margin-left: 0;
+        padding-left: 0;
+      }
     }
   </style>
 
@@ -826,7 +1005,9 @@
       border-radius: 8px;
     }
 
-    .btn { box-shadow: none; }
+    .btn {
+      box-shadow: none;
+    }
 
     .btn-primary {
       border: 1px solid var(--primary);
@@ -876,19 +1057,21 @@
       font-weight: 700;
     }
 
-    .skip-option { border-radius: 10px; }
+    .skip-option {
+      border-radius: 10px;
+    }
   </style>
 
 
   <style>
     /* 로그인 버튼: 다른 버튼과 같은 모서리의 네모형으로 고정 */
-    header.navbar > a.nav-login-btn {
+    header.navbar>a.nav-login-btn {
       border-radius: 8px !important;
       padding: 10px 24px;
     }
 
     @media (max-width: 880px) {
-      header.navbar > a.nav-login-btn {
+      header.navbar>a.nav-login-btn {
         border-radius: 8px !important;
         padding: 8px 16px;
       }
@@ -907,7 +1090,7 @@
       <a th:href="@{/service-signup}" class="active">서비스 가입</a>
       <a th:href="@{/servicePrice}">요금 안내</a>
     </nav>
-    <a th:href="@{/login}" class="nav-login-btn">로그인</a>
+    <a th:href="@{/login}" class="nav-login-btn" th:if="${loginUser == null}">로그인</a>
   </header>
 
   <main class="signup-wrap">
@@ -989,7 +1172,8 @@
             <!-- 🌟 등록된 반려동물이 있는 경우 (Thymeleaf 반복문) -->
             <div class="pet-list" id="petList" th:if="${petList != null and !#lists.isEmpty(petList)}">
               <label class="pet-card" th:each="pet, iterStat : ${petList}">
-                <input type="checkbox" class="pet-check" th:value="${pet.id}" th:data-name="${pet.name}" th:checked="${iterStat.first}">
+                <input type="checkbox" class="pet-check" th:value="${pet.id}" th:data-name="${pet.name}"
+                  th:checked="${iterStat.first}">
                 <span class="pet-avatar" th:text="${pet.species == '고양이' ? '🐱' : '🐶'}">🐶</span>
                 <span class="pet-info">
                   <strong th:text="${pet.name}">초코</strong>
@@ -1002,7 +1186,8 @@
             <!-- 🌟 등록된 반려동물이 없는 경우 안내 및 등록 버튼 유도 -->
             <div class="no-pet-box" th:if="${petList == null or #lists.isEmpty(petList)}">
               <p>아직 등록된 반려동물이 없어요.<br>새로운 아이를 먼저 등록해 주세요!</p>
-              <button type="button" class="btn btn-primary" id="openPetModalBtnEmpty" style="padding: 10px 20px; font-size: 14px;">+ 새 반려동물 등록하기</button>
+              <button type="button" class="btn btn-primary" id="openPetModalBtnEmpty"
+                style="padding: 10px 20px; font-size: 14px;">+ 새 반려동물 등록하기</button>
             </div>
 
             <!-- 반려동물이 있을 때만 표시되는 스킵 옵션 및 하단 추가 버튼 -->
@@ -1066,28 +1251,35 @@
               </label>
 
               <label class="agree-item">
-                <input type="checkbox" class="agree-check" id="agree-terms" required>
-                서비스 이용약관 동의 <span class="required">(필수)</span>
-                <a href="#" class="view" data-modal="terms">보기</a>
+                <input type="checkbox" class="agree-check" id="agree-article1" required>
+                제1조 (서비스 이용약관) <span class="required">(필수)</span>
+                <a href="#" class="view" data-modal="article1">보기</a>
               </label>
 
               <label class="agree-item">
-                <input type="checkbox" class="agree-check" id="agree-video" required>
-                영상 정보 수집 및 처리 동의 <span class="required">(필수)</span>
-                <a href="#" class="view" data-modal="video">보기</a>
+                <input type="checkbox" class="agree-check" id="agree-article2" required>
+                제2조 (영상 정보 수집 및 처리) <span class="required">(필수)</span>
+                <a href="#" class="view" data-modal="article2">보기</a>
               </label>
 
               <label class="agree-item">
-                <input type="checkbox" class="agree-check" id="agree-payment" required>
-                유료 결제 및 자동 갱신 동의 <span class="required">(필수)</span>
-                <a href="#" class="view" data-modal="payment">보기</a>
+                <input type="checkbox" class="agree-check" id="agree-article3" required>
+                제3조 (유료 결제 및 자동 갱신) <span class="required">(필수)</span>
+                <a href="#" class="view" data-modal="article3">보기</a>
               </label>
 
               <label class="agree-item">
-                <input type="checkbox" class="agree-check" id="agree-marketing">
-                서비스 소식 및 혜택 수신 동의 <span class="optional">(선택)</span>
-                <a href="#" class="view" data-modal="marketing">보기</a>
+                <input type="checkbox" class="agree-check" id="agree-article4" required>
+                제4조 (책임제한 및 면책) <span class="required">(필수)</span>
+                <a href="#" class="view" data-modal="article4">보기</a>
               </label>
+
+              <label class="agree-item">
+                <input type="checkbox" class="agree-check" id="agree-article5">
+                제5조 (서비스 소식 및 혜택 수신) <span class="optional">(선택)</span>
+                <a href="#" class="view" data-modal="article5">보기</a>
+              </label>
+
             </div>
           </div>
 
@@ -1112,7 +1304,9 @@
           </div>
 
           <!-- 🌟 만약 로그인 안 되어 있다면 버튼을 비활성화하거나 로그인 유도 가능 -->
-          <button type="submit" class="btn btn-primary submit-btn" th:disabled="${session.loginUser == null}" th:style="${session.loginUser == null ? 'background-color: #ccc; cursor: not-allowed;' : ''}">서비스 시작하기</button>
+          <button type="submit" class="btn btn-primary submit-btn" th:disabled="${session.loginUser == null}"
+            th:style="${session.loginUser == null ? 'background-color: #ccc; cursor: not-allowed;' : ''}">서비스
+            시작하기</button>
         </form>
       </div>
 
@@ -1187,22 +1381,14 @@
   <script>
     // 약관 데이터 정의
     const termsData = {
-      terms: {
-        title: "서비스 이용약관 동의 (필수)",
-        content: `<p>본 약관은 회사와 회원의 권리 및 의무를 규정합니다.</p>`
-      },
-      video: {
-        title: "영상 정보 수집 및 처리 동의 (필수)",
-        content: `<p>AI 행동 분석을 위해 영상 데이터를 수집합니다.</p>`
-      },
-      payment: {
-        title: "유료 결제 및 자동 갱신 동의 (필수)",
-        content: `<p>정기 결제 및 자동 갱신 조건에 대한 안내입니다.</p>`
-      },
-      marketing: {
-        title: "서비스 소식 및 혜택 수신 동의 (선택)",
-        content: `<p>이벤트 및 혜택 정보를 받아보실 수 있습니다.</p>`
-      }
+      article1: { title: "제1조 (서비스 이용약관 동의)", content: `<p>본 약관은 주식회사 쫑긋(이하 "회사"라 합니다)이 제공하는 AI 기반 반려동물 탐지 및 행동 분석 서비스(이하 "서비스"라 합니다)의 이용과 관련하여 회사와 회원의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.</p><ul><li><strong>용어의 정의:</strong> "서비스"란 회사가 제공하는 AI 영상 기반 반려동물 위치/행동 탐지, 실시간 모니터링, 이상행동 분석 리포트, 알림 등 제반 서비스를 의미하며, "회원"이란 본 약관에 동의하고 서비스를 이용하는 고객을 말합니다.</li><li><strong>약관의 효력 및 개정:</strong> 회사는 본 약관을 서비스 화면에 게시하며, 관련 법령을 위배하지 않는 범위에서 약관을 개정할 수 있습니다. 약관 개정 시 적용일자 7일 전부터 공지사항을 통해 고지합니다.</li><li><strong>서비스 이용계약의 성립:</strong> 이용계약은 회원이 본 필수 약관에 동의하고 회사가 승낙함으로써 체결됩니다.</li></ul>` },
+      article2: { title: "제2조 (영상 정보 수집 및 처리 동의)", content: `<p>회사는 AI 기반 반려동물 행동 분석 및 실시간 모니터링 서비스 제공을 위해 회원이 연결한 영상기기(IP카메라, 모바일 카메라 등)로부터 영상 데이터를 수집하고 처리합니다.</p><ul><li><strong>수집 및 처리 목적:</strong> 반려동물 행동 패턴 학습, 위치/이상행동 감지, 맞춤형 AI 리포트 생성 및 품질 개선</li><li><strong>처리하는 영상 정보:</strong> 연결된 영상기기를 통해 촬영되는 실시간 및 녹화 영상 데이터</li><li><strong>보유 및 이용 기간:</strong> 회원 탈퇴 시 또는 서비스 이용 종료 시까지 (단, 관계 법령에 의거하여 보존할 필요가 있는 경우 해당 기간 동안 보관)</li><li><strong>영상기기 설치 및 회원 의무:</strong> 회원은 영상기기 설치 시 타인의 초상권 및 사생활이 침해되지 않도록 주의해야 하며, 무단 촬영으로 발생하는 모든 법적 책임은 회원 본인에게 있습니다.</li></ul><p><strong>주의사항 및 안내</strong><br>영상 정보 수집 및 처리에 동의하지 않으실 경우 AI 기반 행동 분석 및 실시간 모니터링 등 핵심 서비스 이용이 제한됩니다. AI 분석 결과는 보조용 참고 정보이며, <strong>수의학적 진단이나 치료를 대체하지 않습니다.</strong></p>` },
+      article3: { title: "제3조 (유료 결제 및 자동 갱신 동의)", content: `<p>회사는 유료 구독 서비스(스탠다드 플랜 등) 이용 회원에게 아래 결제 및 자동 갱신 조건 정책을 적용합니다.</p><ul><li><strong>결제 방식 및 주기:</strong> 월간 또는 연간 단위의 정기 결제 플랜을 이용할 수 있으며, 지정된 결제 수단으로 자동 청구됩니다.</li><li><strong>자동 갱신 조건:</strong> 직접 해지 신청을 하기 전까지 동일한 조건으로 매월/매년 자동 갱신 및 결제됩니다.</li><li><strong>청약철회 및 환불 정책:</strong><ul><li>결제 후 7일 이내 서비스를 전혀 이용하지 않은 경우 전액 환불이 가능합니다.</li><li>서비스를 이용했거나 7일이 경과한 경우 당월 이용 금액을 차감한 잔여 기간 기준으로 환불 처리됩니다.</li></ul></li><li><strong>구독 해지 안내:</strong> [마이페이지 &gt; 구독 관리]에서 언제든지 해지를 신청할 수 있으며, 해지 시에도 기존 결제 주기의 남은 기간 동안 서비스를 이용할 수 있습니다.</li></ul>` },
+      article4: { title: "제4조 (책임제한 및 면책)", content: `<ul><li>회사는 천재지변, 통신 장애, 영상기기의 하드웨어 결함 등 회사의 귀책사유 없이 발생한 서비스 중단 및 오류에 대해 책임을 지지 않습니다.</li><li>AI 분석 알고리즘 특성상 감지 오차나 분석 오류가 발생할 수 있으며, 회사는 분석 결과의 완전성이나 절대적 정확성을 보장하지 않습니다.</li></ul>` },
+      article5: { title: "제5조 (서비스 소식 및 혜택 수신 동의)", content: `<p>회사는 회원이 동의한 경우에 한하여 각종 서비스 업데이트 소식, 이벤트 및 마케팅 혜택 정보를 제공합니다.</p><ul><li><strong>수신 항목:</strong> 앱 푸시 알림, 이메일, SMS/LMS 메시지</li><li><strong>제공 내용:</strong> 신규 기능 안내, 할인 이벤트 및 프로모션 소식, 주간 케어 팁, 회원 맞춤 혜택 안내</li><li><strong>동의 철회:</strong> 본 동의는 선택 사항이며, 동의하지 않더라도 서비스 이용에는 제한이 없습니다. 동의 후에도 [마이페이지 &gt; 알림 설정]에서 언제든지 수신 여부를 변경할 수 있습니다.</li></ul>` },
+      video: { title: "영상 정보 수집 및 처리 동의 (필수)", content: `<p>영상 정보 수집 및 처리에 관한 내용은 제2조를 확인해 주세요.</p>` },
+      payment: { title: "유료 결제 및 자동 갱신 동의 (필수)", content: `<p>유료 결제 및 자동 갱신에 관한 내용은 제3조를 확인해 주세요.</p>` },
+      marketing: { title: "서비스 소식 및 혜택 수신 동의 (선택)", content: `<p>서비스 소식 및 혜택 수신에 관한 내용은 제5조를 확인해 주세요.</p>` }
     };
 
     const modalOverlay = document.getElementById('termsModal');
@@ -1296,11 +1482,11 @@
       const picked = [...petChecks].filter(c => c.checked).map(c => c.dataset.name);
 
       if (petSkip && petSkip.checked) {
-        if(petCount) petCount.textContent = '가입 후에 지정합니다';
-        if(sumPets) sumPets.textContent = '가입 후 지정';
+        if (petCount) petCount.textContent = '가입 후에 지정합니다';
+        if (sumPets) sumPets.textContent = '가입 후 지정';
       } else {
-        if(petCount) petCount.textContent = picked.length + '마리 선택됨';
-        if(sumPets) sumPets.textContent = picked.length ? picked.join(', ') : '선택 안 함';
+        if (petCount) petCount.textContent = picked.length + '마리 선택됨';
+        if (sumPets) sumPets.textContent = picked.length ? picked.join(', ') : '선택 안 함';
       }
     }
 
@@ -1333,32 +1519,32 @@
     const petRegisterForm = document.getElementById('petRegisterForm');
 
     function openPetModal() {
-      if(petRegisterModal) {
+      if (petRegisterModal) {
         petRegisterModal.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
     }
 
     function closePetModal() {
-      if(petRegisterModal) {
+      if (petRegisterModal) {
         petRegisterModal.classList.remove('active');
         document.body.style.overflow = '';
-        if(petRegisterForm) petRegisterForm.reset();
+        if (petRegisterForm) petRegisterForm.reset();
       }
     }
 
-    if(openPetModalBtn) openPetModalBtn.addEventListener('click', openPetModal);
-    if(openPetModalBtnEmpty) openPetModalBtnEmpty.addEventListener('click', openPetModal);
-    if(petModalClose) petModalClose.addEventListener('click', closePetModal);
-    if(petModalCancel) petModalCancel.addEventListener('click', closePetModal);
+    if (openPetModalBtn) openPetModalBtn.addEventListener('click', openPetModal);
+    if (openPetModalBtnEmpty) openPetModalBtnEmpty.addEventListener('click', openPetModal);
+    if (petModalClose) petModalClose.addEventListener('click', closePetModal);
+    if (petModalCancel) petModalCancel.addEventListener('click', closePetModal);
 
-    if(petRegisterModal) {
+    if (petRegisterModal) {
       petRegisterModal.addEventListener('click', e => {
         if (e.target === petRegisterModal) closePetModal();
       });
     }
 
-    if(petRegisterForm) {
+    if (petRegisterForm) {
       petRegisterForm.addEventListener('submit', e => {
         e.preventDefault();
         alert('반려동물이 등록되었습니다! (연동 필요)');

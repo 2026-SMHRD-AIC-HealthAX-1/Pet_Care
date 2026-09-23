@@ -67,12 +67,14 @@
 
         /* 카드 클릭(active) 시에만 표시되는 수정/삭제 버튼 그룹 */
         .btn-row {
-            display: none; /* 기본 상태: 안 보임 */
+            display: none;
+            /* 기본 상태: 안 보임 */
             gap: 10px;
         }
 
         .pet-card-wrapper.show-actions .btn-row {
-            display: flex; /* 선택 시 보임 */
+            display: flex;
+            /* 선택 시 보임 */
         }
 
         .btn-row .btn {
@@ -273,14 +275,15 @@
                 <!-- 🌟 백엔드 전송 경로 및 메서드 설정 -->
                 <form id="petDetailForm" th:action="@{/petinsert}" method="post">
 
-					<!-- 🌟 수정 및 식별을 위한 seq 히든 필드 추가 -->
-					<input type="hidden" id="petSeq" name="seq">
-    
+                    <!-- 🌟 수정 및 식별을 위한 seq 히든 필드 추가 -->
+                    <input type="hidden" id="petSeq" name="seq">
+
                     <h4 class="form-section-title">📌 기본 정보</h4>
                     <div class="form-grid-3">
                         <div class="form-group">
                             <label for="petName">이름</label>
-                            <input type="text" id="petName" name="pName" class="form-control" placeholder="예: 몽이" required>
+                            <input type="text" id="petName" name="pName" class="form-control" placeholder="예: 몽이"
+                                required>
                         </div>
 
                         <div class="form-group">
@@ -309,12 +312,14 @@
                     <div class="form-grid-2">
                         <div class="form-group">
                             <label for="petAge">나이 (세)</label>
-                            <input type="number" id="petAge" name="pAge" class="form-control" placeholder="예: 3" required>
+                            <input type="number" id="petAge" name="pAge" class="form-control" placeholder="예: 3"
+                                required>
                         </div>
 
                         <div class="form-group">
                             <label for="petWeight">몸무게 (kg)</label>
-                            <input type="number" id="petWeight" name="pWeight" class="form-control" step="0.1" placeholder="예: 5.2">
+                            <input type="number" id="petWeight" name="pWeight" class="form-control" step="0.1"
+                                placeholder="예: 5.2">
                         </div>
                     </div>
 
@@ -374,7 +379,8 @@
 
                     <div class="form-group" style="margin-bottom: 24px;">
                         <label for="specialNotes">특이사항 (알레르기, 지병 등)</label>
-                        <input type="text" id="specialNotes" name="pSpec" class="form-control" placeholder="예: 닭고기 알레르기 유, 소리에 민감함">
+                        <input type="text" id="specialNotes" name="pSpec" class="form-control"
+                            placeholder="예: 닭고기 알레르기 유, 소리에 민감함">
                     </div>
 
                     <h4 class="form-section-title">📝 사전 정보 (생활환경 및 참고사항)</h4>
@@ -410,13 +416,13 @@
             const cancelBtn = document.getElementById('cancelBtn');
             const leftAside = document.getElementById('leftAside');
 
-            let serverPetList = /*[[${petList}]]*/ [];
+            let serverPetList = /*[[${petList}]]*/[];
             let petDataList = serverPetList || [];
             let activePetId = null;
 
-         	// 🌟 여기에 직접 작성해 두기
+            // 🌟 여기에 직접 작성해 두기
             console.log("받아온 리스트:", serverPetList);
-         
+
             // 목록 상단으로 부드럽게 이동
             function scrollToTopList() {
                 leftAside.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -441,9 +447,9 @@
 
             // 폼 필드 데이터 채우기
             function setFormData(data) {
-            	// 히든 seq 필드 세팅
+                // 히든 seq 필드 세팅
                 document.getElementById('petSeq').value = data.seq || '';
-            	
+
                 document.getElementById('petName').value = data.pName || '';
                 document.getElementById('petType').value = data.pSpecies || '';
                 document.getElementById('petAge').value = data.pAge || '';
@@ -481,7 +487,7 @@
                     petListSection.innerHTML = '<p style="text-align:center; color:#999; font-size:13px; margin-top:20px;">등록된 반려동물이 없습니다.</p>';
                     return;
                 }
-                
+
                 petDataList.forEach(pet => {
                     const wrapper = document.createElement('div');
                     const isActive = pet.seq === activePetId;
@@ -517,7 +523,7 @@
                 document.querySelectorAll('.pet-item-card').forEach(card => {
                     card.addEventListener('click', () => {
                         const petId = Number(card.getAttribute('data-id'));
-                        
+
                         // 이미 선택된 카드를 클릭하면 선택 해제(숨김) 가능하도록 처리
                         if (activePetId === petId) {
                             resetToNewMode();
@@ -536,11 +542,11 @@
 
                 // 수정 버튼 클릭
                 document.querySelectorAll('.edit-btn').forEach(btn => {
-                	btn.addEventListener('click', (e) => {
+                    btn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        
+
                         const petId = Number(btn.getAttribute('data-id'));
-                        
+
                         // 1. 현재 히든 seq 필드에 수정할 대상 번호 세팅
                         document.getElementById('petSeq').value = petId;
 
@@ -570,7 +576,7 @@
                         e.stopPropagation();
                         const petId = Number(btn.getAttribute('data-id'));
                         if (confirm('해당 반려동물 정보를 삭제하시겠습니까?')) {
-                        	location.href = `/petdelete?seq=${petId}`;
+                            location.href = `/petdelete?seq=${petId}`;
                         }
                     });
                 });
@@ -578,13 +584,13 @@
 
             // 폼 초기화 및 추가 모드로 복귀
             function resetToNewMode() {
-            	activePetId = null;
+                activePetId = null;
                 petForm.reset();
                 document.getElementById('petSeq').value = '';
-                
+
                 // 신규 등록 경로로 폼 액션 원복
                 petForm.action = '/petinsert';
-                
+
                 renderPetList();
             }
 
@@ -609,11 +615,11 @@
 
             // '+ 반려동물 등록' 버튼 클릭
             resetFormBtn.addEventListener('click', resetToNewMode);
-            
+
             // 초기 실행: 서버에서 받아온 목록 화면에 즉시 렌더링
             renderPetList();
         });
-        
+
     </script>
 
 </body>

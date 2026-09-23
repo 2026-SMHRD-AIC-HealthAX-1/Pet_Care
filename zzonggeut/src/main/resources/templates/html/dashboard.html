@@ -368,23 +368,23 @@
     <section class="kpi-grid">
       <div class="kpi-card">
         <span class="kpi-label">카메라 상태</span>
-        <div class="kpi-value status-online">🟢 연결됨</div>
-        <p class="kpi-sub">거실 카메라 (HD 정상)</p>
+        <div class="kpi-value">대기중</div>
+        <p class="kpi-sub">카메라 선택 후 LIVE 분석을 시작해주세요.</p>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">변화 감지 (최근 7일)</span>
-        <div class="kpi-value warning-text">3건</div>
-        <p class="kpi-sub">최근: 오늘 12:40 (활동량 감소)</p>
+        <div class="kpi-value warning-text">학습 중</div>
+        <p class="kpi-sub">기준 행동 패턴을 수집하고 있습니다.</p>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">활동량 (평소 대비)</span>
-        <div class="kpi-value primary-text">-12%</div>
-        <p class="kpi-sub">평소 패턴 대비 소폭 감소</p>
+        <div class="kpi-value primary-text">비교 준비 중</div>
+        <p class="kpi-sub">기준 데이터가 충분해지면 표시됩니다.</p>
       </div>
       <div class="kpi-card">
         <span class="kpi-label">주요 체류 장소</span>
-        <div class="kpi-value">거실 48%</div>
-        <p class="kpi-sub">침실 31% · 기타 21%</p>
+        <div class="kpi-value">분석 데이터 없음</div>
+        <p class="kpi-sub">분석 완료 후 체류 결과가 표시됩니다.</p>
       </div>
     </section>
 
@@ -516,62 +516,43 @@
       <div class="dash-card analysis-card">
         <div class="card-header">
           <h3>📊 주간 활동량 추이</h3>
-          <input type="text" class="date-input" value="2026.08.26 ~ 09.01" readonly>
         </div>
 
-        <div class="bar-chart-container">
-          <div class="bar-group">
-            <div class="bar" style="height: 40%;"></div><span>월</span>
-          </div>
-          <div class="bar-group">
-            <div class="bar" style="height: 55%;"></div><span>화</span>
-          </div>
-          <div class="bar-group">
-            <div class="bar" style="height: 45%;"></div><span>수</span>
-          </div>
-          <div class="bar-group">
-            <div class="bar" style="height: 80%;"></div><span>목</span>
-          </div>
-          <div class="bar-group">
-            <div class="bar" style="height: 65%;"></div><span>금</span>
-          </div>
-          <div class="bar-group">
-            <div class="bar" style="height: 90%;"></div><span>토</span>
-          </div>
-          <div class="bar-group">
-            <div class="bar" style="height: 50%;"></div><span>일</span>
+        <div style="
+          min-height: 150px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 24px;
+          color: #64748b;
+          background: #f8fafc;
+          border: 1px dashed #cbd5e1;
+          border-radius: 12px;
+        ">
+          <div>
+            <div style="font-size: 28px; margin-bottom: 8px;">📈</div>
+            <strong style="display:block; color:#334155; margin-bottom:6px;">활동 데이터 누적 중</strong>
+            <span style="font-size:13px;">기준 데이터가 충분히 쌓이면 주간 활동량 추이를 제공합니다.</span>
           </div>
         </div>
 
         <h4 class="sub-title">⏰ 시간대별 활동 비율</h4>
-        <div class="time-activity-list">
-          <div class="time-item">
-            <span>오전</span>
-            <div class="progress-bar">
-              <div class="fill" style="width: 40%;"></div>
-            </div>
-            <span class="percent">40%</span>
-          </div>
-          <div class="time-item">
-            <span>새벽</span>
-            <div class="progress-bar">
-              <div class="fill" style="width: 30%;"></div>
-            </div>
-            <span class="percent">30%</span>
-          </div>
-          <div class="time-item">
-            <span>오후</span>
-            <div class="progress-bar">
-              <div class="fill" style="width: 20%;"></div>
-            </div>
-            <span class="percent">20%</span>
-          </div>
-          <div class="time-item">
-            <span>야간</span>
-            <div class="progress-bar">
-              <div class="fill" style="width: 10%;"></div>
-            </div>
-            <span class="percent">10%</span>
+        <div style="
+          min-height: 110px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 20px;
+          color: #64748b;
+          background: #f8fafc;
+          border: 1px dashed #cbd5e1;
+          border-radius: 12px;
+        ">
+          <div>
+            <strong style="display:block; color:#334155; margin-bottom:6px;">시간대별 데이터 누적 중</strong>
+            <span style="font-size:13px;">분석 데이터가 충분해지면 시간대별 활동 비율을 제공합니다.</span>
           </div>
         </div>
       </div>
@@ -590,31 +571,12 @@
         </div>
 
         <div class="history-list">
-          <!-- 1) 음수값 (-30%): 빨간색 글씨 + 빨간계열 뱃지 -->
-          <div class="history-item">
-            <div class="history-info">
-              <span class="history-date">09/01 14:20</span>
-              <span class="history-title">활동량이 평소보다 감소했어요.</span>
+          <div class="history-item" style="justify-content:center; text-align:center; min-height:120px;">
+            <div class="history-info" style="align-items:center;">
+              <span style="font-size:28px; margin-bottom:6px;">🐾</span>
+              <span class="history-title">아직 감지된 행동 변화가 없습니다.</span>
+              <span class="history-date">기준 행동 패턴이 준비되면 변화 이력이 표시됩니다.</span>
             </div>
-            <span class="pill-badge pill-negative">-30%</span>
-          </div>
-
-          <!-- 2) 양수값 (+25%): 파란색 글씨 + 파란계열 뱃지 -->
-          <div class="history-item">
-            <div class="history-info">
-              <span class="history-date">08/30 11:05</span>
-              <span class="history-title">활동량이 평소보다 많았어요</span>
-            </div>
-            <span class="pill-badge pill-positive">+45%</span>
-          </div>
-
-          <!-- 3) 양수값 (+35%): 초록색 글씨 + 초록계열 뱃지 -->
-          <div class="history-item">
-            <div class="history-info">
-              <span class="history-date">08/28 18:40</span>
-              <span class="history-title">평소와 비슷한 행동 패턴을 보였어요.</span>
-            </div>
-            <span class="pill-badge pill-neutral">평소와 비슷</span>
           </div>
         </div>
       </div>

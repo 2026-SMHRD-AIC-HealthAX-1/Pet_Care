@@ -375,12 +375,44 @@
           <h3>🎥 모니터링 화면</h3>
 
           <div class="header-controls">
-            <select class="small-select" id="cameraSelect">
-              <option value="1">거실 카메라</option>
-              <option value="2">안방 카메라</option>
+
+            <select
+              class="small-select"
+              id="petSelect"
+            >
+              <option
+                th:if="${petList == null or #lists.isEmpty(petList)}"
+                value=""
+              >
+                등록된 반려동물이 없습니다
+              </option>
+
+              <option
+                th:each="pet : ${petList}"
+                th:value="${pet.seq}"
+                th:text="${pet.pName + ' · ' + pet.pSpecies}"
+              >
+                반려동물
+              </option>
             </select>
 
-            <span class="badge live-badge" id="liveBadge">대기중</span>
+            <select
+              class="small-select"
+              id="cameraSelect"
+            >
+              <option value="CAM-INTEGRATION-001">
+                거실 카메라
+              </option>
+
+              <option value="CAM-INTEGRATION-002">
+                안방 카메라
+              </option>
+            </select>
+
+            <span class="badge live-badge" id="liveBadge">
+              대기중
+            </span>
+
           </div>
         </div>
 
@@ -842,6 +874,12 @@
       const aiResultCard =
         document.getElementById('aiResultCard');
 
+      const petSelect =
+        document.getElementById('petSelect');
+
+      const cameraSelect =
+        document.getElementById('cameraSelect');
+
       let selectedFile = null;
 
       uploadVideoBtn.addEventListener('click', () => {
@@ -907,6 +945,17 @@
           return;
         }
 
+        if (
+          !petSelect ||
+          !petSelect.value
+        ) {
+          alert(
+            '분석할 반려동물을 먼저 선택해주세요.'
+          );
+
+          return;
+        }
+
         runAnalysisBtn.disabled =
           true;
 
@@ -932,17 +981,13 @@
 
         formData.append(
           'petId',
-          'PET-INTEGRATION-001'
+          petSelect.value
         );
 
         formData.append(
           'cameraId',
+          cameraSelect?.value ||
           'CAM-INTEGRATION-001'
-        );
-
-        formData.append(
-          'species',
-          'DOG'
         );
 
         try {

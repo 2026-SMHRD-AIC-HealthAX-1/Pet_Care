@@ -5,10 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>관심영역(ROI) 설정 - 쫑긋</title>
-  <!-- 🌟 정적 CSS 경로 타임리프 적용 -->
+
   <link rel="stylesheet" th:href="@{/css/dashboardStyle.css}">
+
   <style>
-    /* roiSelect 전용 레이아웃 및 캔버스 스타일 추가 */
     .roi-page-header {
       display: flex;
       justify-content: space-between;
@@ -31,8 +31,8 @@
     .video-wrapper {
       position: relative;
       width: 100%;
-      aspect-ratio: 16 / 9; /* 카메라 해상도 비율 */
-      background-color: #000; /* 여백이 생길 경우 검은색 처리 */
+      aspect-ratio: 16 / 9;
+      background-color: #000;
       overflow: hidden;
       border-radius: 8px;
     }
@@ -40,8 +40,9 @@
     #video {
       width: 100%;
       height: 100%;
-      object-fit: contain; /* 원본 비율 100% 보존 */
+      object-fit: contain;
       display: block;
+      background: #000;
     }
 
     #roiCanvas {
@@ -65,10 +66,6 @@
       font-weight: 500;
     }
 
-/*     #sourceupload {
-      display: none;
-    } */
-
     .form-section {
       margin-bottom: 20px;
     }
@@ -91,10 +88,22 @@
       font-size: 13px;
       color: #333;
       outline: none;
+      box-sizing: border-box;
     }
 
     input[type="file"].full-input {
       padding-top: 8px;
+    }
+
+    .camera-info-box {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #d7e7e5;
+      border-radius: 6px;
+      background: #f4fbfa;
+      color: #0b6f70;
+      font-size: 13px;
+      box-sizing: border-box;
     }
 
     #roiList {
@@ -168,7 +177,7 @@
       font-size: 11px;
       white-space: pre-wrap;
       word-break: break-all;
-      max-height: 150px;
+      max-height: 220px;
       overflow-y: auto;
     }
 
@@ -185,13 +194,6 @@
       color: #0b8484;
     }
 
-    @media (max-width: 900px) {
-      .roi-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* '내 반려동물' 버튼 디자인 (프론트 반영) */
     .pet-btn {
       padding: 8px 16px;
       border-radius: 8px;
@@ -207,543 +209,1542 @@
     .pet-btn:hover {
       background-color: #086868;
     }
+
+    @media (max-width: 900px) {
+      .roi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- 1. 상단 네비게이션 바 -->
-  <header class="navbar">
-    <div class="logo">
-      <!-- 🌟 로그인 후 메인인 /main으로 연결 -->
-      <a th:href="@{/main}">
-        <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
-      </a>
-    </div>
-    <nav class="nav-links">
-      <a th:href="@{/dashboard}">대시보드</a>
-      <!-- 리포트 경로 연동 -->
-      <a th:href="@{/report}">리포트</a>
-    </nav>
-    <div class="nav-utils">
-      <button class="icon-btn" id="alarmBtn">🔔</button>
-      <!-- 🌟 마이페이지 링크 연결 -->
-      <a th:href="@{/mypage}" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
-      <!-- 🌟 프론트 최신 반영: 내 반려동물 단일 버튼 적용 -->
-      <a th:href="@{/pet-management}" class="pet-btn">내 반려동물</a>
-    </div>
-  </header>
+<header class="navbar">
 
-  <!-- 2. 메인 컨테이너 (중앙 정렬) -->
-  <main class="dashboard-container">
+  <div class="logo">
+    <a th:href="@{/main}">
+      <img
+        th:src="@{/assets/logo.png}"
+        alt="쫑긋 로고"
+        class="logo-img"
+      >
+    </a>
+  </div>
 
-    <!-- 🌟 대시보드로 돌아가기 링크 타임리프 적용 -->
-    <a th:href="@{/dashboard}" class="back-link">← 대시보드로 돌아가기</a>
+  <nav class="nav-links">
+    <a th:href="@{/dashboard}">
+      대시보드
+    </a>
 
-    <div class="roi-page-header">
-      <h2 class="roi-page-title">🎯 관심영역(ROI) 설정</h2>
-      <span class="badge live-badge">카메라: CAM-001</span>
-    </div>
+    <a th:href="@{/report}">
+      리포트
+    </a>
+  </nav>
 
-    <div class="roi-grid">
+  <div class="nav-utils">
 
-      <!-- 좌측: 비디오 & 캔버스 카드 -->
-      <section class="dash-card">
-        <div class="video-wrapper">
-          <video id="video" controls muted autoplay playsinline></video>
-          <canvas id="roiCanvas"></canvas>
+    <button
+      class="icon-btn"
+      id="alarmBtn"
+    >
+      🔔
+    </button>
+
+    <a
+      th:href="@{/mypage}"
+      class="icon-btn"
+      id="profileBtn"
+      style="text-decoration: none;"
+    >
+      👤
+    </a>
+
+    <a
+      th:href="@{/pet-management}"
+      class="pet-btn"
+    >
+      내 반려동물
+    </a>
+
+  </div>
+
+</header>
+
+
+<main class="dashboard-container">
+
+  <a
+    th:href="@{/dashboard}"
+    class="back-link"
+  >
+    ← 대시보드로 돌아가기
+  </a>
+
+
+  <div class="roi-page-header">
+
+    <h2 class="roi-page-title">
+      🎯 관심영역(ROI) 설정
+    </h2>
+
+    <span class="badge live-badge">
+      카메라: CAM-INTEGRATION-001
+    </span>
+
+  </div>
+
+
+  <div class="roi-grid">
+
+    <!-- ============================= -->
+    <!-- 좌측: 영상 + ROI Canvas -->
+    <!-- ============================= -->
+
+    <section class="dash-card">
+
+      <div class="video-wrapper">
+
+        <video
+          id="video"
+          controls
+          muted
+          playsinline
+        ></video>
+
+        <canvas
+          id="roiCanvas"
+        ></canvas>
+
+      </div>
+
+      <div class="instruction">
+        💡 영상을 선택한 뒤 화면 위에서 마우스로 드래그하여 영역을 지정하세요.
+        저장된 ROI는 페이지를 다시 열어도 자동으로 불러옵니다.
+      </div>
+
+    </section>
+
+
+    <!-- ============================= -->
+    <!-- 우측: ROI 설정 -->
+    <!-- ============================= -->
+
+    <section class="dash-card">
+
+
+      <!-- 반려동물 선택 -->
+      <div class="form-section">
+
+        <label class="form-label">
+          분석 대상 반려동물
+        </label>
+
+        <select
+          id="petSelect"
+          class="full-input"
+        >
+
+          <option
+            th:if="${petList == null or #lists.isEmpty(petList)}"
+            value=""
+          >
+            등록된 반려동물이 없습니다
+          </option>
+
+          <option
+            th:each="pet : ${petList}"
+            th:value="${pet.seq}"
+            th:data-species="${pet.pSpecies}"
+            th:text="${pet.pName + ' · ' + pet.pSpecies}"
+          >
+            반려동물
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- 카메라 정보 -->
+      <div class="form-section">
+
+        <label class="form-label">
+          적용 카메라
+        </label>
+
+        <div class="camera-info-box">
+          거실 카메라 · CAM-INTEGRATION-001
         </div>
-        <div class="instruction">
-          💡 영상 위에서 마우스로 드래그하여 영역을 지정하세요. 기존 영역을 클릭하면 선택할 수 있습니다.
-        </div>
-      </section>
 
-      <!-- 우측: 설정 컨트롤 카드 -->
-      <section class="dash-card">
-        <div id="sourceupload" class="form-section">
-          <label class="form-label">영상 소스 선택/업로드</label>
-          <input type="file" id="videoInput" class="full-input" accept="video/*">
-        </div>
+      </div>
 
-        <div class="form-section">
-          <label class="form-label">지정할 영역 이름</label>
-          <select id="roiType" class="full-input">
-            <option value="WATER_BOWL">물그릇 (WATER_BOWL)</option>
-            <option value="FOOD_BOWL">밥그릇 (FOOD_BOWL)</option>
-            <option value="BED">침대 (BED)</option>
-          </select>
-        </div>
 
-        <div class="form-section">
-          <label class="form-label">
-            지정된 영역 목록 (<span id="roiCount" class="primary-text font-bold">0</span>개)
-          </label>
-          <div id="roiList">
-            <div class="empty-msg">아직 지정된 영역이 없습니다.</div>
+      <!-- 영상 업로드 -->
+      <div class="form-section">
+
+        <label class="form-label">
+          ROI 설정용 영상
+        </label>
+
+        <input
+          type="file"
+          id="videoInput"
+          class="full-input"
+          accept="video/*"
+        >
+
+      </div>
+
+
+      <!-- ROI 타입 -->
+      <div class="form-section">
+
+        <label class="form-label">
+          지정할 영역 이름
+        </label>
+
+        <select
+          id="roiType"
+          class="full-input"
+        >
+
+          <option value="WATER_BOWL">
+            물그릇 (WATER_BOWL)
+          </option>
+
+          <option value="FOOD_BOWL">
+            밥그릇 (FOOD_BOWL)
+          </option>
+
+          <option value="BED">
+            침대 (BED)
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- ROI 목록 -->
+      <div class="form-section">
+
+        <label class="form-label">
+          지정된 영역 목록
+          (
+          <span
+            id="roiCount"
+            class="primary-text font-bold"
+          >
+            0
+          </span>
+          개)
+        </label>
+
+        <div id="roiList">
+
+          <div class="empty-msg">
+            아직 지정된 영역이 없습니다.
           </div>
+
         </div>
 
-        <div class="roi-btn-group">
-          <button class="btn btn-sm" id="deleteButton">선택 삭제</button>
-          <button type="button" class="btn primary-btn" id="saveButton">설정 저장하기</button>
-        </div>
+      </div>
 
-        <pre id="jsonBox" class="json-box"></pre>
-      </section>
 
-    </div>
+      <!-- 버튼 -->
+      <div class="roi-btn-group">
 
-  </main>
+        <button
+          class="btn btn-sm"
+          id="deleteButton"
+        >
+          선택 삭제
+        </button>
 
-  <!-- 3. 하단 푸터 -->
-  <footer class="footer">
-    <div class="footer-bottom">
-      <p>© 2026 쫑긋. All rights reserved.</p>
-    </div>
-  </footer>
+        <button
+          type="button"
+          class="btn primary-btn"
+          id="saveButton"
+        >
+          설정 저장하기
+        </button>
 
-  <script>
-    const video = document.getElementById("video");
-    const videoInput = document.getElementById("videoInput");
-    const canvas = document.getElementById("roiCanvas");
-    const ctx = canvas.getContext("2d");
+      </div>
 
-    const roiType = document.getElementById("roiType");
-    const roiList = document.getElementById("roiList");
-    const roiCount = document.getElementById("roiCount");
 
-    const deleteButton = document.getElementById("deleteButton");
-    const saveButton = document.getElementById("saveButton");
-    const jsonBox = document.getElementById("jsonBox");
+      <pre
+        id="jsonBox"
+        class="json-box"
+      ></pre>
 
-    let rois = [];
-    let selectedROI = null;
-    let drawing = false;
-    let startX = 0;
-    let startY = 0;
+    </section>
 
-    let pc = null; // WebRTC 연결 객체
+  </div>
 
-    if (videoInput) {
-      videoInput.addEventListener("change", async function () {
-        const file = this.files[0];
-        if (!file) return;
+</main>
 
-     	// [추가] 실시간 WebRTC 스트리밍 종료 함수 호출
-        await EndVideo();
-     
-        const url = URL.createObjectURL(file);
-        video.src = url;
-        video.load();
-      });
-    }
 
-    function resizeCanvas() {
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-      drawROI();
-    }
+<footer class="footer">
 
-    window.addEventListener("resize", resizeCanvas);
-    video.addEventListener("loadedmetadata", resizeCanvas);
+  <div class="footer-bottom">
+    <p>
+      © 2026 쫑긋. All rights reserved.
+    </p>
+  </div>
 
-    function getMousePosition(event) {
-      const rect = canvas.getBoundingClientRect();
-      return {
-        x: (event.clientX - rect.left) * canvas.width / rect.width,
-        y: (event.clientY - rect.top) * canvas.height / rect.height
-      };
-    }
+</footer>
 
-    canvas.addEventListener("mousedown", function (event) {
-      const pos = getMousePosition(event);
-      const clickedROI = findROI(pos.x, pos.y);
 
-      if (clickedROI) {
-        selectedROI = clickedROI;
-        updateROIList();
-        drawROI();
-        return;
-      }
+<script>
 
-      drawing = true;
-      startX = pos.x;
-      startY = pos.y;
-    });
+  // ==========================================
+  // 기본 상수
+  // ==========================================
 
-    canvas.addEventListener("mousemove", function (event) {
-      if (!drawing) return;
+  const DEMO_CAMERA_ID =
+    "CAM-INTEGRATION-001";
 
-      const pos = getMousePosition(event);
-      drawROI();
 
-      ctx.strokeStyle = "#0b8484";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([6, 4]);
-      ctx.strokeRect(startX, startY, pos.x - startX, pos.y - startY);
-      ctx.setLineDash([]);
-    });
+  // ==========================================
+  // DOM
+  // ==========================================
 
-    canvas.addEventListener("mouseup", function (event) {
-      if (!drawing) return;
-      drawing = false;
+  const video =
+    document.getElementById(
+      "video"
+    );
 
-      const pos = getMousePosition(event);
-      const x = Math.min(startX, pos.x);
-      const y = Math.min(startY, pos.y);
-      const width = Math.abs(pos.x - startX);
-      const height = Math.abs(pos.y - startY);
+  const videoInput =
+    document.getElementById(
+      "videoInput"
+    );
 
-      if (width < 10 || height < 10) {
-        drawROI();
-        return;
-      }
+  const canvas =
+    document.getElementById(
+      "roiCanvas"
+    );
 
-      const selectedOption = roiType.options[roiType.selectedIndex];
-      const roi = {
-        id: Date.now(),
-        name: roiType.value,
-        label: selectedOption.text,
-        x: x,
-        y: y,
-        width: width,
-        height: height
-      };
+  const ctx =
+    canvas.getContext(
+      "2d"
+    );
 
-      rois.push(roi);
-      selectedROI = roi;
-      updateROIList();
-      drawROI();
-    });
+  const petSelect =
+    document.getElementById(
+      "petSelect"
+    );
 
-    function findROI(x, y) {
-      for (let i = rois.length - 1; i >= 0; i--) {
-        const roi = rois[i];
-        if (x >= roi.x && x <= roi.x + roi.width && y >= roi.y && y <= roi.y + roi.height) {
-          return roi;
-        }
-      }
+  const roiType =
+    document.getElementById(
+      "roiType"
+    );
+
+  const roiList =
+    document.getElementById(
+      "roiList"
+    );
+
+  const roiCount =
+    document.getElementById(
+      "roiCount"
+    );
+
+  const deleteButton =
+    document.getElementById(
+      "deleteButton"
+    );
+
+  const saveButton =
+    document.getElementById(
+      "saveButton"
+    );
+
+  const jsonBox =
+    document.getElementById(
+      "jsonBox"
+    );
+
+
+  // ==========================================
+  // ROI 상태
+  // ==========================================
+
+  let rois = [];
+
+  let selectedROI = null;
+
+  let drawing = false;
+
+  let startX = 0;
+
+  let startY = 0;
+
+  let currentVideoUrl = null;
+
+
+  // ==========================================
+  // PET 종 변환
+  // ==========================================
+
+  function normalizeSpecies(
+    rawSpecies
+  ) {
+
+    if (!rawSpecies) {
       return null;
     }
 
-    function drawROI() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const value =
+      String(
+        rawSpecies
+      )
+      .trim()
+      .toUpperCase();
 
-      rois.forEach(function (roi) {
-        if (roi === selectedROI) {
-          ctx.strokeStyle = "#0b8484";
-          ctx.fillStyle = "rgba(11, 132, 132, 0.25)";
-        } else {
-          ctx.strokeStyle = "#4db6ac";
-          ctx.fillStyle = "rgba(77, 182, 172, 0.15)";
-        }
 
-        ctx.lineWidth = 2;
-        ctx.fillRect(roi.x, roi.y, roi.width, roi.height);
-        ctx.strokeRect(roi.x, roi.y, roi.width, roi.height);
-
-        ctx.fillStyle = "#0b8484";
-        ctx.font = "bold 13px Pretendard, sans-serif";
-        ctx.fillText(roi.label, roi.x + 6, roi.y + 18);
-      });
+    if (
+      value === "DOG"
+      || value === "개"
+      || value === "강아지"
+    ) {
+      return "DOG";
     }
 
-    function updateROIList() {
-      roiCount.textContent = rois.length;
-      roiList.innerHTML = "";
 
-      if (rois.length === 0) {
-        roiList.innerHTML = '<div class="empty-msg">아직 지정된 영역이 없습니다.</div>';
+    if (
+      value === "CAT"
+      || value === "고양이"
+    ) {
+      return "CAT";
+    }
+
+
+    return null;
+  }
+
+
+  function getSelectedPetInfo() {
+
+    if (
+      !petSelect
+      || !petSelect.value
+    ) {
+      return null;
+    }
+
+    const option =
+      petSelect.options[
+        petSelect.selectedIndex
+      ];
+
+    return {
+
+      petId:
+        petSelect.value,
+
+      species:
+        normalizeSpecies(
+          option.dataset.species
+        )
+    };
+  }
+
+
+  // ==========================================
+  // 영상 파일 선택
+  // ==========================================
+
+  videoInput.addEventListener(
+    "change",
+    function () {
+
+      const file =
+        this.files[0];
+
+      if (!file) {
         return;
       }
 
-      rois.forEach(function (roi) {
-        const item = document.createElement("div");
-        item.className = "roi-item";
 
-        if (roi === selectedROI) {
-          item.classList.add("selected");
+      if (currentVideoUrl) {
+
+        URL.revokeObjectURL(
+          currentVideoUrl
+        );
+
+        currentVideoUrl =
+          null;
+      }
+
+
+      currentVideoUrl =
+        URL.createObjectURL(
+          file
+        );
+
+
+      video.src =
+        currentVideoUrl;
+
+      video.load();
+
+
+      console.log(
+        "[ROI 영상 선택]",
+        file.name
+      );
+
+    }
+  );
+
+
+  // ==========================================
+  // Canvas 크기
+  // ==========================================
+
+  function resizeCanvas() {
+
+    canvas.width =
+      canvas.clientWidth;
+
+    canvas.height =
+      canvas.clientHeight;
+
+    drawROI();
+  }
+
+
+  window.addEventListener(
+    "resize",
+    resizeCanvas
+  );
+
+
+  video.addEventListener(
+    "loadedmetadata",
+    function () {
+
+      resizeCanvas();
+
+      drawROI();
+    }
+  );
+
+
+  video.addEventListener(
+    "loadeddata",
+    function () {
+
+      resizeCanvas();
+
+      drawROI();
+    }
+  );
+
+
+  // ==========================================
+  // 마우스 좌표 계산
+  // ==========================================
+
+  function getMousePosition(
+    event
+  ) {
+
+    const rect =
+      canvas.getBoundingClientRect();
+
+    return {
+
+      x:
+        (
+          event.clientX
+          - rect.left
+        )
+        * canvas.width
+        / rect.width,
+
+      y:
+        (
+          event.clientY
+          - rect.top
+        )
+        * canvas.height
+        / rect.height
+    };
+  }
+
+
+  // ==========================================
+  // ROI 선택 / 그리기 시작
+  // ==========================================
+
+  canvas.addEventListener(
+    "mousedown",
+    function (event) {
+
+      const pos =
+        getMousePosition(
+          event
+        );
+
+      const clickedROI =
+        findROI(
+          pos.x,
+          pos.y
+        );
+
+
+      if (clickedROI) {
+
+        selectedROI =
+          clickedROI;
+
+        updateROIList();
+
+        drawROI();
+
+        return;
+      }
+
+
+      drawing = true;
+
+      startX =
+        pos.x;
+
+      startY =
+        pos.y;
+    }
+  );
+
+
+  // ==========================================
+  // ROI 드래그 미리보기
+  // ==========================================
+
+  canvas.addEventListener(
+    "mousemove",
+    function (event) {
+
+      if (!drawing) {
+        return;
+      }
+
+      const pos =
+        getMousePosition(
+          event
+        );
+
+      drawROI();
+
+
+      ctx.strokeStyle =
+        "#0b8484";
+
+      ctx.lineWidth =
+        2;
+
+      ctx.setLineDash(
+        [6, 4]
+      );
+
+      ctx.strokeRect(
+        startX,
+        startY,
+        pos.x - startX,
+        pos.y - startY
+      );
+
+      ctx.setLineDash(
+        []
+      );
+    }
+  );
+
+
+  // ==========================================
+  // ROI 생성 완료
+  // ==========================================
+
+  canvas.addEventListener(
+    "mouseup",
+    function (event) {
+
+      if (!drawing) {
+        return;
+      }
+
+
+      drawing = false;
+
+
+      const pos =
+        getMousePosition(
+          event
+        );
+
+
+      const x =
+        Math.min(
+          startX,
+          pos.x
+        );
+
+      const y =
+        Math.min(
+          startY,
+          pos.y
+        );
+
+      const width =
+        Math.abs(
+          pos.x - startX
+        );
+
+      const height =
+        Math.abs(
+          pos.y - startY
+        );
+
+
+      if (
+        width < 10
+        || height < 10
+      ) {
+
+        drawROI();
+
+        return;
+      }
+
+
+      const selectedOption =
+        roiType.options[
+          roiType.selectedIndex
+        ];
+
+
+      const roi = {
+
+        id:
+          String(
+            Date.now()
+          ),
+
+        name:
+          roiType.value,
+
+        label:
+          selectedOption.text,
+
+        x:
+          x,
+
+        y:
+          y,
+
+        width:
+          width,
+
+        height:
+          height
+      };
+
+
+      rois.push(
+        roi
+      );
+
+      selectedROI =
+        roi;
+
+
+      updateROIList();
+
+      drawROI();
+    }
+  );
+
+
+  // ==========================================
+  // ROI hit test
+  // ==========================================
+
+  function findROI(
+    x,
+    y
+  ) {
+
+    for (
+      let i =
+        rois.length - 1;
+
+      i >= 0;
+
+      i--
+    ) {
+
+      const roi =
+        rois[i];
+
+
+      if (
+        x >= roi.x
+        && x <= roi.x + roi.width
+        && y >= roi.y
+        && y <= roi.y + roi.height
+      ) {
+        return roi;
+      }
+    }
+
+
+    return null;
+  }
+
+
+  // ==========================================
+  // ROI Canvas 렌더링
+  // ==========================================
+
+  function drawROI() {
+
+    ctx.clearRect(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+
+    rois.forEach(
+      function (roi) {
+
+        if (
+          roi === selectedROI
+        ) {
+
+          ctx.strokeStyle =
+            "#0b8484";
+
+          ctx.fillStyle =
+            "rgba(11, 132, 132, 0.25)";
+
+        } else {
+
+          ctx.strokeStyle =
+            "#4db6ac";
+
+          ctx.fillStyle =
+            "rgba(77, 182, 172, 0.15)";
         }
 
-        const ratio = convertToRatio(roi);
 
-        item.innerHTML = `
-          <div>
-            <div class="roi-name">${roi.label}</div>
-            <div class="roi-coordinate">
-              x: ${ratio.x} · y: ${ratio.y} · w: ${ratio.width} · h: ${ratio.height}
-            </div>
+        ctx.lineWidth =
+          2;
+
+
+        ctx.fillRect(
+          roi.x,
+          roi.y,
+          roi.width,
+          roi.height
+        );
+
+
+        ctx.strokeRect(
+          roi.x,
+          roi.y,
+          roi.width,
+          roi.height
+        );
+
+
+        ctx.fillStyle =
+          "#0b8484";
+
+        ctx.font =
+          "bold 13px Pretendard, sans-serif";
+
+
+        ctx.fillText(
+          roi.label,
+          roi.x + 6,
+          roi.y + 18
+        );
+      }
+    );
+  }
+
+
+  // ==========================================
+  // ROI 목록 렌더링
+  // ==========================================
+
+  function updateROIList() {
+
+    roiCount.textContent =
+      rois.length;
+
+
+    roiList.innerHTML =
+      "";
+
+
+    if (
+      rois.length === 0
+    ) {
+
+      roiList.innerHTML =
+        `
+          <div class="empty-msg">
+            아직 지정된 영역이 없습니다.
           </div>
         `;
 
-        item.addEventListener("click", function () {
-          selectedROI = roi;
-          updateROIList();
-          drawROI();
-        });
-
-        roiList.appendChild(item);
-      });
+      return;
     }
 
-    function convertToRatio(roi) {
-      return {
-        x: Number((roi.x / canvas.width).toFixed(6)),
-        y: Number((roi.y / canvas.height).toFixed(6)),
-        width: Number((roi.width / canvas.width).toFixed(6)),
-        height: Number((roi.height / canvas.height).toFixed(6))
-      };
-    }
 
-    // 영문 코드명을 화면 표시용 라벨로 변환
-    function getRoiLabel(name) {
-      const labels = {
-        "WATER_BOWL": "물그릇 (WATER_BOWL)",
-        "FOOD_BOWL": "밥그릇 (FOOD_BOWL)",
-        "BED": "침대 (BED)"
-      };
-      return labels[name] || name;
-    }
+    rois.forEach(
+      function (roi) {
 
-    // DB 비율(0~1) 좌표를 현재 캔버스 픽셀 좌표로 환산
-    function convertFromRatio(dbRoi, cWidth, cHeight) {
-      return {
-        id: dbRoi.seq,
-        name: dbRoi.roi_name,
-        label: getRoiLabel(dbRoi.roi_name),
-        x: dbRoi.x_start * cWidth,
-        y: dbRoi.y_start * cHeight,
-        width: dbRoi.width * cWidth,
-        height: dbRoi.height * cHeight
-      };
-    }
+        const item =
+          document.createElement(
+            "div"
+          );
 
-    // DB에서 ROI 데이터 조회
-    async function loadRoiData() {
-      try {
-        const response = await fetch("/roiget");
-        if (!response.ok) {
-          throw new Error("데이터 조회 실패: " + response.status);
+
+        item.className =
+          "roi-item";
+
+
+        if (
+          roi === selectedROI
+        ) {
+
+          item.classList.add(
+            "selected"
+          );
         }
 
-        const dbData = await response.json();
-        console.log("불러온 ROI 데이터:", dbData);
 
-        if (!dbData || dbData.length === 0) {
+        const ratio =
+          convertToRatio(
+            roi
+          );
+
+
+        item.innerHTML =
+          `
+            <div>
+
+              <div class="roi-name">
+                ${roi.label}
+              </div>
+
+              <div class="roi-coordinate">
+                x: ${ratio.x}
+                · y: ${ratio.y}
+                · w: ${ratio.width}
+                · h: ${ratio.height}
+              </div>
+
+            </div>
+          `;
+
+
+        item.addEventListener(
+          "click",
+          function () {
+
+            selectedROI =
+              roi;
+
+            updateROIList();
+
+            drawROI();
+          }
+        );
+
+
+        roiList.appendChild(
+          item
+        );
+      }
+    );
+  }
+
+
+  // ==========================================
+  // Canvas pixel → 0~1 정규화
+  // ==========================================
+
+  function convertToRatio(
+    roi
+  ) {
+
+    return {
+
+      x:
+        Number(
+          (
+            roi.x
+            / canvas.width
+          ).toFixed(6)
+        ),
+
+      y:
+        Number(
+          (
+            roi.y
+            / canvas.height
+          ).toFixed(6)
+        ),
+
+      width:
+        Number(
+          (
+            roi.width
+            / canvas.width
+          ).toFixed(6)
+        ),
+
+      height:
+        Number(
+          (
+            roi.height
+            / canvas.height
+          ).toFixed(6)
+        )
+    };
+  }
+
+
+  // ==========================================
+  // ROI 이름 표시
+  // ==========================================
+
+  function getRoiLabel(
+    name
+  ) {
+
+    const labels = {
+
+      WATER_BOWL:
+        "물그릇 (WATER_BOWL)",
+
+      FOOD_BOWL:
+        "밥그릇 (FOOD_BOWL)",
+
+      BED:
+        "침대 (BED)"
+    };
+
+
+    return (
+      labels[name]
+      || name
+    );
+  }
+
+
+  // ==========================================
+  // DB 0~1 좌표 → Canvas pixel 좌표
+  // ==========================================
+
+  function convertFromRatio(
+    dbRoi,
+    cWidth,
+    cHeight
+  ) {
+
+    return {
+
+      id:
+        String(
+          dbRoi.seq
+        ),
+
+      name:
+        dbRoi.roi_name,
+
+      label:
+        getRoiLabel(
+          dbRoi.roi_name
+        ),
+
+      x:
+        dbRoi.x_start
+        * cWidth,
+
+      y:
+        dbRoi.y_start
+        * cHeight,
+
+      width:
+        dbRoi.width
+        * cWidth,
+
+      height:
+        dbRoi.height
+        * cHeight
+    };
+  }
+
+
+  // ==========================================
+  // 저장 ROI 조회
+  // ==========================================
+
+  async function loadRoiData() {
+
+    try {
+
+      const response =
+        await fetch(
+          "/roiget",
+          {
+            method:
+              "GET",
+
+            cache:
+              "no-store"
+          }
+        );
+
+
+      if (
+        !response.ok
+      ) {
+
+        throw new Error(
+          "ROI 조회 실패: "
+          + response.status
+        );
+      }
+
+
+      const dbData =
+        await response.json();
+
+
+      console.log(
+        "[ROI DB 조회]",
+        dbData
+      );
+
+
+      if (
+        !dbData
+        || dbData.length === 0
+      ) {
+
+        rois =
+          [];
+
+        selectedROI =
+          null;
+
+        updateROIList();
+
+        drawROI();
+
+        return;
+      }
+
+
+      const cWidth =
+        canvas.width;
+
+      const cHeight =
+        canvas.height;
+
+
+      rois =
+        dbData.map(
+          function (item) {
+
+            return convertFromRatio(
+              item,
+              cWidth,
+              cHeight
+            );
+          }
+        );
+
+
+      selectedROI =
+        null;
+
+
+      updateROIList();
+
+      drawROI();
+
+
+    } catch (error) {
+
+      console.error(
+        "[ROI 로드 실패]",
+        error
+      );
+    }
+  }
+
+
+  // ==========================================
+  // ROI 선택 삭제
+  // ==========================================
+
+  deleteButton.addEventListener(
+    "click",
+    function () {
+
+      if (
+        !selectedROI
+      ) {
+
+        alert(
+          "삭제할 영역을 먼저 선택해주세요."
+        );
+
+        return;
+      }
+
+
+      rois =
+        rois.filter(
+          roi =>
+            roi !== selectedROI
+        );
+
+
+      selectedROI =
+        null;
+
+
+      updateROIList();
+
+      drawROI();
+    }
+  );
+
+
+  // ==========================================
+  // Spring 전송 JSON 생성
+  // ==========================================
+
+  function createJSON() {
+
+    const petInfo =
+      getSelectedPetInfo();
+
+
+    return {
+
+      camera_id:
+        DEMO_CAMERA_ID,
+
+      pet_id:
+        petInfo
+          ? String(
+              petInfo.petId
+            )
+          : null,
+
+      species:
+        petInfo
+          ? petInfo.species
+          : null,
+
+      video:
+        (
+          videoInput
+          && videoInput.files[0]
+        )
+          ? videoInput.files[0].name
+          : null,
+
+      rois:
+        rois.map(
+          function (roi) {
+
+            const ratio =
+              convertToRatio(
+                roi
+              );
+
+
+            return {
+
+              id:
+                String(
+                  roi.id
+                ),
+
+              name:
+                roi.name,
+
+              x:
+                ratio.x,
+
+              y:
+                ratio.y,
+
+              width:
+                ratio.width,
+
+              height:
+                ratio.height
+            };
+          }
+        )
+    };
+  }
+
+
+  // ==========================================
+  // ROI 저장
+  // ==========================================
+
+  saveButton.addEventListener(
+    "click",
+    async function (
+      event
+    ) {
+
+      event.preventDefault();
+
+
+      const petInfo =
+        getSelectedPetInfo();
+
+
+      if (
+        !petInfo
+      ) {
+
+        alert(
+          "분석할 반려동물을 선택해주세요."
+        );
+
+        return;
+      }
+
+
+      if (
+        !petInfo.species
+      ) {
+
+        alert(
+          "반려동물 종 정보를 확인할 수 없습니다."
+        );
+
+        return;
+      }
+
+
+      try {
+
+        const data =
+          createJSON();
+
+
+        console.log(
+          "[ROI 저장 요청]",
+          data
+        );
+
+
+        // ROI 0개면 현재 카메라 ROI 삭제
+        if (
+          data.rois.length === 0
+        ) {
+
+          const response =
+            await fetch(
+              "/roidelete",
+              {
+                method:
+                  "POST"
+              }
+            );
+
+
+          const responseText =
+            await response.text();
+
+
+          if (
+            !response.ok
+          ) {
+
+            throw new Error(
+              responseText
+              || "ROI 삭제 실패"
+            );
+          }
+
+
+          alert(
+            "ROI 데이터가 삭제되었습니다."
+          );
+
+
+          window.location.href =
+            "/roi-select";
+
+
           return;
         }
 
-        const cWidth = canvas.width;
-        const cHeight = canvas.height;
 
-        rois = dbData.map(function (item) {
-          return convertFromRatio(item, cWidth, cHeight);
-        });
+        // ROI 저장
+        const response =
+          await fetch(
+            "/roiinsert",
+            {
+              method:
+                "POST",
 
-        updateROIList(); 
-        drawROI();
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
 
-      } catch (error) {
-        console.error("ROI 로드 실패:", error);
-      }
-    }
-
-    // 페이지 진입 시 실행
-    window.addEventListener("load", async function () {
-      resizeCanvas();
-      await loadRoiData();
-      await DiaplayVideo();
-    });
-
-    // 페이지 이탈 시 스트리밍 종료
-    window.addEventListener("beforeunload", function () {
-      EndVideo();
-    });
-
-    async function DiaplayVideo() {
-      if (pc && (pc.connectionState === "connected" || pc.connectionState === "connecting")) {
-        console.log("이미 스트리밍이 실행 중입니다.");
-        return;
-      }
-
-      pc = new RTCPeerConnection();
-
-      pc.ontrack = (event) => {
-        const videoElement = document.getElementById("video");
-        videoElement.srcObject = event.streams[0];
-      };
-
-      pc.addTransceiver('video', { direction: 'recvonly' });
-
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-
-      try {
-        const response = await fetch('http://localhost:8000/offer', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sdp: pc.localDescription.sdp,
-            type: pc.localDescription.type,
-
-            // WebRTC 실제 카메라 번호
-            camera_num: 0,
-
-            
-            // 시연용: 녹화 영상을 LIVE 스트림 소스로 사용
-            source_type: "video",
-
-// LIVE AI 분석 메타
-            pet_id: "PET-001",
-            camera_id: "CAM-001",
-            species: "DOG",
-
-            // 현재 화면/DB에서 로드된 ROI를 AI 모델 형식으로 전달
-            roi_data: {
-              camera_id: "CAM-001",
-              roi_areas: rois.map(function (roi) {
-                const ratio = convertToRatio(roi);
-
-                return {
-                  roi_id: String(roi.id),
-                  roi_name: roi.name,
-                  roi_type: "RECTANGLE",
-                  x: ratio.x,
-                  y: ratio.y,
-                  width: ratio.width,
-                  height: ratio.height
-                };
-              })
+              body:
+                JSON.stringify(
+                  data
+                )
             }
-          })
-        });
+          );
 
-        if (!response.ok) {
-          throw new Error(`서버 응답 에러: ${response.status}`);
+
+        const responseText =
+          await response.text();
+
+
+        if (
+          !response.ok
+        ) {
+
+          throw new Error(
+            responseText
+            || "ROI 저장 실패"
+          );
         }
 
-        const answer = await response.json();
-        await pc.setRemoteDescription(new RTCSessionDescription(answer));
-        console.log("WebRTC 연결 수립 완료");
+
+        jsonBox.textContent =
+          JSON.stringify(
+            data,
+            null,
+            4
+          );
+
+
+        jsonBox.style.display =
+          "block";
+
+
+        console.log(
+          "[ROI 저장 완료]",
+          responseText
+        );
+
+
+        alert(
+          "ROI 설정이 저장되었습니다."
+        );
+
+
+        window.location.href =
+          "/roi-select";
+
 
       } catch (error) {
-        console.error("스트리밍 연결 실패:", error);
+
+        console.error(
+          "[ROI 저장 실패]",
+          error
+        );
+
+
+        alert(
+          "저장 실패: "
+          + (
+            error?.message
+            || "알 수 없는 오류"
+          )
+        );
       }
     }
+  );
 
-    async function EndVideo() {
-      const videoElement = document.getElementById("video");
 
-      if (videoElement.srcObject) {
-        const stream = videoElement.srcObject;
-        stream.getTracks().forEach(track => track.stop());
-        videoElement.srcObject = null;
-      }
+  // ==========================================
+  // PET 변경
+  // ==========================================
 
-      if (pc) {
-        pc.close();
-        pc = null;
-        console.log("브라우저 WebRTC 세션 종료");
-      }
+  petSelect?.addEventListener(
+    "change",
+    function () {
 
-      try {
-        await fetch('/api/streaming/stop', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        });
-      } catch (error) {
-        console.error("송출 서버 종료 요청 실패:", error);
-      }
+      console.log(
+        "[PET 선택 변경]",
+        getSelectedPetInfo()
+      );
     }
+  );
 
-    video.addEventListener("loadeddata", function () {
+
+  // ==========================================
+  // 페이지 시작
+  //
+  // 중요:
+  // WebRTC /offer 자동 호출 없음
+  // /api/streaming/stop 호출 없음
+  // ==========================================
+
+  window.addEventListener(
+    "load",
+    async function () {
+
       resizeCanvas();
-      drawROI();
-    });
 
-    deleteButton.addEventListener("click", function () {
-      if (!selectedROI) {
-        alert("삭제할 영역을 먼저 선택해주세요.");
-        return;
-      }
-
-      rois = rois.filter(roi => roi !== selectedROI);
-      selectedROI = null;
-      updateROIList();
-      drawROI();
-    });
-
-    function createJSON() {
-      return {
-        camera_id: "CAM-001",
-        video: videoInput && videoInput.files[0] ? videoInput.files[0].name : null,
-        rois: rois.map(function (roi) {
-          const ratio = convertToRatio(roi);
-          return {
-            id: roi.id,
-            name: roi.name,
-            x: ratio.x,
-            y: ratio.y,
-            width: ratio.width,
-            height: ratio.height
-          };
-        })
-      };
+      await loadRoiData();
     }
+  );
 
-    saveButton.addEventListener("click", async function (e) {
-      if (e) e.preventDefault();
 
-      try 
-      {
-	        const data = createJSON();
-	        console.log("전송할 데이터:", data);
-	          
-	        if(data.rois.length == 0)
-	        {
-	        	const res = await fetch("/roidelete", {
-	                method: "POST" // 🌟 POST 방식으로 명시
-	            });
+  // ==========================================
+  // 페이지 종료 정리
+  // ==========================================
 
-	            if (res.ok) {
-	                alert("ROI 데이터가 삭제 되었습니다.");
-	                window.location.href = "/roi-select"; // 필요 시 페이지 이동
-	            } else {
-	                alert("삭제 실패: " + res.status);
-	            }
-	        	return;
-	        }
-	        
-	        const response = await fetch("/roiinsert", {
-	          method: "POST",
-	          headers: {
-	            "Content-Type": "application/json"
-	          },
-	          body: JSON.stringify(data)
-	        });
-	
-	        if (!response.ok) {
-	          const errorText = await response.text();
-	          throw new Error(`서버 오류 [${response.status}]: ${errorText}`);
-	        }
-	
-	        jsonBox.textContent = JSON.stringify(data, null, 4);
-	        jsonBox.style.display = "block";
-	
-	        alert("ROI 설정이 저장되었습니다.");
-	
-	        // 저장이 완료되면 대시보드나 관련 페이지로 이동
-	        //window.location.href = "/dashboard";
-	        window.location.href = "/roi-select";
-	
-	      } catch (error) {
-	        console.error("전송 실패 원인:", error);
-	        alert("저장 실패: 콘솔 로그를 확인하세요.");
-	      }
-    });
+  window.addEventListener(
+    "beforeunload",
+    function () {
 
-    resizeCanvas();
-  </script>
+      if (
+        currentVideoUrl
+      ) {
+
+        URL.revokeObjectURL(
+          currentVideoUrl
+        );
+
+        currentVideoUrl =
+          null;
+      }
+    }
+  );
+
+
+  resizeCanvas();
+
+</script>
+
 </body>
-
 </html>

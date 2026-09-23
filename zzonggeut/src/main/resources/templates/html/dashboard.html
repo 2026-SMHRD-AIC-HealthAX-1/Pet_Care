@@ -642,33 +642,17 @@
 
 	    let selectedFile = null; // 선택된 동영상 파일 저장 변수
 
-	    // AI 결과 샘플 데이터 (첫 번째 스크립트 기준 유지)
-	    const sampleResult = {
-	      analysis_status: "COMPLETED",
-	      features_overall: {
-	        activity_level: 0.043682,
-	        stationary_ratio: 0.708108,
-	        normalized_travel_distance: 1.010126,
-	        normalized_moving_speed: 0.14965
-	      },
-	      change_detection: {
-	        change_status: "NOT_EVALUATED"
-	      }
-	    };
-
-	    // 🌟 [2. 영상 업로드 버튼 클릭 시 파일 선택창 열기]
+	    // 2. 영상 업로드 버튼 클릭 시 파일 선택창 열기
 	    uploadVideoBtn.addEventListener('click', () => {
 	      videoFileInput.click();
 	    });
 
-	    // 🌟 [3. 파일이 선택되었을 때 브라우저에 미리보기 화면 출력]
+	    // 3. 파일이 선택되었을 때 브라우저에 미리보기 화면 출력
 	    videoFileInput.addEventListener('change', (e) => {
 	      const file = e.target.files[0];
 	      if (!file) return;
 
-	      selectedFile = file; // 백엔드 전송용 변수에 저장
-
-	      // 파일 선택 후 URL 생성하여 비디오 태그 생성
+	      selectedFile = file;
 	      const fileUrl = URL.createObjectURL(file);
 
 	      videoContainer.innerHTML = `
@@ -678,7 +662,6 @@
 	        </video>
 	      `;
 
-	      // 상단 배지 및 버튼 텍스트 변경
 	      if (liveBadge) {
 	        liveBadge.textContent = '🎬 영상 로드됨';
 	        liveBadge.style.backgroundColor = '#0b8484';
@@ -688,7 +671,7 @@
 	      uploadVideoBtn.textContent = '🔄 다른 영상 선택';
 	    });
 
-	    // 🌟 [4. AI 행동 분석 실행 버튼 동작 (두 번째 스크립트의 실제 비동기 분석 및 ROI 전달 로직 결합)]
+	    // 4. AI 행동 분석 실행 버튼 동작
 	    runAnalysisBtn.addEventListener('click', async () => {
 	      if (!selectedFile) {
 	        alert('먼저 분석할 영상을 업로드해주세요!');
@@ -703,7 +686,7 @@
 	      analysisStatusText.textContent = '⏳ AI가 동영상을 분석하고 있습니다...';
 
 	      try {
-	        // [추가된 로직 1] DB에서 현재 저장된 CAMERA_ROI_INFO 데이터 조회 (/roiget 호출)
+	        // [단계 1] DB에서 현재 저장된 CAMERA_ROI_INFO 데이터 조회
 	        let formattedRoiData = [];
 	        try {
 	          const roiResponse = await fetch('/roiget');
@@ -711,7 +694,6 @@
 	            const dbRoiList = await roiResponse.json();
 	            console.log('[DB에서 가져온 원본 ROI]:', dbRoiList);
 
-	            // 파이썬 analyzer.analyze(roi_data=[...]) 포맷에 맞게 필드명 변환
 	            if (Array.isArray(dbRoiList) && dbRoiList.length > 0) {
 	              formattedRoiData = dbRoiList.map(item => ({
 	                roi_name: item.roi_name || item.roiName,
@@ -723,21 +705,19 @@
 	            }
 	          }
 	        } catch (err) {
-	          console.warn('ROI 조회 중 오류 발생 (ROI 없이 계속 진행):', err);
+	          console.warn('ROI 조회 중 오류 발생 (기본값 진행):', err);
 	        }
 
 	        console.log('[파이썬 규격으로 매핑된 roi_data]:', formattedRoiData);
 
-	        // [추가된 로직 2] 서버 전송을 위한 FormData 생성 및 부가 파라미터 추가
+	        // [단계 2] 서버 전송용 FormData 생성
 	        const formData = new FormData();
 	        formData.append('video', selectedFile);
 	        formData.append('pet_id', 'PET-001');
 	        formData.append('species', 'DOG');
-
-	        // ROI 데이터를 JSON 문자열 형태로 FormData에 추가
 	        formData.append('roi_data', JSON.stringify(formattedRoiData));
 
-	        // [추가된 로직 3] 스프링 서버 실제 호출 및 결과 수신
+	        // [단계 3] 스프링 서버 실제 호출 및 결과 수신
 	        const response = await fetch('/api/monitoring/run-video-ai', {
 	          method: 'POST',
 	          body: formData
@@ -751,10 +731,48 @@
 	        console.log('[AI 분석 결과 수신]:', result);
 
 	        if (!result.data) {
-	          console.warn('응답에 data 필드가 없습니다. result 본문:', result);
-	          return;
+	          throw new Error('응답 결과에 data 필드가 누락되었습니다.');
 	        }
 
+	        // [단계 4: 추가] PET_ACT_RECORD 테이블로 구역별 체류기록 JPA 저장 요청
+	        const spaceAnalysis = result.data.space_analysis;
+	        const totalDuration = result.data.video_info?.duration_sec || 0;
+
+	        if (spaceAnalysis && Array.isArray(spaceAnalysis.roi_results)) {
+	          const recordsToSave = spaceAnalysis.roi_results.map(roi => {
+	            const stayTime = Number(roi.stay_time_sec || 0);
+
+	            // STOP_RATIO(체류 비율) 계산 (소수점 4자리 유지)
+	            let ratio = 0.0;
+	            if (totalDuration > 0) {
+	              ratio = parseFloat((stayTime / totalDuration).toFixed(4));
+	            }
+
+	            return {
+	              petSeq: 1,                          // 펫 번호 (세션값에 맞게 변경 가능)
+	              userSeq: "admin",                   // 회원 식별자
+	              roiName: roi.roi_name,              // ROI명 (BED, FOOD_BOWL 등)
+	              continueTime: Math.round(stayTime), // 지속시간(초)
+	              stopRatio: ratio                    // 체류비율
+	            };
+	          });
+
+	          console.log('[PET_ACT_RECORD 저장 요청 데이터]:', recordsToSave);
+
+	          // JPA 컨트롤러 호출 (백그라운드 전송)
+	          fetch('/api/monitoring/save-roi-records', {
+	            method: 'POST',
+	            headers: { 'Content-Type': 'application/json' },
+	            body: JSON.stringify(recordsToSave)
+	          })
+	          .then(res => {
+	            if (res.ok) console.log('✓ PET_ACT_RECORD DB 저장 성공');
+	            else console.error('❌ PET_ACT_RECORD DB 저장 실패');
+	          })
+	          .catch(err => console.error('DB 저장 통신 에러:', err));
+	        }
+
+	        // [단계 5] 화면 렌더링 데이터 매핑
 	        const analysisData = {
 	          analysis_status: result.data.analysis_status,
 	          features_overall: {
@@ -769,7 +787,7 @@
 	        };
 
 	        analysisStatusBox.className = 'analysis-status-box status-success';
-	        analysisStatusText.textContent = '✓ 분석 요청이 완료되었습니다.';
+	        analysisStatusText.textContent = '✓ 영상 분석 및 저장이 완료되었습니다.';
 
 	        renderAiResult(analysisData);
 
@@ -782,7 +800,7 @@
 	      }
 	    });
 
-	    // AI 분석 결과 출력 함수
+	    // AI 분석 결과 카드 출력 함수
 	    function renderAiResult(data) {
 	      document.getElementById('resAnalysisStatus').textContent = data.analysis_status || '-';
 	      document.getElementById('resActivityLevel').textContent = data.features_overall?.activity_level ?? '-';

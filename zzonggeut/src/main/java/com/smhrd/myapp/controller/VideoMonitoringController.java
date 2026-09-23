@@ -10,11 +10,26 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+import com.smhrd.myapp.dto.PetActRecordRequestDto;
+import com.smhrd.myapp.entity.PetActRecord;
+import com.smhrd.myapp.repository.PetActRecordRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/monitoring")
 public class VideoMonitoringController 
 {
+	private final PetActRecordRepository petActRecordRepository;
 	private final String PYTHON_AI_URL = "http://localhost:8000/api/ai/upload-and-analyze";
+
+	VideoMonitoringController(PetActRecordRepository petActRecordRepository) {
+		this.petActRecordRepository = petActRecordRepository;
+	}
 
     @PostMapping("/run-video-ai")
     public ResponseEntity<?> runAiAnalysis(
@@ -69,5 +84,36 @@ public class VideoMonitoringController
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("파이썬 AI 서버 통신 오류: " + e.getMessage());
         }
+    }
+    
+    @PostMapping("/save-roi-records")
+    public ResponseEntity<?> saveRoiRecords(@RequestBody List<PetActRecordRequestDto> dtos) {
+        if (dtos == null || dtos.isEmpty()) {
+            return ResponseEntity.badRequest().body("저장할 데이터가 없습니다.");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        List<PetActRecord> entities = new ArrayList<>();
+
+        for (int i = 0; i < dtos.size(); i++) {
+            PetActRecordRequestDto dto = dtos.get(i);
+
+            PetActRecord entity = PetActRecord.builder()
+                    // DTTM이 단독 PK이므로 동일 시점 레코드 간 충돌 방지를 위해 나노초 단위 시차 부여
+            		.dttm(now.plusSeconds(i))
+                    .petSeq(dto.getPetSeq() != null ? dto.getPetSeq() : 1)
+                    .userSeq(dto.getUserSeq() != null ? dto.getUserSeq() : "admin")
+                    .roiName(dto.getRoiName())
+                    .continueTime(dto.getContinueTime())
+                    .stopRatio(dto.getStopRatio())
+                    .build();
+
+            entities.add(entity);
+        }
+
+        // JPA 일괄 저장 (Batch Insert)
+        petActRecordRepository.saveAll(entities);
+
+        return ResponseEntity.ok("JPA를 통한 데이터 저장이 완료되었습니다.");
     }
 }

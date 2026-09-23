@@ -24,8 +24,17 @@ public class MemberController {
 
     // --- 1. 일반 페이지 매핑 ---
 
+// 로그인 전 메인 화면으로 들어갔을 때 로그인 여부를 판단해서 로그인 전이면 before, 후면 after를 띄움
     @GetMapping("/")
-    public String main() {
+    public String main(HttpSession session) {
+
+        UserEntity loginUser =
+                (UserEntity) session.getAttribute("loginUser");
+
+        if (loginUser != null) {
+            return "redirect:/main";
+        }
+
         return "html/mainBefore";
     }
 

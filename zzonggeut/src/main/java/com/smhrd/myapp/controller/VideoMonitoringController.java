@@ -28,6 +28,13 @@ import java.time.ZoneId; // 🌟 한국 시간대 지정을 위해 추가
 import java.util.ArrayList;
 import java.util.List;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/monitoring")
 public class VideoMonitoringController 
@@ -162,5 +169,65 @@ public class VideoMonitoringController
         petActRecordRepository.saveAll(entities);
 
         return ResponseEntity.ok("저장 성공 (USER_SEQ: " + loginUserSeq + ", PET_SEQ: " + targetPetSeq + ")");
+    }
+    
+    @GetMapping("/today-stay-ratio")
+    public ResponseEntity<?> getTodayStayRatio(HttpSession session) {
+        // 1. 세션에서 로그인한 유저 ID 꺼내기
+        String loginUserSeq = "admin";
+        Object sessionUser = session.getAttribute("loginUser");
+        if (sessionUser instanceof UserEntity) {
+            loginUserSeq = ((UserEntity) sessionUser).getId();
+        } else if (sessionUser != null) {
+            loginUserSeq = sessionUser.toString();
+        }
+
+        // 2. 해당 유저의 펫 번호 조회
+        Integer targetPetSeq = 1;
+        List<PetEntity> petList = petRepository.findByUser_seq(loginUserSeq);
+        if (petList != null && !petList.isEmpty()) {
+            targetPetSeq = petList.get(0).getSeq();
+        }
+
+        // 3. 오늘 00:00:00 ~ 23:59:59 (한국 시간 기준)
+        LocalDateTime startOfDay = LocalDate.now(ZoneId.of("Asia/Seoul")).atStartOfDay();
+        LocalDateTime endOfDay = LocalDate.now(ZoneId.of("Asia/Seoul")).atTime(LocalTime.MAX);
+
+        // 4. 당일 기록 DB 조회
+        List<PetActRecord> records = petActRecordRepository.findTodayRecords(loginUserSeq, targetPetSeq, startOfDay, endOfDay);
+
+        if (records.isEmpty()) {
+            return ResponseEntity.ok(Map.of("totalStayTime", 0, "ratios", List.of()));
+        }
+
+        // 5. 구역(roiName)별 체류시간(continueTime) 누적 합산
+        Map<String, Integer> stayByRoi = records.stream()
+                .collect(Collectors.groupingBy(
+                        PetActRecord::getRoiName,
+                        Collectors.summingInt(r -> r.getContinueTime() != null ? r.getContinueTime() : 0)
+                ));
+
+        int totalStayTime = stayByRoi.values().stream().mapToInt(Integer::intValue).sum();
+
+        // 6. 구역별 비율(%) 계산
+        List<Map<String, Object>> ratioList = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : stayByRoi.entrySet()) {
+            Map<String, Object> item = new HashMap<>();
+            int time = entry.getValue();
+            int percent = totalStayTime > 0 ? (int) Math.round(((double) time / totalStayTime) * 100) : 0;
+            
+            item.put("roiName", entry.getKey());
+            item.put("stayTime", time);
+            item.put("percent", percent);
+            ratioList.add(item);
+        }
+
+        // 체류 비율이 높은 순서로 정렬
+        ratioList.sort((a, b) -> (Integer) b.get("percent") - (Integer) a.get("percent"));
+
+        return ResponseEntity.ok(Map.of(
+                "totalStayTime", totalStayTime,
+                "ratios", ratioList
+        ));
     }
 }

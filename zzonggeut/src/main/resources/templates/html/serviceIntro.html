@@ -56,7 +56,7 @@ ul { list-style: none; }
 }
 
 .logo-img {
-  height: 52px;
+  height: 32px;
   width: auto;
   display: block;
 }
@@ -495,7 +495,7 @@ ul { list-style: none; }
   <!-- 네비게이션 -->
   <header class="navbar">
     <!-- 🌟 메인 연결 -->
-    <a th:href="@{/main}">
+    <a th:href="@{/}">
       <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
     </a>
     <nav class="nav-menu">
@@ -504,7 +504,7 @@ ul { list-style: none; }
       <a th:href="@{/servicePrice}">요금 안내</a>
     </nav>
     <!-- 🌟 로그인 연결 -->
-    <a th:href="@{/login}" class="nav-login-btn">로그인</a>
+    <a th:href="@{/login}" class="nav-login-btn" th:if="${loginUser == null}">로그인</a>
   </header>
 
   <!-- Hero -->

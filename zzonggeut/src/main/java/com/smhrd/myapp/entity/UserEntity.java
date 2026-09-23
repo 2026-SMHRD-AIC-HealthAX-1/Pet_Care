@@ -47,4 +47,15 @@ public class UserEntity implements Persistable<String>{
     public void setPlan(String plan) {
         this.plan = plan;
     }
+    
+    @Override
+    public String getId() {
+        return this.id;
+    }
+
+    // 프로젝트 다른 곳에서 user_seq라는 이름으로 부를 수도 있으므로 편의 메서드 추가
+    public String getUser_seq() {
+        return this.id;
+    }
+    
 }

@@ -51,9 +51,10 @@
       <div class="login-utils">
         <div class="find-links">
           <!-- 🌟 깔끔한 경로로 연결 -->
-          <a th:href="@{/find-id}" class="find-link">아이디 찾기</a>
+          <a th:href="@{/findid}" class="find-link">아이디 찾기</a>
           <span class="divider">|</span>
-          <a th:href="@{/find-pw}" class="find-link">비밀번호 찾기</a>
+          <!-- 비밀번호 찾기 >>> 비밀번호 변경(이름 변경) -->
+          <a th:href="@{/findpw}" class="find-link">비밀번호 변경</a>
         </div>
         <a th:href="@{/signup}" class="signup-link">회원가입</a>
       </div>

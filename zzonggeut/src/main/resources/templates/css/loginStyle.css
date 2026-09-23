@@ -10,20 +10,36 @@ body {
   color: #333;
 }
 
-/* Navbar */
+/* Navbar: 서비스 가입 페이지와 동일한 여백/정렬 */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 40px;
+  padding: 16px 48px;
   background: #fff;
   border-bottom: 1px solid #eee;
 }
 
-.logo-img {
-  height: 36px;
-  width: auto;
+/* 로고 영역의 높이와 축소 여부를 고정 */
+.logo {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  line-height: 0;
+}
+
+.logo a {
   display: block;
+  line-height: 0;
+}
+
+.logo-img {
+  display: block;
+  height: 32px;
+  width: auto;
+  max-height: 32px;
+  flex: 0 0 auto;
+  object-fit: contain;
 }
 
 /* 로그인 카드 영역 */
@@ -142,4 +158,16 @@ body {
 
 .signup-link:hover {
   text-decoration: underline;
+}
+
+/* 작은 화면에서도 로고 높이는 32px 유지 */
+@media (max-width: 880px) {
+  .navbar {
+    padding: 14px 20px;
+  }
+
+  .logo-img {
+    height: 32px;
+    max-height: 32px;
+  }
 }

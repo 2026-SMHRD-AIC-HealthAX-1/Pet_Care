@@ -661,81 +661,92 @@
 	    const analysisStatusText = document.getElementById('analysisStatusText');
 	    const aiResultCard = document.getElementById('aiResultCard');
 
-	    let selectedFile = null; // 선택된 동영상 파일 저장 변수
+	    let selectedFile = null;
+	    let trackingData = [];         // 서버에서 받아온 트래킹 좌표 리스트
+	    let trackingCanvas = null;
+	    let trackingCtx = null;
+	    let animationFrameId = null;
 
 	    // 2. 영상 업로드 버튼 클릭 시 파일 선택창 열기
 	    uploadVideoBtn.addEventListener('click', () => {
 	      videoFileInput.click();
 	    });
 
-	    // 3. 파일이 선택되었을 때 브라우저에 미리보기 화면 출력
+	    // 3. 파일 선택 시 비디오 출력 + 캔버스 생성 + ROI 오버레이 표시
 	    videoFileInput.addEventListener('change', async (e) => {
-	    	const file = e.target.files[0];
-	    	  if (!file) return;
+	      const file = e.target.files[0];
+	      if (!file) return;
 
-	    	  selectedFile = file;
-	    	  const fileUrl = URL.createObjectURL(file);
+	      selectedFile = file;
+	      trackingData = []; // 새 영상 선택 시 이전 좌표 초기화
+	      if (animationFrameId) cancelAnimationFrame(animationFrameId);
 
-	    	  // 1) 비디오 태그 출력
-	    	  videoContainer.innerHTML = `
-	    	    <video id="uploadedVideo" controls autoplay loop style="width:100%; height:100%; object-fit:contain;">
-	    	      <source src="${fileUrl}" type="${file.type}">
-	    	      브라우저가 동영상 재생을 지원하지 않습니다.
-	    	    </video>
-	    	  `;
+	      const fileUrl = URL.createObjectURL(file);
 
-	    	  if (liveBadge) {
-	    	    liveBadge.textContent = '🎬 영상 로드됨';
-	    	    liveBadge.style.backgroundColor = '#0b8484';
-	    	    liveBadge.style.color = '#fff';
-	    	  }
+	      // 🌟 비디오 위에 겹쳐질 투명 Canvas 함께 생성
+	      videoContainer.innerHTML = `
+	        <video id="uploadedVideo" controls autoplay loop style="width:100%; height:100%; object-fit:contain;">
+	          <source src="${fileUrl}" type="${file.type}">
+	          브라우저가 동영상 재생을 지원하지 않습니다.
+	        </video>
+	        <canvas id="trackingCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:5;"></canvas>
+	      `;
 
-	    	  uploadVideoBtn.textContent = '🔄 다른 영상 선택';
+	      if (liveBadge) {
+	        liveBadge.textContent = '🎬 영상 로드됨';
+	        liveBadge.style.backgroundColor = '#0b8484';
+	        liveBadge.style.color = '#fff';
+	      }
 
-	    	  // 🌟 2) DB에서 CAMERA_ROI_INFO 가져와서 비디오 위에 박스 표시
-	    	  try {
-	    	    const res = await fetch('/roiget');
-	    	    if (!res.ok) return;
+	      uploadVideoBtn.textContent = '🔄 다른 영상 선택';
 
-	    	    const roiList = await res.json();
-	    	    console.log('[화면 표시용 ROI 목록]:', roiList);
+	      const video = document.getElementById('uploadedVideo');
+	      trackingCanvas = document.getElementById('trackingCanvas');
+	      trackingCtx = trackingCanvas.getContext('2d');
 
-	    	    if (Array.isArray(roiList) && roiList.length > 0) {
-	    	      roiList.forEach(roi => {
-	    	        // 필드명 호환 (카멜케이스 / 스네이크케이스 모두 지원)
-	    	        const name = roi.roi_name || roi.roiName || 'ROI';
-	    	        const x = Number(roi.x_start ?? roi.xstart ?? 0);
-	    	        const y = Number(roi.y_start ?? roi.ystart ?? 0);
-	    	        const w = Number(roi.width ?? 0);
-	    	        const h = Number(roi.height ?? 0);
+	      // 비디오 실제 해상도와 캔버스 내부 해상도 동기화 및 렌더링 루프 시작
+	      video.addEventListener('loadedmetadata', () => {
+	        trackingCanvas.width = video.videoWidth || 1280;
+	        trackingCanvas.height = video.videoHeight || 720;
+	        startTrackingLoop(video);
+	      });
 
-	    	        // 표시할 한글 라벨 매핑 (선택사항)
-	    	        let displayName = name;
-	    	        if (name === 'BED') displayName = '침대 (BED)';
-	    	        else if (name === 'FOOD_BOWL') displayName = '밥그릇 (FOOD_BOWL)';
+	      // 🌟 DB에서 CAMERA_ROI_INFO 가져와서 비디오 위에 박스 표시
+	      try {
+	        const res = await fetch('/roiget');
+	        if (res.ok) {
+	          const roiList = await res.json();
+	          if (Array.isArray(roiList) && roiList.length > 0) {
+	            roiList.forEach(roi => {
+	              const name = roi.roi_name || roi.roiName || 'ROI';
+	              const x = Number(roi.x_start ?? roi.xstart ?? 0);
+	              const y = Number(roi.y_start ?? roi.ystart ?? 0);
+	              const w = Number(roi.width ?? 0);
+	              const h = Number(roi.height ?? 0);
 
-	    	        // 박스 엘리먼트 생성
-	    	        const box = document.createElement('div');
-	    	        box.className = 'roi-overlay-box';
+	              let displayName = name;
+	              if (name === 'BED') displayName = '침대 (BED)';
+	              else if (name === 'FOOD_BOWL') displayName = '밥그릇 (FOOD_BOWL)';
 
-	    	        // 0.0 ~ 1.0 비율 값을 % 단위로 변환해 위치 지정
-	    	        box.style.left = `${(x * 100).toFixed(2)}%`;
-	    	        box.style.top = `${(y * 100).toFixed(2)}%`;
-	    	        box.style.width = `${(w * 100).toFixed(2)}%`;
-	    	        box.style.height = `${(h * 100).toFixed(2)}%`;
+	              const box = document.createElement('div');
+	              box.className = 'roi-overlay-box';
+	              box.style.left = `${(x * 100).toFixed(2)}%`;
+	              box.style.top = `${(y * 100).toFixed(2)}%`;
+	              box.style.width = `${(w * 100).toFixed(2)}%`;
+	              box.style.height = `${(h * 100).toFixed(2)}%`;
 
-	    	        // 라벨 생성
-	    	        const label = document.createElement('span');
-	    	        label.className = 'roi-overlay-label';
-	    	        label.textContent = displayName;
+	              const label = document.createElement('span');
+	              label.className = 'roi-overlay-label';
+	              label.textContent = displayName;
 
-	    	        box.appendChild(label);
-	    	        videoContainer.appendChild(box);
-	    	      });
-	    	    }
-	    	  } catch (err) {
-	    	    console.error('ROI 오버레이 렌더링 실패:', err);
-	    	  }
+	              box.appendChild(label);
+	              videoContainer.appendChild(box);
+	            });
+	          }
+	        }
+	      } catch (err) {
+	        console.error('ROI 오버레이 렌더링 실패:', err);
+	      }
 	    });
 
 	    // 4. AI 행동 분석 실행 버튼 동작
@@ -753,14 +764,12 @@
 	      analysisStatusText.textContent = '⏳ AI가 동영상을 분석하고 있습니다...';
 
 	      try {
-	        // [단계 1] DB에서 현재 저장된 CAMERA_ROI_INFO 데이터 조회
+	        // [단계 1] DB에서 현재 저장된 ROI 데이터 조회
 	        let formattedRoiData = [];
 	        try {
 	          const roiResponse = await fetch('/roiget');
 	          if (roiResponse.ok) {
 	            const dbRoiList = await roiResponse.json();
-	            console.log('[DB에서 가져온 원본 ROI]:', dbRoiList);
-
 	            if (Array.isArray(dbRoiList) && dbRoiList.length > 0) {
 	              formattedRoiData = dbRoiList.map(item => ({
 	                roi_name: item.roi_name || item.roiName,
@@ -775,15 +784,13 @@
 	          console.warn('ROI 조회 중 오류 발생 (기본값 진행):', err);
 	        }
 
-	        console.log('[파이썬 규격으로 매핑된 roi_data]:', formattedRoiData);
-
-	        // [단계 2] 서버 전송용 FormData 생성
+	        // [단계 2] FormData 생성
 	        const formData = new FormData();
 	        formData.append('video', selectedFile);
 	        formData.append('species', 'DOG');
 	        formData.append('roi_data', JSON.stringify(formattedRoiData));
 
-	        // [단계 3] 스프링 서버 실제 호출 및 결과 수신
+	        // [단계 3] 서버 요청 및 결과 수신
 	        const response = await fetch('/api/monitoring/run-video-ai', {
 	          method: 'POST',
 	          body: formData
@@ -800,6 +807,12 @@
 	          throw new Error('응답 결과에 data 필드가 누락되었습니다.');
 	        }
 
+	        // 🌟 [핵심]: 파이썬이 보내준 트래킹 좌표 저장 -> 즉시 캔버스에 그리기 시작
+	        if (Array.isArray(result.data.tracking_points)) {
+	          trackingData = result.data.tracking_points;
+	          console.log(`✓ 트래킹 좌표 ${trackingData.length}개 로드 완료`);
+	        }
+
 	        // [단계 4] PET_ACT_RECORD 테이블로 구역별 체류기록 JPA 저장 요청
 	        const spaceAnalysis = result.data.space_analysis;
 	        const totalDuration = result.data.video_info?.duration_sec || 0;
@@ -807,7 +820,6 @@
 	        if (spaceAnalysis && Array.isArray(spaceAnalysis.roi_results)) {
 	          const recordsToSave = spaceAnalysis.roi_results.map(roi => {
 	            const stayTime = Number(roi.stay_time_sec || 0);
-
 	            let ratio = 0.0;
 	            if (totalDuration > 0) {
 	              ratio = parseFloat((stayTime / totalDuration).toFixed(4));
@@ -822,9 +834,6 @@
 	            };
 	          });
 
-	          console.log('[PET_ACT_RECORD 저장 요청 데이터]:', recordsToSave);
-
-	          // 🌟 1) 저장이 완료될 때까지 기다림(await)
 	          const saveRes = await fetch('/api/monitoring/save-roi-records', {
 	            method: 'POST',
 	            headers: { 'Content-Type': 'application/json' },
@@ -833,10 +842,7 @@
 
 	          if (saveRes.ok) {
 	            console.log('✓ PET_ACT_RECORD DB 저장 성공 -> 당일 화면 통계 갱신 시작');
-	            // 🌟 2) 저장이 끝나자마자 즉시 DB에서 당일 전체 데이터를 다시 읽어와 화면 갱신!
 	            await loadTodayStayRatio();
-	          } else {
-	            console.error('❌ PET_ACT_RECORD DB 저장 실패');
 	          }
 	        }
 
@@ -880,7 +886,71 @@
 	      aiResultCard.style.display = 'block';
 	    }
 
-	    // 🌟 [추가된 함수] 오늘 당일의 공간별 체류 비율 DB 조회 및 렌더링 함수
+	    // 🌟 [추가]: 비디오 시간에 맞춰 실시간으로 박스와 궤적 그리는 루프 함수
+	    function startTrackingLoop(video) {
+	      const trail = []; // 최근 이동 궤적 포인트 보관
+
+	      function render() {
+	        if (!trackingCtx || !video) return;
+
+	        // 매 프레임마다 이전 캔버스 내용 지우기
+	        trackingCtx.clearRect(0, 0, trackingCanvas.width, trackingCanvas.height);
+
+	        // 트래킹 데이터가 있고 영상이 재생 중일 때
+	        if (trackingData.length > 0 && !video.paused) {
+	          const currentTime = video.currentTime;
+
+	          // 현재 영상 재생 시간과 가장 가까운 좌표 탐색 (오차 범위 ±0.06초)
+	          const currentPoint = trackingData.find(p => Math.abs(p.time - currentTime) < 0.06);
+
+	          if (currentPoint) {
+	            trail.push({ x: currentPoint.x, y: currentPoint.y });
+	            if (trail.length > 25) trail.shift(); // 궤적 길이 25개 유지
+
+	            // 1) 하늘색 이동 궤적(Trail) 그리기
+	            if (trail.length >= 2) {
+	              trackingCtx.beginPath();
+	              trackingCtx.strokeStyle = '#38bdf8'; // 하늘색
+	              trackingCtx.lineWidth = 4;
+	              trackingCtx.lineCap = 'round';
+	              trackingCtx.lineJoin = 'round';
+	              trackingCtx.moveTo(trail[0].x, trail[0].y);
+	              for (let i = 1; i < trail.length; i++) {
+	                trackingCtx.lineTo(trail[i].x, trail[i].y);
+	              }
+	              trackingCtx.stroke();
+	            }
+
+	            // 2) 초록색 감지 박스 (사진과 동일한 가로/세로 비율)
+	            const boxW = 140;
+	            const boxH = 110;
+	            const bx = currentPoint.x - boxW / 2;
+	            const by = currentPoint.y - boxH / 2;
+
+	            trackingCtx.strokeStyle = '#22c55e'; // 밝은 초록색
+	            trackingCtx.lineWidth = 3;
+	            trackingCtx.strokeRect(bx, by, boxW, boxH);
+
+	            // 3) 빨간색 중심점 (Circle)
+	            trackingCtx.beginPath();
+	            trackingCtx.arc(currentPoint.x, currentPoint.y, 6, 0, Math.PI * 2);
+	            trackingCtx.fillStyle = '#ef4444';
+	            trackingCtx.fill();
+
+	            // 4) 라벨 텍스트 ("DOG ID:1 0.90")
+	            trackingCtx.fillStyle = '#22c55e';
+	            trackingCtx.font = 'bold 16px sans-serif';
+	            trackingCtx.fillText('DOG ID:1', bx, Math.max(22, by - 8));
+	          }
+	        }
+
+	        animationFrameId = requestAnimationFrame(render);
+	      }
+
+	      render();
+	    }
+
+	    // 오늘 당일 공간별 체류 비율 DB 조회 및 렌더링 함수
 	    async function loadTodayStayRatio() {
 	      try {
 	        const res = await fetch('/api/monitoring/today-stay-ratio');
@@ -907,16 +977,14 @@
 	          return;
 	        }
 
-	        // 1. 가장 많이 머문 공간 텍스트 반영
 	        const topRoi = ratios[0];
 	        topPlaceName.textContent = topRoi.roiName;
 	        topPlacePercent.textContent = `${topRoi.percent}%`;
 	        if (ratioSummaryMain) ratioSummaryMain.textContent = `우리 아이는 오늘 주로 [${topRoi.roiName}]에서 시간을 보내고 있어요.`;
 	        if (ratioSummarySub) ratioSummarySub.textContent = `총 누적 체류 시간: ${result.totalStayTime}초`;
 
-	        // 2. 도넛 차트 및 표 렌더링 (색상 팔레트)
 	        const colors = ['#0b6b71', '#9fe3de', '#c7e8ad', '#fcd34d', '#cbd5e1'];
-	        const circumference = 219.9; // 2 * PI * r(35)
+	        const circumference = 219.9;
 	        let accumulatedPercent = 0;
 	        let svgHtml = '';
 	        let tableHtml = '';
@@ -926,7 +994,6 @@
 	          const strokeLength = (item.percent / 100) * circumference;
 	          const strokeOffset = (accumulatedPercent / 100) * circumference;
 
-	          // 도넛 차트 SVG 조각
 	          svgHtml += `
 	            <circle cx="50" cy="50" r="35"
 	                    stroke="${color}"
@@ -937,7 +1004,6 @@
 	          `;
 	          accumulatedPercent += item.percent;
 
-	          // 우측 표 행
 	          tableHtml += `
 	            <tr>
 	              <td class="color-dot-cell"><span class="color-dot" style="background-color: ${color};"></span></td>
@@ -954,9 +1020,6 @@
 	        console.error('당일 체류비율 조회 실패:', err);
 	      }
 	    }
-
-	    // 🌟 페이지 처음 로드 시에도 당일 데이터를 DB에서 바로 불러와 표시
-	    //loadTodayStayRatio();
 	  });
   </script>
 

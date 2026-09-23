@@ -564,26 +564,26 @@
         <div class="stay-ratio-container">
           <!-- 도넛 차트 -->
           <div class="donut-chart-box">
-            <svg viewBox="0 0 100 100">
-              <!-- 기타 (9%) -->
+            <svg viewBox="0 0 100 100" id="donutSvg">
+<!--               기타 (9%)
               <circle cx="50" cy="50" r="35" stroke="#e2e8f0" stroke-dasharray="219.9" stroke-dashoffset="0" />
-              <!-- 주방 (12%) -->
+              주방 (12%)
               <circle cx="50" cy="50" r="35" stroke="#c7e8ad" stroke-dasharray="219.9" stroke-dashoffset="19.8" />
-              <!-- 침실 (31%) -->
+              침실 (31%)
               <circle cx="50" cy="50" r="35" stroke="#9fe3de" stroke-dasharray="219.9" stroke-dashoffset="46.2" />
-              <!-- 거실 (48%) -->
-              <circle cx="50" cy="50" r="35" stroke="#0b6b71" stroke-dasharray="219.9" stroke-dashoffset="114.3" />
+              거실 (48%)
+              <circle cx="50" cy="50" r="35" stroke="#0b6b71" stroke-dasharray="219.9" stroke-dashoffset="114.3" /> -->
             </svg>
             <div class="donut-center-text">
-              <span class="percent">48%</span>
-              <span class="label">거실</span>
+              <span class="percent" id="topPlacePercent">-</span>
+              <span class="label" id="topPlaceName">-</span>
             </div>
           </div>
 
           <!-- 공간별 데이터 표 -->
           <table class="ratio-table">
-            <tbody>
-              <tr>
+            <tbody id="ratioTableBody">
+              <!-- <tr>
                 <td class="color-dot-cell"><span class="color-dot dot-living"></span></td>
                 <td class="place-name">거실</td>
                 <td class="place-val">48%</td>
@@ -602,7 +602,7 @@
                 <td class="color-dot-cell"><span class="color-dot dot-etc"></span></td>
                 <td class="place-name">기타</td>
                 <td class="place-val">9%</td>
-              </tr>
+              </tr> -->
             </tbody>
           </table>
         </div>
@@ -611,8 +611,8 @@
         <div class="ratio-summary-box">
           <div class="ratio-summary-icon">🐾</div>
           <div class="ratio-summary-text">
-            <p class="main-text">우리 아이는 주로 거실에서 시간을 보내고 있어요.</p>
-            <p class="sub-text">평소와 비슷한 공간 활용 패턴을 보이고 있습니다.</p>
+            <p class="main-text" id="ratioSummaryMain">오늘 분석된 체류 데이터가 없습니다.</p>
+            <p class="sub-text" id="ratioSummarySub">영상을 분석하면 실시간으로 반영됩니다.</p>
           </div>
         </div>
       </div>
@@ -713,7 +713,6 @@
 	        // [단계 2] 서버 전송용 FormData 생성
 	        const formData = new FormData();
 	        formData.append('video', selectedFile);
-	        formData.append('pet_id', 'PET-001');
 	        formData.append('species', 'DOG');
 	        formData.append('roi_data', JSON.stringify(formattedRoiData));
 
@@ -734,7 +733,7 @@
 	          throw new Error('응답 결과에 data 필드가 누락되었습니다.');
 	        }
 
-	        // [단계 4: 추가] PET_ACT_RECORD 테이블로 구역별 체류기록 JPA 저장 요청
+	        // [단계 4] PET_ACT_RECORD 테이블로 구역별 체류기록 JPA 저장 요청
 	        const spaceAnalysis = result.data.space_analysis;
 	        const totalDuration = result.data.video_info?.duration_sec || 0;
 
@@ -742,37 +741,39 @@
 	          const recordsToSave = spaceAnalysis.roi_results.map(roi => {
 	            const stayTime = Number(roi.stay_time_sec || 0);
 
-	            // STOP_RATIO(체류 비율) 계산 (소수점 4자리 유지)
 	            let ratio = 0.0;
 	            if (totalDuration > 0) {
 	              ratio = parseFloat((stayTime / totalDuration).toFixed(4));
 	            }
 
 	            return {
-	              petSeq: 1,                          // 펫 번호 (세션값에 맞게 변경 가능)
-	              userSeq: "admin",                   // 회원 식별자
-	              roiName: roi.roi_name,              // ROI명 (BED, FOOD_BOWL 등)
-	              continueTime: Math.round(stayTime), // 지속시간(초)
-	              stopRatio: ratio                    // 체류비율
+	              petSeq: 1,                          
+	              userSeq: "admin",                   
+	              roiName: roi.roi_name,              
+	              continueTime: Math.round(stayTime), 
+	              stopRatio: ratio                    
 	            };
 	          });
 
 	          console.log('[PET_ACT_RECORD 저장 요청 데이터]:', recordsToSave);
 
-	          // JPA 컨트롤러 호출 (백그라운드 전송)
-	          fetch('/api/monitoring/save-roi-records', {
+	          // 🌟 1) 저장이 완료될 때까지 기다림(await)
+	          const saveRes = await fetch('/api/monitoring/save-roi-records', {
 	            method: 'POST',
 	            headers: { 'Content-Type': 'application/json' },
 	            body: JSON.stringify(recordsToSave)
-	          })
-	          .then(res => {
-	            if (res.ok) console.log('✓ PET_ACT_RECORD DB 저장 성공');
-	            else console.error('❌ PET_ACT_RECORD DB 저장 실패');
-	          })
-	          .catch(err => console.error('DB 저장 통신 에러:', err));
+	          });
+
+	          if (saveRes.ok) {
+	            console.log('✓ PET_ACT_RECORD DB 저장 성공 -> 당일 화면 통계 갱신 시작');
+	            // 🌟 2) 저장이 끝나자마자 즉시 DB에서 당일 전체 데이터를 다시 읽어와 화면 갱신!
+	            await loadTodayStayRatio();
+	          } else {
+	            console.error('❌ PET_ACT_RECORD DB 저장 실패');
+	          }
 	        }
 
-	        // [단계 5] 화면 렌더링 데이터 매핑
+	        // [단계 5] AI 분석 카드 화면 렌더링
 	        const analysisData = {
 	          analysis_status: result.data.analysis_status,
 	          features_overall: {
@@ -811,6 +812,84 @@
 
 	      aiResultCard.style.display = 'block';
 	    }
+
+	    // 🌟 [추가된 함수] 오늘 당일의 공간별 체류 비율 DB 조회 및 렌더링 함수
+	    async function loadTodayStayRatio() {
+	      try {
+	        const res = await fetch('/api/monitoring/today-stay-ratio');
+	        if (!res.ok) return;
+
+	        const result = await res.json();
+	        const ratios = result.ratios;
+
+	        const topPlaceName = document.getElementById('topPlaceName');
+	        const topPlacePercent = document.getElementById('topPlacePercent');
+	        const ratioSummaryMain = document.getElementById('ratioSummaryMain');
+	        const ratioSummarySub = document.getElementById('ratioSummarySub');
+	        const donutSvg = document.getElementById('donutSvg');
+	        const ratioTableBody = document.getElementById('ratioTableBody');
+
+	        if (!topPlaceName || !donutSvg || !ratioTableBody) return;
+
+	        if (!ratios || ratios.length === 0) {
+	          topPlacePercent.textContent = '0%';
+	          topPlaceName.textContent = '기록 없음';
+	          if (ratioSummaryMain) ratioSummaryMain.textContent = '오늘 기록된 체류 데이터가 없습니다.';
+	          donutSvg.innerHTML = '<circle cx="50" cy="50" r="35" stroke="#e2e8f0" stroke-width="22" fill="transparent" />';
+	          ratioTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding:12px;">오늘 체류 데이터가 없습니다.</td></tr>';
+	          return;
+	        }
+
+	        // 1. 가장 많이 머문 공간 텍스트 반영
+	        const topRoi = ratios[0];
+	        topPlaceName.textContent = topRoi.roiName;
+	        topPlacePercent.textContent = `${topRoi.percent}%`;
+	        if (ratioSummaryMain) ratioSummaryMain.textContent = `우리 아이는 오늘 주로 [${topRoi.roiName}]에서 시간을 보내고 있어요.`;
+	        if (ratioSummarySub) ratioSummarySub.textContent = `총 누적 체류 시간: ${result.totalStayTime}초`;
+
+	        // 2. 도넛 차트 및 표 렌더링 (색상 팔레트)
+	        const colors = ['#0b6b71', '#9fe3de', '#c7e8ad', '#fcd34d', '#cbd5e1'];
+	        const circumference = 219.9; // 2 * PI * r(35)
+	        let accumulatedPercent = 0;
+	        let svgHtml = '';
+	        let tableHtml = '';
+
+	        ratios.forEach((item, index) => {
+	          const color = colors[index % colors.length];
+	          const strokeLength = (item.percent / 100) * circumference;
+	          const strokeOffset = (accumulatedPercent / 100) * circumference;
+
+	          // 도넛 차트 SVG 조각
+	          svgHtml += `
+	            <circle cx="50" cy="50" r="35"
+	                    stroke="${color}"
+	                    stroke-width="22"
+	                    fill="transparent"
+	                    stroke-dasharray="${strokeLength} ${circumference - strokeLength}"
+	                    stroke-dashoffset="${-strokeOffset}" />
+	          `;
+	          accumulatedPercent += item.percent;
+
+	          // 우측 표 행
+	          tableHtml += `
+	            <tr>
+	              <td class="color-dot-cell"><span class="color-dot" style="background-color: ${color};"></span></td>
+	              <td class="place-name">${item.roiName}</td>
+	              <td class="place-val">${item.percent}% <span style="font-size:12px; color:#64748b; font-weight:normal;">(${item.stayTime}초)</span></td>
+	            </tr>
+	          `;
+	        });
+
+	        donutSvg.innerHTML = svgHtml;
+	        ratioTableBody.innerHTML = tableHtml;
+
+	      } catch (err) {
+	        console.error('당일 체류비율 조회 실패:', err);
+	      }
+	    }
+
+	    // 🌟 페이지 처음 로드 시에도 당일 데이터를 DB에서 바로 불러와 표시
+	    //loadTodayStayRatio();
 	  });
   </script>
 

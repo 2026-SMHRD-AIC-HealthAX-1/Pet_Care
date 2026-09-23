@@ -103,6 +103,9 @@ public class AiApiController
             paramMap.put("analysisId", data.get("analysis_id"));
             paramMap.put("schemaVersion", data.get("schema_version"));
             paramMap.put("petId", data.get("pet_id"));
+            
+            paramMap.put("userSeq", data.get("user_seq")); // 파이썬에서 넘어온 user_seq
+            
             paramMap.put("videoId", data.get("video_id"));
             paramMap.put("cameraId", data.get("camera_id"));
             paramMap.put("species", data.get("species"));

@@ -14,6 +14,4 @@ public interface PetRepository extends JpaRepository<PetEntity, Integer> {
 	// 특정 유저(USER_SEQ)의 반려동물 목록 조회
 	@Query("SELECT p FROM PetEntity p WHERE p.user_seq = :userSeq")
     List<PetEntity> findByUser_seq(@Param("userSeq") String userSeq);
-	
-
 }

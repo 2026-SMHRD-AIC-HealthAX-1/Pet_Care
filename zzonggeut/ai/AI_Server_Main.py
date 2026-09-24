@@ -657,6 +657,23 @@ class CameraStreamTrack(
                 )
             )
 
+        self.source_fps = float(
+            self.cap.get(
+                cv2.CAP_PROP_FPS
+            )
+            or 0.0
+        )
+
+        if (
+            self.source_type == "video"
+            and self.source_fps <= 0
+        ):
+            self.source_fps = 30.0
+
+        self._source_frame_index = 0
+        self._stream_started_at = None
+        self._analysis_dropped_count = 0
+
         self.running = True
 
         self.live_session = (
@@ -684,7 +701,7 @@ class CameraStreamTrack(
 
         self._analysis_queue = (
             asyncio.Queue(
-                maxsize=30
+                maxsize=6
             )
         )
 
@@ -773,9 +790,41 @@ class CameraStreamTrack(
         self
     ):
 
+        # WebRTC 기본 VideoStreamTrack은 약 30 FPS 기준으로 동작한다.
+        # 파일 영상은 원본 FPS에 맞춰 추가 pacing하여
+        # 24 FPS 영상이 30 FPS로 빨리 재생되는 문제를 막는다.
         pts, time_base = (
             await self.next_timestamp()
         )
+
+        if (
+            self.source_type == "video"
+            and self.source_fps > 0
+        ):
+            if self._stream_started_at is None:
+                self._stream_started_at = (
+                    time.monotonic()
+                )
+
+            target_elapsed = (
+                self._source_frame_index
+                / self.source_fps
+            )
+
+            actual_elapsed = (
+                time.monotonic()
+                - self._stream_started_at
+            )
+
+            extra_delay = (
+                target_elapsed
+                - actual_elapsed
+            )
+
+            if extra_delay > 0:
+                await asyncio.sleep(
+                    extra_delay
+                )
 
         ret, frame = (
             self.cap.read()
@@ -828,31 +877,61 @@ class CameraStreamTrack(
                 >= self._next_analysis_at
             ):
 
-                timestamp_sec = (
-                    self._analysis_index
-                    / self.analysis_fps
+                if (
+                    self.source_type == "video"
+                    and self.source_fps > 0
+                ):
+                    timestamp_sec = (
+                        self._source_frame_index
+                        / self.source_fps
+                    )
+                else:
+                    timestamp_sec = (
+                        now
+                        - self._analysis_started_at
+                    )
+
+                item = (
+                    frame.copy(),
+                    timestamp_sec,
                 )
 
                 try:
-
                     self._analysis_queue.put_nowait(
-                        (
-                            frame.copy(),
-                            timestamp_sec,
-                        )
+                        item
                     )
 
                     self._analysis_index += 1
 
                 except asyncio.QueueFull:
+                    # 긴 backlog를 쌓아 오래된 프레임을 뒤늦게 분석하지 않고,
+                    # 가장 오래된 대기 프레임 1개를 버린 뒤 최신 프레임을 넣는다.
+                    # timestamp는 실제 영상 시간을 유지하므로 시간축이 압축되지 않는다.
+                    try:
+                        self._analysis_queue.get_nowait()
+                    except asyncio.QueueEmpty:
+                        pass
 
-                    print(
-                        "[LIVE 경고] "
-                        "분석 큐 한도 초과 "
-                        f"- analysis_fps="
-                        f"{self.analysis_fps} "
-                        "처리 성능 재확인 필요"
-                    )
+                    try:
+                        self._analysis_queue.put_nowait(
+                            item
+                        )
+                        self._analysis_dropped_count += 1
+                    except asyncio.QueueFull:
+                        self._analysis_dropped_count += 1
+
+                    if (
+                        self._analysis_dropped_count == 1
+                        or self._analysis_dropped_count % 10 == 0
+                    ):
+                        print(
+                            "[LIVE 경고] "
+                            "분석 처리 지연으로 오래된 샘플 프레임 교체 "
+                            f"- dropped="
+                            f"{self._analysis_dropped_count}, "
+                            f"analysis_fps="
+                            f"{self.analysis_fps}"
+                        )
 
                 while (
                     self._next_analysis_at
@@ -861,6 +940,8 @@ class CameraStreamTrack(
                     self._next_analysis_at += (
                         self._analysis_period
                     )
+
+        self._source_frame_index += 1
 
         rgb_frame = cv2.cvtColor(
             frame,
@@ -914,6 +995,19 @@ class CameraStreamTrack(
             )
 
         try:
+
+            try:
+                metrics = (
+                    self.live_session.metrics()
+                )
+                print(
+                    "[LIVE 처리 성능] "
+                    f"{metrics}, "
+                    f"dropped_samples="
+                    f"{self._analysis_dropped_count}"
+                )
+            except Exception:
+                pass
 
             result = (
                 await asyncio.to_thread(

@@ -29,7 +29,8 @@
     .video-container {
       position: relative;
       width: 100%;
-      height: 320px;
+      aspect-ratio: 16 / 9;
+      height: auto;
       background-color: #000;
       border-radius: 8px;
       overflow: hidden;
@@ -41,7 +42,8 @@
     .video-container video {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+      background-color: #000;
     }
 
     /* 🌟 분석 상태 박스 스타일 */
@@ -684,6 +686,8 @@
     let liveVideoElement = null;
     let liveAnalysisId = null;
     let liveRunning = false;
+    let liveResultWatchTimer = null;
+    let liveResultWatchInFlight = false;
 
     function stopTrackingLoop() {
       if (animationFrameId) {
@@ -1114,6 +1118,179 @@
       );
     }
 
+    function stopLiveResultWatch() {
+      if (liveResultWatchTimer) {
+        clearInterval(
+          liveResultWatchTimer
+        );
+
+        liveResultWatchTimer = null;
+      }
+
+      liveResultWatchInFlight = false;
+    }
+
+
+    async function checkLiveResultOnce(
+      targetAnalysisId
+    ) {
+      if (
+        !targetAnalysisId
+        || liveResultWatchInFlight
+      ) {
+        return false;
+      }
+
+      liveResultWatchInFlight = true;
+
+      try {
+        const response = await fetch(
+          '/api/pet/analysis/latest',
+          {
+            method: 'GET',
+            cache: 'no-store'
+          }
+        );
+
+        if (!response.ok) {
+          return false;
+        }
+
+        const latestResult =
+          await response.json();
+
+        const latestAnalysisId =
+          latestResult?.analysis_id
+          ?? latestResult?.analysisId
+          ?? '';
+
+        if (
+          !latestAnalysisId
+          || String(
+            latestAnalysisId
+          ) !== String(
+            targetAnalysisId
+          )
+        ) {
+          return false;
+        }
+
+        console.log(
+          '[LIVE 결과 자동 감지]',
+          targetAnalysisId
+        );
+
+        stopLiveResultWatch();
+
+        renderLatestAnalysisResult(
+          latestResult
+        );
+
+        await loadTodayStayRatio();
+
+        if (liveBadge) {
+          liveBadge.textContent =
+            '✓ LIVE 완료';
+
+          liveBadge.style
+            .backgroundColor =
+              '#0b8484';
+
+          liveBadge.style.color =
+            '#fff';
+        }
+
+        analysisStatusBox.style.display =
+          'block';
+
+        analysisStatusBox.className =
+          'analysis-status-box status-success';
+
+        analysisStatusText.textContent =
+          '✅ LIVE 분석 및 DB 저장 완료';
+
+        // 결과가 확인된 뒤 브라우저 측 WebRTC 자원만 정리한다.
+        // 서버 분석 종료 신호로 사용하지 않는다.
+        if (livePc) {
+          const pc = livePc;
+          livePc = null;
+
+          try {
+            pc.getReceivers()
+              .forEach((receiver) => {
+                try {
+                  receiver.track?.stop();
+                } catch (_) {}
+              });
+          } catch (_) {}
+
+          try {
+            pc.close();
+          } catch (_) {}
+        }
+
+        if (liveVideoElement) {
+          try {
+            const stream =
+              liveVideoElement.srcObject;
+
+            stream?.getTracks?.()
+              .forEach(
+                track => track.stop()
+              );
+          } catch (_) {}
+
+          liveVideoElement.srcObject =
+            null;
+        }
+
+        liveAnalysisId = null;
+        liveVideoElement = null;
+        setLiveUiState(false);
+
+        return true;
+
+      } catch (error) {
+        console.error(
+          '[LIVE 결과 자동 감시 오류]',
+          error
+        );
+
+        return false;
+
+      } finally {
+        liveResultWatchInFlight = false;
+      }
+    }
+
+
+    function startLiveResultWatch(
+      targetAnalysisId
+    ) {
+      stopLiveResultWatch();
+
+      if (!targetAnalysisId) {
+        return;
+      }
+
+      console.log(
+        '[LIVE 결과 자동 감시 시작]',
+        targetAnalysisId
+      );
+
+      // 첫 조회는 2초 뒤, 이후 2초마다 계속 확인한다.
+      // 실제 홈캠 LIVE가 오래 지속될 수 있으므로 시간 제한은 두지 않는다.
+      liveResultWatchTimer = setInterval(
+        () => {
+          checkLiveResultOnce(
+            targetAnalysisId
+          );
+        },
+        2000
+      );
+    }
+
+
     async function startLiveSession() {
       if (liveRunning) {
         return;
@@ -1222,6 +1399,7 @@
           liveVideoElement
             .play()
             .catch(() => {});
+
         };
 
         pc.onconnectionstatechange = () => {
@@ -1263,6 +1441,13 @@
             analysisStatusText.textContent =
               '❌ LIVE WebRTC 연결에 실패했습니다.';
           }
+        };
+
+        pc.oniceconnectionstatechange = () => {
+          console.log(
+            '[LIVE ICE 상태]',
+            pc.iceConnectionState
+          );
         };
 
         const offer =
@@ -1351,6 +1536,10 @@
           })
         );
 
+        startLiveResultWatch(
+          liveAnalysisId
+        );
+
         console.log(
           '[LIVE 시작 완료]',
           {
@@ -1375,6 +1564,8 @@
         await renderRoiOverlay();
 
       } catch (error) {
+        stopLiveResultWatch();
+
         console.error(
           '[LIVE 시작 오류]',
           error
@@ -1417,6 +1608,8 @@
     async function stopLiveSession(
       shouldPollResult = true
     ) {
+      stopLiveResultWatch();
+
       if (!livePc) {
         setLiveUiState(false);
         return;
@@ -1744,9 +1937,6 @@
         }
 
         const spaceAnalysis = aiData?.space_analysis;
-        const totalDuration = Number(
-          aiData?.video_info?.duration_sec || 0
-        );
 
         if (
           spaceAnalysis
@@ -1757,57 +1947,10 @@
             spaceAnalysis
           );
 
-          const recordsToSave =
-            spaceAnalysis.roi_results.map((roi) => {
-              const stayTime =
-                Number(roi.stay_time_sec || 0);
-
-              let ratio = 0.0;
-
-              if (totalDuration > 0) {
-                ratio = parseFloat(
-                  (stayTime / totalDuration).toFixed(4)
-                );
-              }
-
-              return {
-                petSeq: Number(petSelect.value),
-                roiName: roi.roi_name,
-                continueTime: Math.round(stayTime),
-                stopRatio: ratio
-              };
-            });
-
-          console.log(
-            '[PET_ACT_RECORD 저장 요청]',
-            recordsToSave
-          );
-
-          if (recordsToSave.length > 0) {
-            const saveRes = await fetch(
-              '/api/monitoring/save-roi-records',
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(recordsToSave)
-              }
-            );
-
-            if (saveRes.ok) {
-              console.log(
-                '✓ PET_ACT_RECORD 저장 성공'
-              );
-
-              await loadTodayStayRatio();
-            } else {
-              console.warn(
-                'PET_ACT_RECORD 저장 실패:',
-                saveRes.status
-              );
-            }
-          }
+          // PET_ACT_RECORD 저장은 AI → Spring 결과 수신 시
+          // 서버에서 공통 처리한다.
+          // 프론트에서는 중복 저장하지 않고 최신 체류 비율만 조회한다.
+          await loadTodayStayRatio();
         }
 
         analysisStatusText.textContent =

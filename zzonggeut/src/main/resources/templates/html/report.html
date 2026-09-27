@@ -503,226 +503,95 @@
             <!-- 리포트 상단 타이틀 영역 -->
             <div class="report-top-bar">
                 <div class="report-title-group">
-                    <h1>🐾 주간 행동 리포트</h1>
-                    <p>우리 아이의 일상 행동을 쫑긋 AI가 따뜻하게 분석해 드려요.</p>
+                    <h1>🐾 최근 행동 분석 리포트</h1>
+                    <p>최근 AI 분석 결과를 보호자가 이해하기 쉽게 정리했어요.</p>
                 </div>
-                <div class="date-badge">
-                    📅 2026.08.26 ~ 2026.09.01
-                </div>
+                <div class="date-badge" id="reportDate">📅 최근 분석 불러오는 중</div>
             </div>
 
             <!-- 프로필 & 메인 소견 카드 -->
             <div class="profile-summary-card">
                 <div class="pet-profile-box">
-                    <div class="pet-avatar">
-                        🐶
-                    </div>
+                    <div class="pet-avatar" id="reportPetAvatar">🐾</div>
                     <div class="pet-info">
                         <div class="pet-name-tag">
-                            <span class="pet-name">우리 강아지</span>
-                            <span class="breed-badge">푸들</span>
+                            <span class="pet-name" id="reportPetName">반려동물 분석</span>
+                            <span class="breed-badge" id="reportSpecies">-</span>
                         </div>
                         <div class="meta-text">
-                            <strong>나이:</strong> 3살<br>
-                            <strong>발행일:</strong> 2026.09.02
+                            <strong>분석 ID:</strong> <span id="reportAnalysisId">-</span><br>
+                            <strong>분석 상태:</strong> <span id="reportAnalysisStatus">불러오는 중</span>
                         </div>
                     </div>
                 </div>
-
                 <div class="summary-main-msg">
-                    <div class="msg-header">
-                        ☀️ 오늘은 평소와 비슷한 행동을 보였어요!
-                    </div>
-                    <div class="msg-content">
-                        분석 기간 동안 거실을 주요 활동 공간으로 사용했어요. 전체 주간 활동량은 평소 대비 <strong>-12% 소폭 감소</strong>했으며, 9월 1일 14:20경 일시적 활동 감소가 관찰되었습니다. 아이의 컨디션을 따뜻한 눈길로 살짝 지켜봐 주세요! 💚
-                    </div>
+                    <div class="msg-header" id="reportSummaryTitle">🔎 최근 행동 데이터를 확인하고 있어요</div>
+                    <div class="msg-content" id="reportSummaryText">최신 AI 분석 결과를 불러오는 중입니다.</div>
                 </div>
             </div>
 
-            <!-- 1. 주간 주요 요약 (파스텔 미니 카드) -->
+<!-- 1. 최근 분석 상태 요약 -->
             <div class="report-card">
-                <div class="card-header-cute">
-                    📊 평소와 비교한 주간의 변화
-                </div>
+                <div class="card-header-cute">📊 최근 분석 한눈에 보기</div>
                 <div class="summary-grid">
                     <div class="mini-card bg-mint">
-                        <div class="icon">📹</div>
-                        <div class="label">카메라 상태</div>
-                        <div class="value" style="color: #0b8484;">연결됨</div>
-                        <div class="subtext">거실 카메라 (HD)</div>
+                        <div class="icon">✅</div><div class="label">최근 분석</div>
+                        <div class="value" id="summaryAnalysis" style="color:#0b8484;">-</div>
+                        <div class="subtext" id="summaryAnalysisSub">결과 확인 중</div>
                     </div>
-
                     <div class="mini-card bg-rose">
-                        <div class="icon">🔔</div>
-                        <div class="label">변화 감지 (7일)</div>
-                        <div class="value" style="color: #e11d48;">3 건</div>
-                        <div class="subtext">최근: 09/01 12:40</div>
+                        <div class="icon">🧠</div><div class="label">기준 패턴</div>
+                        <div class="value" id="summaryBaseline" style="color:#e11d48;">-</div>
+                        <div class="subtext" id="summaryBaselineSub">상태 확인 중</div>
                     </div>
-
                     <div class="mini-card bg-amber">
-                        <div class="icon">🏃</div>
-                        <div class="label">활동량 (평소 대비)</div>
-                        <div class="value" style="color: #d97706;">-12%</div>
-                        <div class="chip-badge" style="color: #d97706;">소폭 감소</div>
+                        <div class="icon">🔔</div><div class="label">변화 평가</div>
+                        <div class="value" id="summaryChange" style="color:#d97706;">-</div>
+                        <div class="subtext" id="summaryChangeSub">상태 확인 중</div>
                     </div>
-
                     <div class="mini-card bg-blue">
-                        <div class="icon">🏠</div>
-                        <div class="label">주요 체류 장소</div>
-                        <div class="value" style="color: #0284c7;">거실 48%</div>
-                        <div class="subtext">침실 31% · 기타 21%</div>
+                        <div class="icon">🏠</div><div class="label">오늘 주요 체류 공간</div>
+                        <div class="value" id="summaryTopRoi" style="color:#0284c7;">-</div>
+                        <div class="subtext" id="summaryTopRoiSub">ROI 데이터 확인 중</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. 🌟 [교체 영역] 오늘의 행동 지표 & 공간별 활동(ROI) -->
+<!-- 2. 실제 행동 지표 & 공간별 활동(ROI) -->
             <div class="behavior-roi-section">
-                <!-- 오늘의 행동 지표 -->
                 <div class="report-card">
-                    <div class="card-title-group">
-                        <span>📊 오늘의 행동 지표</span>
-                        <span class="info-circle" title="오늘 아이의 행동을 종합 분석한 수치입니다.">?</span>
-                    </div>
+                    <div class="card-title-group"><span>📊 최근 행동 지표</span><span class="info-circle" title="최근 AI 분석에서 계산된 실제 행동 지표입니다.">?</span></div>
                     <div class="behavior-cards-grid">
-                        <!-- 활동량 -->
-                        <div class="cute-metric-card bg-blue">
-                            <div class="icon-img">🐕</div>
-                            <div class="metric-title">활동량</div>
-                            <div class="metric-value">0.052</div>
-                            <div class="status-pill">평소와 비슷</div>
-                            <div class="metric-desc">평소와 유사한 활동량을 보였어요.</div>
-                        </div>
-
-                        <!-- 정지 비율 -->
-                        <div class="cute-metric-card bg-pink">
-                            <div class="icon-img">🐶</div>
-                            <div class="metric-title">정지 비율</div>
-                            <div class="metric-value">61%</div>
-                            <div class="status-pill">평소와 비슷</div>
-                            <div class="metric-desc">가만히 있는 시간이 적절한 편이에요.</div>
-                        </div>
-
-                        <!-- 이동 거리 -->
-                        <div class="cute-metric-card bg-green">
-                            <div class="icon-img">📍</div>
-                            <div class="metric-title">이동 거리</div>
-                            <div class="metric-value">0.51</div>
-                            <div class="status-pill">평소와 비슷</div>
-                            <div class="metric-desc">평소와 유사한 거리를 이동했어요.</div>
-                        </div>
-
-                        <!-- 이동 속도 -->
-                        <div class="cute-metric-card bg-yellow">
-                            <div class="icon-img">🧭</div>
-                            <div class="metric-title">이동 속도</div>
-                            <div class="metric-value">0.057</div>
-                            <div class="status-pill">평소와 비슷</div>
-                            <div class="metric-desc">평소와 비슷한 속도로 움직였어요.</div>
-                        </div>
+                        <div class="cute-metric-card bg-blue"><div class="icon-img">🐕</div><div class="metric-title">활동량</div><div class="metric-value" id="reportActivity">-</div><div class="status-pill">최근 분석값</div><div class="metric-desc">영상에서 계산한 움직임 정도예요.</div></div>
+                        <div class="cute-metric-card bg-pink"><div class="icon-img">🐶</div><div class="metric-title">정지 비율</div><div class="metric-value" id="reportStationary">-</div><div class="status-pill">최근 분석값</div><div class="metric-desc">분석 시간 중 머물러 있던 비율이에요.</div></div>
+                        <div class="cute-metric-card bg-green"><div class="icon-img">📍</div><div class="metric-title">이동 거리</div><div class="metric-value" id="reportDistance">-</div><div class="status-pill">최근 분석값</div><div class="metric-desc">영상 크기를 기준으로 정규화한 이동량이에요.</div></div>
+                        <div class="cute-metric-card bg-yellow"><div class="icon-img">🧭</div><div class="metric-title">이동 속도</div><div class="metric-value" id="reportSpeed">-</div><div class="status-pill">최근 분석값</div><div class="metric-desc">이동 중 계산된 정규화 속도예요.</div></div>
                     </div>
                 </div>
-
-                <!-- 공간별 활동 (ROI) -->
                 <div class="report-card">
-                    <div class="card-title-group">
-                        <span>📍 공간별 활동 (ROI)</span>
-                        <span class="beta-badge">베타</span>
+                    <div class="card-title-group"><span>📍 오늘의 공간별 체류 (ROI)</span><span class="beta-badge">실데이터</span></div>
+                    <div class="roi-list" id="reportRoiList">
+                        <div class="roi-item"><div class="roi-info-group"><div class="roi-icon-box">⏳</div><div class="roi-name">ROI 데이터 불러오는 중</div></div></div>
                     </div>
-                    <div class="roi-list">
-                        <!-- 밥그릇 주변 -->
-                        <div class="roi-item">
-                            <div class="roi-info-group">
-                                <div class="roi-icon-box">🥣</div>
-                                <div class="roi-name">밥그릇 주변</div>
-                            </div>
-                            <div class="roi-data">
-                                3회 접근<br>
-                                2분 14초 체류
-                            </div>
-                        </div>
-
-                        <!-- 물그릇 주변 -->
-                        <div class="roi-item">
-                            <div class="roi-info-group">
-                                <div class="roi-icon-box">💧</div>
-                                <div class="roi-name">물그릇 주변</div>
-                            </div>
-                            <div class="roi-data">
-                                2회 접근<br>
-                                48초 체류
-                            </div>
-                        </div>
-
-                        <!-- 침대 -->
-                        <div class="roi-item">
-                            <div class="roi-info-group">
-                                <div class="roi-icon-box">🛏️</div>
-                                <div class="roi-name">침대</div>
-                            </div>
-                            <div class="roi-data">
-                                18분 체류
-                            </div>
-                        </div>
-                    </div>
-                    <div class="roi-footer-desc">
-                        <span>ℹ️</span> 공간별 활동은 설정한 영역(ROI)을 기준으로 분석한 결과예요.
-                    </div>
+                    <div class="roi-footer-desc"><span>ℹ️</span> 오늘 저장된 ROI 체류 기록을 기준으로 보여드려요.</div>
                 </div>
             </div>
 
-            <!-- 3. 변화 감지 이력 & 행동 기록 -->
+<!-- 3. 최근 변화 평가 -->
             <div class="report-card">
-                <div class="card-header-cute">
-                    🚨 감지된 변화 이력 (최근 7일)
-                </div>
-                <table class="report-table">
-                    <thead>
-                        <tr>
-                            <th>발생 일시</th>
-                            <th>변화 내용</th>
-                            <th>평소 대비</th>
-                            <th>상태</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>09/01 14:20</td>
-                            <td>활동량 감소</td>
-                            <td style="color: #e11d48; font-weight: 700;">-30%</td>
-                            <td><span class="tag-pill tag-done">확인 완료</span></td>
-                        </tr>
-                        <tr>
-                            <td>08/30 11:05</td>
-                            <td>활동량 증가</td>
-                            <td style="color: #0284c7; font-weight: 700;">+25%</td>
-                            <td><span class="tag-pill tag-done">확인 완료</span></td>
-                        </tr>
-                        <tr>
-                            <td>08/28 18:40</td>
-                            <td>체류시간 증가</td>
-                            <td style="color: #0284c7; font-weight: 700;">+35%</td>
-                            <td><span class="tag-pill tag-done">확인 완료</span></td>
-                        </tr>
-                    </tbody>
+                <div class="card-header-cute">🚨 최근 변화 평가</div>
+                <table class="report-table"><thead><tr><th>분석 일시</th><th>기준 패턴</th><th>변화 평가</th><th>상태</th></tr></thead>
+                    <tbody id="reportChangeTableBody"><tr><td colspan="4">최근 분석 상태를 불러오는 중입니다.</td></tr></tbody>
                 </table>
             </div>
 
-            <!-- 4. 보호자 권장 가이드 -->
+<!-- 4. 보호자 안내 -->
             <div class="report-card">
-                <div class="card-header-cute">
-                    💡 보호자를 위한 케어 가이드
-                </div>
-                <div class="guide-cards">
-                    <div class="guide-card-item">
-                        <strong>오후 시간대 컨디션 체크:</strong> 9월 1일 오후(14:20 경) 활동량이 감소했던 기록이 감지되었어요. 일시적인 휴식인지 컨디션 변화인지 따뜻하게 관찰해 주세요.
-                    </div>
-                    <div class="guide-card-item">
-                        <strong>새벽 수면 환경 점검:</strong> 새벽 시간대 활동 비율이 30%로 다소 높아요. 실내 온도나 소음 등 수면 환경을 점검해 주시면 더 푹 잘 수 있을 거예요.
-                    </div>
-                </div>
+                <div class="card-header-cute">💡 보호자를 위한 안내</div>
+                <div class="guide-cards" id="reportGuideCards"><div class="guide-card-item">최신 분석 상태를 확인하고 있어요.</div></div>
             </div>
 
-            <!-- 푸터 영역 -->
+<!-- 푸터 영역 -->
             <footer class="report-footer">
                 <div>발행기관: 쫑긋 AI 펫케어 센터</div>
                 <div>© 2026 쫑긋. All rights reserved.</div>
@@ -738,6 +607,168 @@
             <p>© 2026 쫑긋. All rights reserved.</p>
         </div>
     </footer>
+
+\n
+
+    <script>
+    (() => {
+      const $ = (id) => document.getElementById(id);
+      const pick = (obj, ...keys) => {
+        if (!obj) return null;
+        for (const key of keys) {
+          if (obj[key] !== undefined && obj[key] !== null) return obj[key];
+        }
+        return null;
+      };
+      const num = (v) => {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : null;
+      };
+      const fmt3 = (v) => {
+        const n = num(v);
+        return n === null ? '-' : n.toFixed(3);
+      };
+      const pct01 = (v) => {
+        const n = num(v);
+        return n === null ? '-' : (n * 100).toFixed(1) + '%';
+      };
+      const fmtDateTime = (v) => {
+        if (!v) return '-';
+        const d = new Date(v);
+        if (Number.isNaN(d.getTime())) return String(v);
+        return new Intl.DateTimeFormat('ko-KR', {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit'
+        }).format(d);
+      };
+      const fmtSeconds = (v) => {
+        const s = Math.max(0, Math.round(Number(v) || 0));
+        const m = Math.floor(s / 60);
+        const r = s % 60;
+        return m > 0 ? `${m}\uBD84 ${r}\uCD08` : `${r}\uCD08`;
+      };
+      const analysisText = (status) => {
+        const s = String(status || '').toUpperCase();
+        if (s === 'COMPLETED' || s === 'COMPLETED_WITH_WARNING') return '\uBD84\uC11D \uC644\uB8CC';
+        if (s === 'FAILED') return '\uBD84\uC11D \uC2E4\uD328';
+        return status || '\uB370\uC774\uD130 \uC5C6\uC74C';
+      };
+      const baselineText = (status) => {
+        const s = String(status || '').toUpperCase();
+        if (s === 'NOT_READY') return '\uD559\uC2B5 \uC911';
+        if (s === 'READY') return '\uC900\uBE44 \uC644\uB8CC';
+        return status || '\uD655\uC778 \uC911';
+      };
+      const changeText = (status) => {
+        const s = String(status || '').toUpperCase();
+        if (s === 'NOT_EVALUATED') return '\uD3C9\uAC00 \uB300\uAE30';
+        if (s === 'NO_CHANGE' || s === 'NORMAL') return '\uD070 \uBCC0\uD654 \uC5C6\uC74C';
+        if (s === 'CHANGED' || s === 'CHANGE_DETECTED') return '\uBCC0\uD654 \uAC10\uC9C0';
+        return status || '\uD655\uC778 \uC911';
+      };
+      const roiLabel = (name) => ({
+        FOOD_BOWL: '\uBC25\uADF8\uB987',
+        WATER_BOWL: '\uBB3C\uADF8\uB987',
+        BED: '\uCE68\uB300',
+        ETC: '\uAE30\uD0C0 \uACF5\uAC04'
+      })[name] || name || 'ROI';
+      const roiIcon = (name) => ({
+        FOOD_BOWL: '\uD83E\uDD63',
+        WATER_BOWL: '\uD83D\uDCA7',
+        BED: '\uD83D\uDECF\uFE0F',
+        ETC: '\uD83D\uDCCD'
+      })[name] || '\uD83D\uDCCD';
+
+      async function loadLatest() {
+        try {
+          const r = await fetch('/api/pet/analysis/latest', {headers:{Accept:'application/json'}});
+          if (r.status === 204) throw new Error('no latest analysis');
+          if (!r.ok) throw new Error('latest ' + r.status);
+          const d = await r.json();
+
+          const analysisStatus = pick(d,'analysis_status','analysisStatus','ANALYSIS_STATUS');
+          const baselineStatus = pick(d,'baseline_status','baselineStatus','BASELINE_STATUS');
+          const changeStatus = pick(d,'change_status','changeStatus','CHANGE_STATUS');
+          const recordedAt = pick(d,'recorded_at','recordedAt','RECORDED_AT');
+          const analysisId = pick(d,'analysis_id','analysisId','ANALYSIS_ID');
+          const petId = pick(d,'pet_id','petId','PET_ID');
+          const species = String(pick(d,'species','SPECIES') || '').toUpperCase();
+          const activity = pick(d,'activity_level','activityLevel','ACTIVITY_LEVEL');
+          const stationary = pick(d,'stationary_ratio','stationaryRatio','STATIONARY_RATIO');
+          const distance = pick(d,'normalized_travel_distance','normalizedTravelDistance','NORMALIZED_TRAVEL_DISTANCE');
+          const speed = pick(d,'normalized_moving_speed','normalizedMovingSpeed','NORMALIZED_MOVING_SPEED');
+
+          $('reportDate').textContent = '\uD83D\uDCC5 ' + fmtDateTime(recordedAt);
+          $('reportPetAvatar').textContent = species === 'CAT' ? '\uD83D\uDC31' : species === 'DOG' ? '\uD83D\uDC36' : '\uD83D\uDC3E';
+          $('reportPetName').textContent = petId ? `\uBC18\uB824\uB3D9\uBB3C #${petId}` : '\uBC18\uB824\uB3D9\uBB3C \uBD84\uC11D';
+          $('reportSpecies').textContent = species || '-';
+          $('reportAnalysisId').textContent = analysisId || '-';
+          $('reportAnalysisStatus').textContent = analysisText(analysisStatus);
+          $('reportActivity').textContent = fmt3(activity);
+          $('reportStationary').textContent = pct01(stationary);
+          $('reportDistance').textContent = fmt3(distance);
+          $('reportSpeed').textContent = fmt3(speed);
+          $('summaryAnalysis').textContent = analysisText(analysisStatus);
+          $('summaryAnalysisSub').textContent = recordedAt ? fmtDateTime(recordedAt) : '\uCD5C\uADFC \uBD84\uC11D \uACB0\uACFC';
+          $('summaryBaseline').textContent = baselineText(baselineStatus);
+          $('summaryBaselineSub').textContent = String(baselineStatus||'').toUpperCase()==='NOT_READY' ? '\uD589\uB3D9 \uB370\uC774\uD130 \uB204\uC801 \uC911' : '\uD3C9\uC18C \uD328\uD134 \uBE44\uAD50 \uAC00\uB2A5';
+          $('summaryChange').textContent = changeText(changeStatus);
+          $('summaryChangeSub').textContent = String(changeStatus||'').toUpperCase()==='NOT_EVALUATED' ? '\uAE30\uC900 \uD328\uD134 \uC900\uBE44 \uD6C4 \uD3C9\uAC00' : '\uCD5C\uADFC \uBD84\uC11D \uAE30\uC900';
+
+          if (String(baselineStatus||'').toUpperCase()==='NOT_READY') {
+            $('reportSummaryTitle').textContent='\uD83E\uDDE0 \uC9C0\uAE08\uC740 \uD3C9\uC18C \uD589\uB3D9 \uD328\uD134\uC744 \uD559\uC2B5\uD558\uACE0 \uC788\uC5B4\uC694';
+            $('reportSummaryText').innerHTML=`\uCD5C\uADFC \uBD84\uC11D\uC740 \uC815\uC0C1\uC801\uC73C\uB85C \uC644\uB8CC\uB410\uC5B4\uC694. \uC774\uBC88 \uC601\uC0C1\uC5D0\uC11C \uD65C\uB3D9\uB7C9 <strong>${fmt3(activity)}</strong>, \uC815\uC9C0 \uBE44\uC728 <strong>${pct01(stationary)}</strong>\uAC00 \uAE30\uB85D\uB410\uC2B5\uB2C8\uB2E4. \uD589\uB3D9 \uB370\uC774\uD130\uAC00 \uCD94\uAC00\uB85C \uC313\uC774\uBA74 \uD3C9\uC18C\uC640 \uB2E4\uB978 \uBCC0\uD654\uB97C \uD568\uAED8 \uC54C\uB824\uB4DC\uB9B4\uAC8C\uC694.`;
+          } else {
+            $('reportSummaryTitle').textContent='\uD83D\uDD0E \uCD5C\uADFC \uD589\uB3D9 \uBD84\uC11D\uC774 \uC644\uB8CC\uB410\uC5B4\uC694';
+            $('reportSummaryText').innerHTML=`\uCD5C\uADFC \uBD84\uC11D \uACB0\uACFC\uB97C \uAE30\uC900 \uD328\uD134\uACFC \uBE44\uAD50\uD55C \uC0C1\uD0DC\uB294 <strong>${changeText(changeStatus)}</strong>\uC785\uB2C8\uB2E4.`;
+          }
+
+          $('reportChangeTableBody').innerHTML=`<tr><td>${fmtDateTime(recordedAt)}</td><td>${baselineText(baselineStatus)}</td><td>${changeText(changeStatus)}</td><td><span class="tag-pill tag-done">${analysisText(analysisStatus)}</span></td></tr>`;
+
+          if (String(baselineStatus||'').toUpperCase()==='NOT_READY') {
+            $('reportGuideCards').innerHTML='<div class="guide-card-item"><strong>\uAE30\uC900 \uD328\uD134 \uD559\uC2B5 \uC911:</strong> \uD604\uC7AC\uB294 \uBC18\uB824\uB3D9\uBB3C\uC758 \uD3C9\uC18C \uD589\uB3D9\uC744 \uC54C\uC544\uAC00\uAE30 \uC704\uD55C \uB370\uC774\uD130\uB97C \uB204\uC801\uD558\uACE0 \uC788\uC5B4\uC694.</div><div class="guide-card-item"><strong>\uBD84\uC11D \uACB0\uACFC \uD65C\uC6A9:</strong> \uCAD1\uAE0B\uC740 \uAC74\uAC15 \uC0C1\uD0DC\uB97C \uC9C4\uB2E8\uD558\uB294 \uC11C\uBE44\uC2A4\uAC00 \uC544\uB2C8\uB77C, \uD3C9\uC18C\uC640 \uB2E4\uB978 \uD589\uB3D9 \uBCC0\uD654\uB97C \uC54C\uC544\uCC28\uB9AC\uB294 \uB370 \uB3C4\uC6C0\uC744 \uC8FC\uAE30 \uC704\uD55C \uC11C\uBE44\uC2A4\uC608\uC694.</div>';
+          } else {
+            $('reportGuideCards').innerHTML=`<div class="guide-card-item"><strong>\uCD5C\uADFC \uBCC0\uD654 \uD3C9\uAC00:</strong> \uD604\uC7AC \uC0C1\uD0DC\uB294 <strong>${changeText(changeStatus)}</strong>\uC785\uB2C8\uB2E4.</div><div class="guide-card-item"><strong>\uBD84\uC11D \uACB0\uACFC \uD65C\uC6A9:</strong> \uD589\uB3D9 \uBD84\uC11D \uACB0\uACFC\uB294 \uBCF4\uD638\uC790\uC758 \uAD00\uCC30\uC744 \uB3D5\uAE30 \uC704\uD55C \uC815\uBCF4\uC785\uB2C8\uB2E4.</div>`;
+          }
+        } catch (e) {
+          console.error('[REPORT] latest analysis load failed',e);
+          $('reportSummaryTitle').textContent='\uD83D\uDCEC \uC544\uC9C1 \uD45C\uC2DC\uD560 \uBD84\uC11D \uACB0\uACFC\uAC00 \uC5C6\uC5B4\uC694';
+          $('reportSummaryText').textContent='\uB300\uC2DC\uBCF4\uB4DC\uC5D0\uC11C \uC601\uC0C1\uC744 \uBD84\uC11D\uD558\uBA74 \uCD5C\uADFC \uACB0\uACFC\uAC00 \uC774 \uB9AC\uD3EC\uD2B8\uC5D0 \uD45C\uC2DC\uB429\uB2C8\uB2E4.';
+          $('reportAnalysisStatus').textContent='\uB370\uC774\uD130 \uC5C6\uC74C';
+          $('summaryAnalysis').textContent='\uB370\uC774\uD130 \uC5C6\uC74C';
+          $('summaryBaseline').textContent='-';
+          $('summaryChange').textContent='-';
+          $('reportChangeTableBody').innerHTML='<tr><td colspan="4">\uC544\uC9C1 \uC800\uC7A5\uB41C \uBD84\uC11D \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.</td></tr>';
+        }
+      }
+
+      async function loadRoi() {
+        try {
+          const r=await fetch('/api/monitoring/today-stay-ratio',{headers:{Accept:'application/json'}});
+          if(!r.ok) throw new Error('roi '+r.status);
+          const d=await r.json();
+          const rs=Array.isArray(d.ratios)?d.ratios:[];
+          if(!rs.length){
+            $('summaryTopRoi').textContent='\uB370\uC774\uD130 \uC5C6\uC74C';
+            $('summaryTopRoiSub').textContent='\uC624\uB298 \uC800\uC7A5\uB41C ROI \uCCB4\uB958 \uAE30\uB85D \uC5C6\uC74C';
+            $('reportRoiList').innerHTML='<div class="roi-item"><div class="roi-info-group"><div class="roi-icon-box">\uD83D\uDCEC</div><div class="roi-name">\uC624\uB298 \uC800\uC7A5\uB41C \uACF5\uAC04 \uCCB4\uB958 \uB370\uC774\uD130\uAC00 \uC5C6\uC5B4\uC694</div></div></div>';
+            return;
+          }
+          const top=rs[0];
+          $('summaryTopRoi').textContent=`${roiLabel(top.roiName)} ${Number(top.percent||0)}%`;
+          $('summaryTopRoiSub').textContent=`${fmtSeconds(top.stayTime)} \uCCB4\uB958`;
+          $('reportRoiList').innerHTML=rs.slice(0,4).map(x=>`<div class="roi-item"><div class="roi-info-group"><div class="roi-icon-box">${roiIcon(x.roiName)}</div><div class="roi-name">${roiLabel(x.roiName)}</div></div><div class="roi-data">${fmtSeconds(x.stayTime)} \uCCB4\uB958<br>\uC624\uB298 \uCCB4\uB958\uC758 ${Number(x.percent||0)}%</div></div>`).join('');
+        } catch(e){
+          console.error('[REPORT] roi summary load failed',e);
+          $('summaryTopRoi').textContent='\uC870\uD68C \uC2E4\uD328';
+          $('summaryTopRoiSub').textContent='ROI \uB370\uC774\uD130\uB97C \uD655\uC778\uD574 \uC8FC\uC138\uC694';
+          $('reportRoiList').innerHTML='<div class="roi-item"><div class="roi-info-group"><div class="roi-icon-box">\u26A0\uFE0F</div><div class="roi-name">ROI \uB370\uC774\uD130\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC5B4\uC694</div></div></div>';
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded',()=>{ loadLatest(); loadRoi(); });
+    })();
+    </script>
 
 </body>
 

@@ -203,10 +203,21 @@
       display: inline-block;
     }
 
-    .dot-living { background-color: #0b6b71; }
-    .dot-bed { background-color: #9fe3de; }
-    .dot-kitchen { background-color: #c7e8ad; }
-    .dot-etc { background-color: #e2e8f0; }
+    .dot-living {
+      background-color: #0b6b71;
+    }
+
+    .dot-bed {
+      background-color: #9fe3de;
+    }
+
+    .dot-kitchen {
+      background-color: #c7e8ad;
+    }
+
+    .dot-etc {
+      background-color: #e2e8f0;
+    }
 
     .place-name {
       font-weight: 700;
@@ -320,32 +331,31 @@
       border: 1px solid #bbf7d0;
     }
 
-	.roi-overlay-box {
-	  position: absolute;
-	  border: 2px solid #2dd4bf;              /* 청록색 테두리 */
-	  background-color: rgba(45, 212, 191, 0.15); /* 살짝 투명한 배경 */
-	  box-sizing: border-box;
-	  pointer-events: none;                  /* 비디오 컨트롤바 조작 방해 금지 */
-	  z-index: 10;
-	}
+    .roi-overlay-box {
+      position: absolute;
+      border: 2px solid #2dd4bf;
+      background-color: rgba(45, 212, 191, 0.15);
+      box-sizing: border-box;
+      pointer-events: none;
+      z-index: 10;
+    }
 
-	.roi-overlay-label {
-	  position: absolute;
-	  top: 2px;
-	  left: 4px;
-	  font-size: 11px;
-	  font-weight: bold;
-	  color: #2dd4bf;
-	  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-	  white-space: nowrap;
-	}
-
-
+    .roi-overlay-label {
+      position: absolute;
+      top: 2px;
+      left: 4px;
+      font-size: 11px;
+      font-weight: bold;
+      color: #2dd4bf;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      white-space: nowrap;
+    }
 
     /* =========================================================
        최종 UX/UI 정리: 사용자 편의성 · 정보 우선순위 · 시연 적합성
        기존 기능/ID/JS 계약은 유지하고 화면 표현만 정리한다.
        ========================================================= */
+
     .dashboard-intro {
       display: flex;
       align-items: flex-end;
@@ -2322,7 +2332,6 @@
     line-height: 1.55;
   }
 
-
   /* CONTROL */
   .zz-control {
     padding: 24px;
@@ -2597,7 +2606,6 @@
   .analysis-status-box {
     margin-top: 14px;
   }
-
 
   /* RESULTS */
   .zz-results {
@@ -3297,7 +3305,7 @@
     </div>
     <nav class="nav-links">
       <a th:href="@{/dashboard}" class="active">대시보드</a>
-      <a th:href="@{/report}">리포트</a>
+      <a th:href="@{/report}" id="reportNavLink">리포트</a>
     </nav>
 
     <div class="nav-utils" style="display: flex; align-items: center; gap: 12px;">
@@ -3307,303 +3315,342 @@
     </div>
   </header>
 
+  <main class="dashboard-container pet-home-dashboard zz-home zz-relaxed">
 
+    <!-- 1. 오늘 요약 -->
+    <section class="zz-relaxed-hero">
+      <div class="zz-relaxed-intro">
+        <div class="zz-relaxed-title-row">
+          <div>
+            <span class="zz-kicker">오늘의 쫑긋</span>
+            <p class="zz-relaxed-overline">우리 아이의 하루를 편하게 확인해보세요.</p>
+            <h1><span id="selectedPetHeroName">반려동물</span>의 오늘</h1>
+          </div>
 
+          <span class="zz-learning-pill" id="heroStatusBadge">
+            평소 패턴 학습 중
+          </span>
+        </div>
 
+        <p class="zz-relaxed-copy" id="heroMainMessage">
+          지금은 행동 데이터를 모아 평소 패턴을 만드는 단계예요.
+          충분한 데이터가 쌓이면 평소와 다른 변화를 자동으로 알려드립니다.
+        </p>
 
-<main class="dashboard-container pet-home-dashboard zz-home zz-relaxed">
+        <div class="zz-relaxed-actions">
+          <button class="zz-primary-action" id="heroLiveBtn" type="button">
+            LIVE 확인
+          </button>
+          <button class="zz-secondary-action" id="heroUploadBtn" type="button">
+            저장 영상 분석
+          </button>
+        </div>
+      </div>
 
-  <!-- 1. 오늘 요약 -->
-  <section class="zz-relaxed-hero">
-    <div class="zz-relaxed-intro">
-      <div class="zz-relaxed-title-row">
+      <aside class="zz-hero-insight" aria-label="오늘의 핵심 한마디">
+        <span class="zz-hero-insight-kicker">오늘 가장 오래 머문 곳</span>
+        <strong id="heroTopSpaceName">분석 전</strong>
+        <span class="zz-hero-insight-percent" id="heroTopSpacePercent">-</span>
+
+        <div class="zz-hero-insight-divider"></div>
+
+        <span class="zz-hero-insight-kicker">오늘의 한마디</span>
+        <p id="heroDailyComment">
+          영상을 분석하면 오늘의 공간 이용을 한 문장으로 알려드려요.
+        </p>
+      </aside>
+
+      <div class="zz-relaxed-summary">
+        <div class="zz-summary-chip">
+          <span>현재 상태</span>
+          <strong id="summaryMonitoringValue">대기중</strong>
+        </div>
+
+        <div class="zz-summary-chip">
+          <span>행동 변화</span>
+          <strong id="summaryChangeValue">학습 중</strong>
+        </div>
+
+        <div class="zz-summary-chip">
+          <span>주요 공간</span>
+          <strong id="summarySpaceValue">분석 전</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 오늘 결과를 먼저 -->
+    <section class="zz-relaxed-results">
+      <div class="zz-relaxed-section-head">
         <div>
-          <span class="zz-kicker">오늘의 쫑긋</span>
-          <p class="zz-relaxed-overline">우리 아이의 하루를 편하게 확인해보세요.</p>
-          <h1><span id="selectedPetHeroName">반려동물</span>의 오늘</h1>
+          <span class="zz-kicker">오늘 결과</span>
+          <h2>오늘의 기록을 한눈에</h2>
         </div>
 
-        <span class="zz-learning-pill" id="heroStatusBadge">
-          평소 패턴 학습 중
-        </span>
+        <p>공간 이용과 변화 기록을 먼저 확인하고, 필요할 때 영상을 열어보세요.</p>
       </div>
 
-      <p class="zz-relaxed-copy" id="heroMainMessage">
-        지금은 행동 데이터를 모아 평소 패턴을 만드는 단계예요.
-        충분한 데이터가 쌓이면 평소와 다른 변화를 자동으로 알려드립니다.
-      </p>
-
-      <div class="zz-relaxed-actions">
-        <button class="zz-primary-action" id="heroLiveBtn" type="button">
-          LIVE 확인
-        </button>
-        <button class="zz-secondary-action" id="heroUploadBtn" type="button">
-          저장 영상 분석
-        </button>
-      </div>
-    </div>
-
-    <aside class="zz-hero-insight" aria-label="오늘의 핵심 한마디">
-      <span class="zz-hero-insight-kicker">오늘 가장 오래 머문 곳</span>
-      <strong id="heroTopSpaceName">분석 전</strong>
-      <span class="zz-hero-insight-percent" id="heroTopSpacePercent">-</span>
-
-      <div class="zz-hero-insight-divider"></div>
-
-      <span class="zz-hero-insight-kicker">오늘의 한마디</span>
-      <p id="heroDailyComment">
-        영상을 분석하면 오늘의 공간 이용을 한 문장으로 알려드려요.
-      </p>
-    </aside>
-
-    <div class="zz-relaxed-summary">
-      <div class="zz-summary-chip">
-        <span>현재 상태</span>
-        <strong id="summaryMonitoringValue">대기중</strong>
-      </div>
-      <div class="zz-summary-chip">
-        <span>행동 변화</span>
-        <strong id="summaryChangeValue">학습 중</strong>
-      </div>
-      <div class="zz-summary-chip">
-        <span>주요 공간</span>
-        <strong id="summarySpaceValue">분석 전</strong>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- 2. 오늘 결과를 먼저 -->
-  <section class="zz-relaxed-results">
-    <div class="zz-relaxed-section-head">
-      <div>
-        <span class="zz-kicker">오늘 결과</span>
-        <h2>오늘의 기록을 한눈에</h2>
-      </div>
-      <p>공간 이용과 변화 기록을 먼저 확인하고, 필요할 때 영상을 열어보세요.</p>
-    </div>
-
-    <div class="zz-relaxed-result-grid">
-      <div class="zz-relaxed-card zz-space-card primary-result-card is-empty" id="spaceUsageCard">
-        <div class="zz-relaxed-card-head">
-          <div>
-            <span class="zz-result-index">01</span>
-            <h3>공간 이용</h3>
-            <p>관심영역 안에서 감지된 체류시간 비율입니다.</p>
-          </div>
-        </div>
-
-        <div class="stay-ratio-container">
-          <div class="donut-chart-box">
-            <svg viewBox="0 0 100 100" id="donutSvg"></svg>
-            <div class="donut-center-text">
-              <span class="percent" id="topPlacePercent">-</span>
-              <span class="label" id="topPlaceName">-</span>
+      <div class="zz-relaxed-result-grid">
+        <div
+          class="zz-relaxed-card zz-space-card primary-result-card is-empty"
+          id="spaceUsageCard"
+        >
+          <div class="zz-relaxed-card-head">
+            <div>
+              <span class="zz-result-index">01</span>
+              <h3>공간 이용</h3>
+              <p>관심영역 안에서 감지된 체류시간 비율입니다.</p>
             </div>
           </div>
 
-          <table class="ratio-table">
-            <tbody id="ratioTableBody"></tbody>
-          </table>
-        </div>
+          <div class="stay-ratio-container">
+            <div class="donut-chart-box">
+              <svg viewBox="0 0 100 100" id="donutSvg"></svg>
 
-        <div class="ratio-summary-box zz-ratio-summary">
-          <div class="ratio-summary-text">
-            <p class="main-text" id="ratioSummaryMain">
-              아직 분석된 공간 이용 기록이 없어요.
-            </p>
-            <p class="sub-text" id="ratioSummarySub">
-              LIVE 또는 영상 분석을 완료하면 결과가 표시됩니다.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="zz-relaxed-card zz-change-card">
-        <div class="zz-relaxed-card-head zz-change-head">
-          <div>
-            <span class="zz-result-index">02</span>
-            <h3>최근 행동 변화</h3>
-            <p>평소 패턴이 준비되면 의미 있는 변화가 기록됩니다.</p>
-          </div>
-
-          <select class="small-select" aria-label="행동 변화 조회 기간">
-            <option>최근 7일</option>
-            <option>최근 30일</option>
-          </select>
-        </div>
-
-        <div class="history-list">
-          <div class="history-item zz-relaxed-history-empty">
-            <div class="zz-history-mark" aria-hidden="true">·</div>
-            <div class="history-info">
-              <span class="history-title">아직 감지된 행동 변화가 없어요.</span>
-              <span class="history-date">
-                기준 행동 패턴이 준비되면 변화 이력이 표시됩니다.
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div class="zz-relaxed-baseline">
-          <div class="zz-relaxed-baseline-head">
-            <span>평소 패턴</span>
-            <strong>1 / 3</strong>
-          </div>
-
-          <div class="zz-relaxed-baseline-steps">
-            <div class="is-active"><span>1</span><small>데이터 수집</small></div>
-            <div><span>2</span><small>패턴 생성</small></div>
-            <div><span>3</span><small>변화 비교</small></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- 3. 모니터링은 필요할 때 보는 도구 -->
-  <section class="zz-relaxed-monitoring">
-    <div class="zz-relaxed-section-head zz-monitoring-head">
-      <div>
-        <span class="zz-kicker">모니터링</span>
-        <h2>필요할 때 지금 모습을 확인하세요.</h2>
-        <p>LIVE 또는 저장 영상 분석을 사용할 수 있습니다.</p>
-      </div>
-
-      <div class="zz-control-settings">
-        <div class="zz-field">
-          <label for="petSelect">반려동물</label>
-          <select class="small-select" id="petSelect">
-            <option
-              th:if="${petList == null or #lists.isEmpty(petList)}"
-              value=""
-            >
-              등록된 반려동물이 없습니다
-            </option>
-
-            <option
-              th:each="pet : ${petList}"
-              th:value="${pet.seq}"
-              th:text="${pet.pName + ' · ' + pet.pSpecies}"
-              th:data-species="${pet.pSpecies}"
-            >
-              반려동물
-            </option>
-          </select>
-        </div>
-
-        <input
-          type="hidden"
-          id="loginUserSeq"
-          th:value="${loginUser != null ? loginUser.id : ''}"
-        >
-
-        <div class="zz-field">
-          <label for="cameraSelect">카메라</label>
-          <select class="small-select" id="cameraSelect">
-            <option value="CAM-INTEGRATION-001">거실 카메라</option>
-            <option value="CAM-INTEGRATION-002">안방 카메라</option>
-          </select>
-        </div>
-
-        <span class="badge live-badge zz-live-status" id="liveBadge" aria-live="polite">
-          대기중
-        </span>
-
-        <a
-          th:href="@{/roi-select}"
-          class="zz-roi-link"
-          aria-label="관심영역 설정 화면으로 이동"
-        >
-          관심영역 설정
-        </a>
-      </div>
-    </div>
-
-    <div class="zz-relaxed-monitor-body">
-      <div class="zz-video-shell">
-        <div class="video-container" id="videoContainer">
-          <div class="video-placeholder" id="videoPlaceholder">
-            <div class="zz-placeholder">
-              <div class="zz-placeholder-symbol" aria-hidden="true">
-                <span></span><span></span><span></span>
+              <div class="donut-center-text">
+                <span class="percent" id="topPlacePercent">-</span>
+                <span class="label" id="topPlaceName">-</span>
               </div>
-              <strong>확인할 준비가 됐어요.</strong>
-              <p>LIVE를 시작하거나 저장 영상을 선택해 분석해보세요.</p>
+            </div>
+
+            <table class="ratio-table">
+              <tbody id="ratioTableBody"></tbody>
+            </table>
+          </div>
+
+          <div class="ratio-summary-box zz-ratio-summary">
+            <div class="ratio-summary-text">
+              <p class="main-text" id="ratioSummaryMain">
+                아직 분석된 공간 이용 기록이 없어요.
+              </p>
+
+              <p class="sub-text" id="ratioSummarySub">
+                LIVE 또는 영상 분석을 완료하면 결과가 표시됩니다.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="zz-relaxed-card zz-change-card">
+          <div class="zz-relaxed-card-head zz-change-head">
+            <div>
+              <span class="zz-result-index">02</span>
+              <h3>최근 행동 변화</h3>
+              <p>평소 패턴이 준비되면 의미 있는 변화가 기록됩니다.</p>
+            </div>
+
+            <select class="small-select" aria-label="행동 변화 조회 기간">
+              <option>최근 7일</option>
+              <option>최근 30일</option>
+            </select>
+          </div>
+
+          <div class="history-list">
+            <div class="history-item zz-relaxed-history-empty">
+              <div class="zz-history-mark" aria-hidden="true">·</div>
+
+              <div class="history-info">
+                <span class="history-title">아직 감지된 행동 변화가 없어요.</span>
+                <span class="history-date">
+                  기준 행동 패턴이 준비되면 변화 이력이 표시됩니다.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="zz-relaxed-baseline">
+            <div class="zz-relaxed-baseline-head">
+              <span>평소 패턴</span>
+              <strong>1 / 3</strong>
+            </div>
+
+            <div class="zz-relaxed-baseline-steps">
+              <div class="is-active">
+                <span>1</span>
+                <small>데이터 수집</small>
+              </div>
+
+              <div>
+                <span>2</span>
+                <small>패턴 생성</small>
+              </div>
+
+              <div>
+                <span>3</span>
+                <small>변화 비교</small>
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </section>
 
-      <div class="zz-relaxed-tools">
-        <div class="zz-relaxed-tool">
-          <div>
-            <span class="zz-mode-caption">실시간</span>
-            <strong>LIVE 모니터링</strong>
-            <small>현재 모습을 바로 확인합니다.</small>
-          </div>
-
-          <button class="btn primary-btn" id="startLiveBtn" type="button">
-            LIVE 시작
-          </button>
-
-          <button
-            class="btn outline-btn"
-            id="stopLiveBtn"
-            type="button"
-            disabled
-            style="display:none;"
-          >
-            LIVE 종료
-          </button>
+    <!-- 3. 모니터링은 필요할 때 보는 도구 -->
+    <section class="zz-relaxed-monitoring">
+      <div class="zz-relaxed-section-head zz-monitoring-head">
+        <div>
+          <span class="zz-kicker">모니터링</span>
+          <h2>필요할 때 지금 모습을 확인하세요.</h2>
+          <p>LIVE 또는 저장 영상 분석을 사용할 수 있습니다.</p>
         </div>
 
-        <div class="zz-relaxed-tool">
-          <div>
-            <span class="zz-mode-caption">저장 영상</span>
-            <strong>영상 업로드 분석</strong>
-            <small>선택한 영상을 분석합니다.</small>
+        <div class="zz-control-settings">
+          <div class="zz-field">
+            <label for="petSelect">반려동물</label>
+
+            <select class="small-select" id="petSelect">
+              <option
+                th:if="${petList == null or #lists.isEmpty(petList)}"
+                value=""
+              >
+                등록된 반려동물이 없습니다
+              </option>
+
+              <option
+                th:each="pet : ${petList}"
+                th:value="${pet.seq}"
+                th:text="${pet.pName + ' · ' + pet.pSpecies}"
+                th:data-species="${pet.pSpecies}"
+              >
+                반려동물
+              </option>
+            </select>
           </div>
 
           <input
-            type="file"
-            id="videoFileInput"
-            accept="video/*"
-            style="display:none;"
+            type="hidden"
+            id="loginUserSeq"
+            th:value="${loginUser != null ? loginUser.id : ''}"
           >
 
-          <div class="zz-mode-actions">
-            <button class="btn outline-btn" id="uploadVideoBtn" type="button">
-              영상 선택
+          <div class="zz-field">
+            <label for="cameraSelect">카메라</label>
+
+          <select class="small-select" id="cameraSelect">
+            <option value="CAM-INTEGRATION-001">거실 카메라</option>
+          </select>
+          </div>
+
+          <span
+            class="badge live-badge zz-live-status"
+            id="liveBadge"
+            aria-live="polite"
+          >
+            대기중
+          </span>
+
+          <a
+            th:href="@{/roi-select}"
+            class="zz-roi-link"
+            aria-label="관심영역 설정 화면으로 이동"
+          >
+            관심영역 설정
+          </a>
+        </div>
+      </div>
+
+      <div class="zz-relaxed-monitor-body">
+        <div class="zz-video-shell">
+          <div class="video-container" id="videoContainer">
+            <div class="video-placeholder" id="videoPlaceholder">
+              <div class="zz-placeholder">
+                <div class="zz-placeholder-symbol" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+
+                <strong>확인할 준비가 됐어요.</strong>
+                <p>LIVE를 시작하거나 저장 영상을 선택해 분석해보세요.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="zz-relaxed-tools">
+          <div class="zz-relaxed-tool">
+            <div>
+              <span class="zz-mode-caption">실시간</span>
+              <strong>LIVE 모니터링</strong>
+              <small>현재 모습을 바로 확인합니다.</small>
+            </div>
+
+            <button
+              class="btn primary-btn"
+              id="startLiveBtn"
+              type="button"
+            >
+              LIVE 시작
             </button>
-            <button class="btn primary-btn" id="runAnalysisBtn" type="button">
-              분석 시작
+
+            <button
+              class="btn outline-btn"
+              id="stopLiveBtn"
+              type="button"
+              disabled
+              style="display:none;"
+            >
+              LIVE 종료
             </button>
+          </div>
+
+          <div class="zz-relaxed-tool">
+            <div>
+              <span class="zz-mode-caption">저장 영상</span>
+              <strong>영상 업로드 분석</strong>
+              <small>선택한 영상을 분석합니다.</small>
+            </div>
+
+            <input
+              type="file"
+              id="videoFileInput"
+              accept="video/*"
+              style="display:none;"
+            >
+
+            <div class="zz-mode-actions">
+              <button
+                class="btn outline-btn"
+                id="uploadVideoBtn"
+                type="button"
+              >
+                영상 선택
+              </button>
+
+              <button
+                class="btn primary-btn"
+                id="runAnalysisBtn"
+                type="button"
+              >
+                분석 시작
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div id="analysisStatusBox" class="analysis-status-box" aria-live="polite">
-      <p id="analysisStatusText" style="margin:0;"></p>
-    </div>
+      <div
+        id="analysisStatusBox"
+        class="analysis-status-box"
+        aria-live="polite"
+      >
+        <p id="analysisStatusText" style="margin:0;"></p>
+      </div>
 
-    <div id="aiResultCard" class="ai-result-card" aria-hidden="true">
-      <span id="resAnalysisStatus">-</span>
-      <span id="resActivityLevel">-</span>
-      <span id="resStationaryRatio">-</span>
-      <span id="resTravelDistance">-</span>
-      <span id="resMovingSpeed">-</span>
-      <span id="resChangeStatus">-</span>
-    </div>
-  </section>
+      <div
+        id="aiResultCard"
+        class="ai-result-card"
+        aria-hidden="true"
+      >
+        <span id="resAnalysisStatus">-</span>
+        <span id="resActivityLevel">-</span>
+        <span id="resStationaryRatio">-</span>
+        <span id="resTravelDistance">-</span>
+        <span id="resMovingSpeed">-</span>
+        <span id="resChangeStatus">-</span>
+      </div>
+    </section>
 
-</main>
-
-
-
-
+  </main>
 
   <footer class="footer">
     <div class="footer-bottom">
@@ -3627,12 +3674,38 @@
     const petSelect = document.getElementById('petSelect');
     const cameraSelect = document.getElementById('cameraSelect');
     const loginUserSeq = document.getElementById('loginUserSeq');
+    const reportNavLink =
+  document.getElementById('reportNavLink');
+
+
+    function syncReportNavLink() {
+
+      if (!reportNavLink) {
+        return;
+      }
+
+      const selectedPetId =
+        petSelect?.value;
+
+      reportNavLink.href =
+        selectedPetId
+          ? `/report?pet_id=${encodeURIComponent(selectedPetId)}`
+          : '/report';
+    }
+
+    function getLatestAnalysisUrl() {
+      const selectedPetId = petSelect?.value;
+
+      return selectedPetId
+        ? `/api/pet/analysis/latest?pet_id=${encodeURIComponent(selectedPetId)}`
+        : '/api/pet/analysis/latest';
+    }
 
     const startLiveBtn = document.getElementById('startLiveBtn');
     const stopLiveBtn = document.getElementById('stopLiveBtn');
 
     let selectedFile = null;
-    let selectedFileUrl = null;
+        let selectedFileUrl = null;
 
     let trackingData = [];
     let trackingCanvas = null;
@@ -4005,7 +4078,7 @@
       ) {
         try {
           const res = await fetch(
-            '/api/pet/analysis/latest',
+            getLatestAnalysisUrl(),
             {
               method: 'GET',
               cache: 'no-store'
@@ -4104,7 +4177,7 @@
 
       try {
         const response = await fetch(
-          '/api/pet/analysis/latest',
+          getLatestAnalysisUrl(),
           {
             method: 'GET',
             cache: 'no-store'
@@ -4168,8 +4241,6 @@
         analysisStatusText.textContent =
           '✅ LIVE 분석이 완료되었습니다. 결과가 화면에 반영되었습니다.';
 
-        // 결과가 확인된 뒤 브라우저 측 WebRTC 자원만 정리한다.
-        // 서버 분석 종료 신호로 사용하지 않는다.
         if (livePc) {
           const pc = livePc;
           livePc = null;
@@ -4237,8 +4308,6 @@
         targetAnalysisId
       );
 
-      // 첫 조회는 2초 뒤, 이후 2초마다 계속 확인한다.
-      // 실제 홈캠 LIVE가 오래 지속될 수 있으므로 시간 제한은 두지 않는다.
       liveResultWatchTimer = setInterval(
         () => {
           checkLiveResultOnce(
@@ -4358,7 +4427,6 @@
           liveVideoElement
             .play()
             .catch(() => {});
-
         };
 
         pc.onconnectionstatechange = () => {
@@ -4386,9 +4454,7 @@
               'analysis-status-box status-success';
 
             analysisStatusText.textContent =
-              liveAnalysisId
-                ? '🔴 LIVE 분석중'
-                : '🔴 LIVE 분석중';
+              '🔴 LIVE 분석중';
           }
 
           if (
@@ -4823,6 +4889,7 @@
       analysisStatusBox.style.display = 'block';
       analysisStatusBox.className =
         'analysis-status-box status-loading';
+
       analysisStatusText.textContent =
         '⏳ 영상을 분석하고 있습니다. 잠시만 기다려주세요.';
 
@@ -4831,6 +4898,7 @@
 
         formData.append('video', selectedFile);
         formData.append('petId', petSelect.value);
+
         formData.append(
           'cameraId',
           cameraSelect?.value || 'CAM-INTEGRATION-001'
@@ -4894,6 +4962,7 @@
           );
         } else {
           trackingData = [];
+
           console.warn(
             '분석 결과에 tracking_points가 없습니다.'
           );
@@ -4910,9 +4979,6 @@
             spaceAnalysis
           );
 
-          // PET_ACT_RECORD 저장은 AI → Spring 결과 수신 시
-          // 서버에서 공통 처리한다.
-          // 프론트에서는 중복 저장하지 않고 최신 체류 비율만 조회한다.
           await loadTodayStayRatio();
         }
 
@@ -4920,7 +4986,7 @@
           '⏳ 분석 결과를 화면에 반영하고 있습니다...';
 
         const latestResponse = await fetch(
-          '/api/pet/analysis/latest',
+          getLatestAnalysisUrl(),
           {
             method: 'GET',
             cache: 'no-store'
@@ -4969,9 +5035,7 @@
           'analysis-status-box status-success';
 
         analysisStatusText.textContent =
-          trackingData.length > 0
-            ? '✓ 영상 분석이 완료되었습니다. 결과가 화면에 반영되었습니다.'
-            : '✓ 영상 분석이 완료되었습니다. 결과가 화면에 반영되었습니다.';
+          '✓ 영상 분석이 완료되었습니다. 결과가 화면에 반영되었습니다.';
 
       } catch (error) {
         console.error('[분석 오류]', error);
@@ -5045,8 +5109,23 @@
 
     async function loadTodayStayRatio() {
       try {
+        const selectedPetId =
+          petSelect?.value;
+
+        const roiUrl =
+          selectedPetId
+            ? `/api/monitoring/today-stay-ratio?pet_id=${encodeURIComponent(selectedPetId)}`
+            : '/api/monitoring/today-stay-ratio';
+
         const res = await fetch(
-          '/api/monitoring/today-stay-ratio'
+          roiUrl,
+          {
+            method: 'GET',
+            cache: 'no-store',
+            headers: {
+              Accept: 'application/json'
+            }
+          }
         );
 
         if (!res.ok) {
@@ -5179,9 +5258,11 @@
                   style="background-color:${color};"
                 ></span>
               </td>
+
               <td class="place-name">
                 ${getRoiDisplayName(item.roiName)}
               </td>
+
               <td class="place-val">
                 ${item.percent}%
                 <span
@@ -5213,10 +5294,6 @@
     }
 
 
-    // ==========================================================
-    // 사용자 중심 상단 화면 보조 연결
-    // 핵심 분석/저장 로직은 건드리지 않는다.
-    // ==========================================================
     const heroLiveBtn =
       document.getElementById('heroLiveBtn');
 
@@ -5237,7 +5314,6 @@
 
     const summarySpaceValue =
       document.getElementById('summarySpaceValue');
-
 
     const heroTopSpaceName =
       document.getElementById('heroTopSpaceName');
@@ -5288,8 +5364,20 @@
 
     petSelect?.addEventListener(
       'change',
-      syncSelectedPetHeroName
+      async () => {
+
+        syncSelectedPetHeroName();
+
+        syncReportNavLink();
+
+        await loadTodayStayRatio();
+      }
     );
+
+
+    syncSelectedPetHeroName();
+
+    syncReportNavLink();
 
 
     syncSelectedPetHeroName();
@@ -5349,7 +5437,6 @@
             name;
         }
 
-
         if (heroTopSpaceName) {
           heroTopSpaceName.textContent =
             name;
@@ -5385,7 +5472,6 @@
             '분석 전';
         }
 
-
         if (heroTopSpaceName) {
           heroTopSpaceName.textContent =
             '분석 전';
@@ -5409,9 +5495,7 @@
     };
 
 
-    // 첫 진입 시 기존 당일 공간 이용 데이터가 있다면 상단 요약에도 반영
     loadTodayStayRatio();
-
 
 
     window.addEventListener('beforeunload', () => {

@@ -4,7 +4,13 @@
 
 <mapper namespace="com.smhrd.myapp.mapper.PetAnalysisMapper">
 
-    <insert id="insertBehaviorMap" parameterType="map">
+    <!-- =====================================================
+         AI 분석 결과 저장
+         ===================================================== -->
+    <insert
+        id="insertBehaviorMap"
+        parameterType="map"
+    >
         INSERT INTO RECEIVE_AI_DATA (
             input_dttm,
             gubun,
@@ -25,7 +31,8 @@
             baseline_status,
             change_status,
             change_score
-        ) VALUES (
+        )
+        VALUES (
             #{recordedAt},
             #{gubun},
             #{analysisId},
@@ -48,7 +55,17 @@
         )
     </insert>
 
-    <select id="selectLatestBehaviorMap" resultType="map">
+
+    <!-- =====================================================
+         로그인 사용자의 가장 최근 분석 결과
+
+         pet_id를 전달하지 않는 기존 호출에 대한
+         하위 호환용 조회
+         ===================================================== -->
+    <select
+        id="selectLatestBehaviorMapByUser"
+        resultType="map"
+    >
         SELECT
             input_dttm,
             analysis_id,
@@ -69,6 +86,41 @@
             change_status,
             change_score
         FROM RECEIVE_AI_DATA
+        WHERE user_seq = #{userSeq}
+        ORDER BY input_dttm DESC
+        LIMIT 1
+    </select>
+
+
+    <!-- =====================================================
+         로그인 사용자 + 선택 PET의 가장 최근 분석 결과
+         ===================================================== -->
+    <select
+        id="selectLatestBehaviorMapByUserAndPet"
+        resultType="map"
+    >
+        SELECT
+            input_dttm,
+            analysis_id,
+            schema_version,
+            pet_id,
+            user_seq,
+            video_id,
+            camera_id,
+            species,
+            recorded_at,
+            time_slot,
+            analysis_status,
+            activity_level,
+            stationary_ratio,
+            normalized_travel_distance,
+            normalized_moving_speed,
+            baseline_status,
+            change_status,
+            change_score
+        FROM RECEIVE_AI_DATA
+        WHERE user_seq = #{userSeq}
+          AND pet_id = #{petId}
         ORDER BY input_dttm DESC
         LIMIT 1
     </select>

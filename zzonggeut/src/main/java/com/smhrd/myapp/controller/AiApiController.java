@@ -3,13 +3,17 @@ package com.smhrd.myapp.controller;
 import com.smhrd.myapp.dto.AiModeNotifyDto;
 import com.smhrd.myapp.dto.PetAnalysisResultDto;
 import com.smhrd.myapp.entity.PetActRecord;
+import com.smhrd.myapp.entity.UserEntity;
 import com.smhrd.myapp.mapper.PetAnalysisMapper;
 import com.smhrd.myapp.repository.PetActRecordRepository;
 import com.smhrd.myapp.service.AiModeManager;
 
+import jakarta.servlet.http.HttpSession;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,28 +26,40 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class AiApiController {
 
-    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+    private static final ZoneId KST =
+            ZoneId.of("Asia/Seoul");
 
-    // 기존 구조 유지
-    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private final ObjectMapper objectMapper =
+            new ObjectMapper();
+
 
     private final AiModeManager aiModeManager;
+
     private final PetAnalysisMapper petAnalysisMapper;
+
     private final PetActRecordRepository petActRecordRepository;
 
-    /**
-     * AI 서버 구동 시 모드 알림 수신
-     */
+
+    // =========================================================
+    // AI 서버 모드 수신
+    // =========================================================
     @PostMapping("/api/ai/mode")
     public ResponseEntity<String> receiveAiMode(
-            @RequestBody AiModeNotifyDto dto
+            @RequestBody
+            AiModeNotifyDto dto
     ) {
-        aiModeManager.setMode(dto.getMode());
+
+        aiModeManager.setMode(
+                dto.getMode()
+        );
+
 
         log.info(
                 "[AI 모드 갱신] 현재 모드: {}, 전송시간: {}",
@@ -51,31 +67,40 @@ public class AiApiController {
                 dto.getTimestamp()
         );
 
+
         return ResponseEntity.ok(
                 "Mode updated successfully"
         );
     }
 
-    /**
-     * UPLOAD / LIVE 공통 AI 결과 수신
-     *
-     * 1) RECEIVE_AI_DATA 저장
-     * 2) space_analysis.roi_results가 있으면 PET_ACT_RECORD 저장
-     */
+
+    // =========================================================
+    // UPLOAD / LIVE 공통 AI 결과 수신
+    //
+    // 1. RECEIVE_AI_DATA 저장
+    // 2. space_analysis.roi_results 저장
+    // =========================================================
     @PostMapping("/api/pet/analysis")
     @SuppressWarnings("unchecked")
     public ResponseEntity<String> receiveUploadAnalysis(
-            @RequestBody PetAnalysisResultDto dto
+            @RequestBody
+            PetAnalysisResultDto dto
     ) {
+
         try {
+
             String prettyJson =
                     objectMapper
                             .writerWithDefaultPrettyPrinter()
-                            .writeValueAsString(dto);
+                            .writeValueAsString(
+                                    dto
+                            );
+
 
             System.out.println(
                     "=================================================="
             );
+
 
             log.info(
                     "[AI 분석 결과 수신] mode={}, 분석 일시={}",
@@ -83,28 +108,40 @@ public class AiApiController {
                     dto.getAnalyzedAt()
             );
 
+
             log.info(
                     "분석 데이터 내용: {}",
                     dto.getData()
             );
 
+
             System.out.println(
                     "[FastAPI 수신 데이터 확인]"
             );
-            System.out.println(prettyJson);
+
+            System.out.println(
+                    prettyJson
+            );
+
 
             System.out.println(
                     "=================================================="
             );
 
+
             Map<String, Object> data =
                     dto.getData();
 
+
             if (data == null) {
+
                 return ResponseEntity
                         .badRequest()
-                        .body("Data is null");
+                        .body(
+                                "Data is null"
+                        );
             }
+
 
             Map<String, Object> featuresOverall =
                     (Map<String, Object>)
@@ -112,285 +149,441 @@ public class AiApiController {
                                     "features_overall"
                             );
 
+
             Map<String, Object> changeDetection =
                     (Map<String, Object>)
                             data.get(
                                     "change_detection"
                             );
 
+
             Map<String, Object> paramMap =
                     new HashMap<>();
 
-            // ------------------------------
+
+            // =================================================
             // 1. RECEIVE_AI_DATA 저장
-            // ------------------------------
+            // =================================================
+            String mode =
+                    dto.getMode();
 
-            String mode = dto.getMode();
-
-            if (
-                    mode == null
-                    || mode.isBlank()
-            ) {
-                mode = aiModeManager.getMode();
-            }
 
             if (
                     mode == null
                     || mode.isBlank()
             ) {
-                mode = "unknown";
+
+                mode =
+                        aiModeManager
+                                .getMode();
             }
+
+
+            if (
+                    mode == null
+                    || mode.isBlank()
+            ) {
+
+                mode =
+                        "unknown";
+            }
+
 
             paramMap.put(
                     "gubun",
                     mode
             );
 
+
             paramMap.put(
                     "analysisId",
-                    data.get("analysis_id")
+                    data.get(
+                            "analysis_id"
+                    )
             );
+
 
             paramMap.put(
                     "schemaVersion",
-                    data.get("schema_version")
+                    data.get(
+                            "schema_version"
+                    )
             );
+
 
             paramMap.put(
                     "petId",
-                    data.get("pet_id")
+                    data.get(
+                            "pet_id"
+                    )
             );
+
 
             paramMap.put(
                     "userSeq",
-                    data.get("user_seq")
+                    data.get(
+                            "user_seq"
+                    )
             );
+
 
             paramMap.put(
                     "videoId",
-                    data.get("video_id")
+                    data.get(
+                            "video_id"
+                    )
             );
+
 
             paramMap.put(
                     "cameraId",
-                    data.get("camera_id")
+                    data.get(
+                            "camera_id"
+                    )
             );
+
 
             paramMap.put(
                     "species",
-                    data.get("species")
+                    data.get(
+                            "species"
+                    )
             );
+
 
             paramMap.put(
                     "recordedAt",
-                    data.get("recorded_at")
+                    data.get(
+                            "recorded_at"
+                    )
             );
+
 
             paramMap.put(
                     "timeSlot",
-                    data.get("time_slot")
+                    data.get(
+                            "time_slot"
+                    )
             );
+
 
             paramMap.put(
                     "analysisStatus",
-                    data.get("analysis_status")
+                    data.get(
+                            "analysis_status"
+                    )
             );
+
 
             paramMap.put(
                     "activityLevel",
+
                     featuresOverall != null
+
                             ? featuresOverall.get(
                                     "activity_level"
                             )
+
                             : 0.0
             );
+
 
             paramMap.put(
                     "stationaryRatio",
+
                     featuresOverall != null
+
                             ? featuresOverall.get(
                                     "stationary_ratio"
                             )
+
                             : 0.0
             );
+
 
             paramMap.put(
                     "normalizedTravelDistance",
+
                     featuresOverall != null
+
                             ? featuresOverall.get(
                                     "normalized_travel_distance"
                             )
+
                             : 0.0
             );
+
 
             paramMap.put(
                     "normalizedMovingSpeed",
+
                     featuresOverall != null
+
                             ? featuresOverall.get(
                                     "normalized_moving_speed"
                             )
+
                             : 0.0
             );
 
+
             paramMap.put(
                     "baselineStatus",
+
                     changeDetection != null
+
                             ? changeDetection.get(
                                     "baseline_status"
                             )
+
                             : null
             );
+
 
             paramMap.put(
                     "changeStatus",
+
                     changeDetection != null
+
                             ? changeDetection.get(
                                     "change_status"
                             )
+
                             : null
             );
+
 
             paramMap.put(
                     "changeScore",
+
                     changeDetection != null
+
                             ? changeDetection.get(
                                     "change_score"
                             )
+
                             : null
             );
 
-            petAnalysisMapper.insertBehaviorMap(
-                    paramMap
-            );
+
+            petAnalysisMapper
+                    .insertBehaviorMap(
+                            paramMap
+                    );
+
 
             log.info(
-                    "[RECEIVE_AI_DATA 저장 완료] analysis_id={}",
-                    paramMap.get("analysisId")
+                    "[RECEIVE_AI_DATA 저장 완료] analysis_id={}, user_seq={}, pet_id={}",
+                    paramMap.get(
+                            "analysisId"
+                    ),
+                    paramMap.get(
+                            "userSeq"
+                    ),
+                    paramMap.get(
+                            "petId"
+                    )
             );
 
-            // ------------------------------
+
+            // =================================================
             // 2. PET_ACT_RECORD 저장
-            // ------------------------------
-            // ROI 저장 실패가 핵심 행동분석 저장까지
-            // 롤백시키지 않도록 별도 try/catch로 처리.
+            // =================================================
             try {
+
                 saveSpaceAnalysisRecords(
                         data
                 );
-            } catch (Exception roiSaveError) {
+
+            } catch (
+                    Exception roiSaveError
+            ) {
+
                 log.error(
                         "[PET_ACT_RECORD 저장 실패] analysis_id={}",
-                        data.get("analysis_id"),
+                        data.get(
+                                "analysis_id"
+                        ),
                         roiSaveError
                 );
             }
+
 
             return ResponseEntity.ok(
                     "Successfully saved to DB"
             );
 
-        } catch (Exception e) {
+
+        } catch (
+                Exception e
+        ) {
+
             log.error(
                     "[DB 저장 실패] 오류: ",
                     e
             );
 
+
             return ResponseEntity
                     .internalServerError()
                     .body(
                             "DB Error: "
-                            + e.getMessage()
+                                    + e.getMessage()
                     );
         }
     }
 
-    /**
-     * AI의 space_analysis.roi_results를
-     * PET_ACT_RECORD로 변환하여 저장한다.
-     */
+
+    // =========================================================
+    // AI space_analysis.roi_results
+    // → PET_ACT_RECORD 저장
+    // =========================================================
     @SuppressWarnings("unchecked")
     private void saveSpaceAnalysisRecords(
             Map<String, Object> data
     ) {
-        Object spaceRaw =
-                data.get("space_analysis");
 
-        if (!(spaceRaw instanceof Map<?, ?>)) {
+        Object spaceRaw =
+                data.get(
+                        "space_analysis"
+                );
+
+
+        if (
+                !(
+                        spaceRaw
+                                instanceof Map<?, ?>
+                )
+        ) {
+
             log.info(
                     "[PET_ACT_RECORD] space_analysis 없음 - 저장 생략"
             );
+
             return;
         }
 
+
         Map<String, Object> spaceAnalysis =
-                (Map<String, Object>) spaceRaw;
+                (Map<String, Object>)
+                        spaceRaw;
+
 
         Object roiRaw =
                 spaceAnalysis.get(
                         "roi_results"
                 );
 
-        if (!(roiRaw instanceof List<?> roiList)
-                || roiList.isEmpty()) {
+
+        if (
+                !(roiRaw instanceof List<?> roiList)
+                || roiList.isEmpty()
+        ) {
+
             log.info(
                     "[PET_ACT_RECORD] roi_results 없음 - 저장 생략"
             );
+
             return;
         }
 
+
         Integer petSeq =
                 parsePetSeq(
-                        data.get("pet_id")
+                        data.get(
+                                "pet_id"
+                        )
                 );
 
+
         String userSeq =
-                data.get("user_seq") != null
+                data.get(
+                        "user_seq"
+                ) != null
+
                         ? String.valueOf(
-                                data.get("user_seq")
+                                data.get(
+                                        "user_seq"
+                                )
                         ).trim()
+
                         : null;
+
 
         if (
                 petSeq == null
                 || userSeq == null
                 || userSeq.isBlank()
         ) {
+
             log.warn(
                     "[PET_ACT_RECORD] pet_id/user_seq 부족 - 저장 생략. pet_id={}, user_seq={}",
-                    data.get("pet_id"),
-                    data.get("user_seq")
+                    data.get(
+                            "pet_id"
+                    ),
+                    data.get(
+                            "user_seq"
+                    )
             );
+
             return;
         }
+
 
         double videoDurationSec =
                 extractVideoDurationSec(
                         data
                 );
 
+
         LocalDateTime baseTime =
-                LocalDateTime.now(KST);
+                LocalDateTime.now(
+                        KST
+                );
+
 
         List<PetActRecord> entities =
                 new ArrayList<>();
 
-        int index = 0;
 
-        for (Object roiObject : roiList) {
-            if (!(roiObject instanceof Map<?, ?>)) {
+        int index =
+                0;
+
+
+        for (
+                Object roiObject
+                : roiList
+        ) {
+
+            if (
+                    !(
+                            roiObject
+                                    instanceof Map<?, ?>
+                    )
+            ) {
+
                 continue;
             }
+
 
             Map<String, Object> roi =
                     (Map<String, Object>)
                             roiObject;
 
+
             String roiName =
-                    roi.get("roi_name") != null
+                    roi.get(
+                            "roi_name"
+                    ) != null
+
                             ? String.valueOf(
-                                    roi.get("roi_name")
+                                    roi.get(
+                                            "roi_name"
+                                    )
                             )
+
                             : "UNKNOWN";
+
 
             double stayTimeSec =
                     toDouble(
@@ -399,19 +592,22 @@ public class AiApiController {
                             )
                     );
 
-            // 현재 DB CONTINUE_TIME이 Integer이므로
-            // 양수 체류는 최소 1초로 보존한다.
+
             int storedStaySeconds =
                     toStoredSeconds(
                             stayTimeSec
                     );
 
-            float stopRatio = 0.0f;
+
+            float stopRatio =
+                    0.0f;
+
 
             if (
                     videoDurationSec > 0
                     && stayTimeSec > 0
             ) {
+
                 stopRatio =
                         (float) (
                                 stayTimeSec
@@ -419,82 +615,131 @@ public class AiApiController {
                         );
             }
 
+
             PetActRecord entity =
                     PetActRecord
                             .builder()
+
                             .dttm(
-                                    baseTime.plusSeconds(
-                                            index
-                                    )
+                                    baseTime
+                                            .plusSeconds(
+                                                    index
+                                            )
                             )
+
                             .petSeq(
                                     petSeq
                             )
+
                             .userSeq(
                                     userSeq
                             )
+
                             .roiName(
                                     roiName
                             )
+
                             .continueTime(
                                     storedStaySeconds
                             )
+
                             .stopRatio(
                                     stopRatio
                             )
+
                             .build();
 
-            entities.add(entity);
+
+            entities.add(
+                    entity
+            );
+
+
             index++;
         }
 
-        if (entities.isEmpty()) {
+
+        if (
+                entities.isEmpty()
+        ) {
+
             return;
         }
 
-        petActRecordRepository.saveAll(
-                entities
-        );
+
+        petActRecordRepository
+                .saveAll(
+                        entities
+                );
+
 
         log.info(
-                "[PET_ACT_RECORD 저장 완료] analysis_id={}, count={}",
-                data.get("analysis_id"),
+                "[PET_ACT_RECORD 저장 완료] analysis_id={}, user_seq={}, pet_id={}, count={}",
+                data.get(
+                        "analysis_id"
+                ),
+                userSeq,
+                petSeq,
                 entities.size()
         );
     }
 
+
     private Integer parsePetSeq(
             Object petId
     ) {
-        if (petId == null) {
+
+        if (
+                petId == null
+        ) {
+
             return null;
         }
 
+
         try {
+
             return Integer.valueOf(
                     String.valueOf(
                             petId
                     ).trim()
             );
-        } catch (NumberFormatException e) {
+
+        } catch (
+                NumberFormatException e
+        ) {
+
             return null;
         }
     }
+
 
     @SuppressWarnings("unchecked")
     private double extractVideoDurationSec(
             Map<String, Object> data
     ) {
-        Object videoInfoRaw =
-                data.get("video_info");
 
-        if (!(videoInfoRaw instanceof Map<?, ?>)) {
+        Object videoInfoRaw =
+                data.get(
+                        "video_info"
+                );
+
+
+        if (
+                !(
+                        videoInfoRaw
+                                instanceof Map<?, ?>
+                )
+        ) {
+
             return 0.0;
         }
+
 
         Map<String, Object> videoInfo =
                 (Map<String, Object>)
                         videoInfoRaw;
+
 
         return toDouble(
                 videoInfo.get(
@@ -503,58 +748,158 @@ public class AiApiController {
         );
     }
 
+
     private double toDouble(
             Object value
     ) {
-        if (value == null) {
+
+        if (
+                value == null
+        ) {
+
             return 0.0;
         }
 
-        if (value instanceof Number number) {
-            return number.doubleValue();
+
+        if (
+                value
+                        instanceof Number number
+        ) {
+
+            return number
+                    .doubleValue();
         }
 
+
         try {
+
             return Double.parseDouble(
                     String.valueOf(
                             value
                     )
             );
-        } catch (NumberFormatException e) {
+
+        } catch (
+                NumberFormatException e
+        ) {
+
             return 0.0;
         }
     }
 
+
     private int toStoredSeconds(
             double stayTimeSec
     ) {
-        if (stayTimeSec <= 0) {
+
+        if (
+                stayTimeSec <= 0
+        ) {
+
             return 0;
         }
 
+
         return Math.max(
                 1,
+
                 (int) Math.round(
                         stayTimeSec
                 )
         );
     }
 
-    @GetMapping("/api/pet/analysis/latest")
-    public ResponseEntity<?> getLatestAnalysis() {
 
-        Map<String, Object> result =
-                petAnalysisMapper
-                        .selectLatestBehaviorMap();
+    // =========================================================
+    // 선택 PET 최신 행동 분석 결과 조회
+    //
+    // pet_id 있음:
+    //   로그인 사용자 + 선택 PET 최신값
+    //
+    // pet_id 없음:
+    //   로그인 사용자 전체 중 최신값
+    //   기존 호출 하위 호환
+    // =========================================================
+    @GetMapping("/api/pet/analysis/latest")
+    public ResponseEntity<?> getLatestAnalysis(
+            @RequestParam(
+                    value = "pet_id",
+                    required = false
+            )
+            Integer petId,
+
+            HttpSession session
+    ) {
+
+        Object sessionUser =
+                session.getAttribute(
+                        "loginUser"
+                );
+
+
+        if (
+                !(
+                        sessionUser
+                                instanceof UserEntity
+                )
+        ) {
+
+            return ResponseEntity
+                    .status(
+                            HttpStatus.UNAUTHORIZED
+                    )
+                    .body(
+                            Map.of(
+                                    "message",
+                                    "로그인이 필요한 서비스입니다."
+                            )
+                    );
+        }
+
+
+        UserEntity loginUser =
+                (UserEntity)
+                        sessionUser;
+
+
+        String loginUserSeq =
+                loginUser.getId();
+
+
+        Map<String, Object> result;
+
+
+        if (
+                petId != null
+        ) {
+
+            result =
+                    petAnalysisMapper
+                            .selectLatestBehaviorMapByUserAndPet(
+                                    loginUserSeq,
+                                    petId
+                            );
+
+        } else {
+
+            result =
+                    petAnalysisMapper
+                            .selectLatestBehaviorMapByUser(
+                                    loginUserSeq
+                            );
+        }
+
 
         if (
                 result == null
                 || result.isEmpty()
         ) {
+
             return ResponseEntity
                     .noContent()
                     .build();
         }
+
 
         return ResponseEntity.ok(
                 result

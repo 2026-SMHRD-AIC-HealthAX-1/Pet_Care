@@ -158,7 +158,7 @@ SMOOTHING_ALPHA = 0.35
 # =========================================================
 MODEL_PATH = "yolo11s.pt"
 
-YOLO_IMAGE_SIZE = 960
+YOLO_IMAGE_SIZE = 640
 YOLO_CONFIDENCE = 0.15
 YOLO_IOU = 0.50
 

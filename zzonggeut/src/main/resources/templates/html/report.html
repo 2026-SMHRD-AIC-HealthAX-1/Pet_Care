@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>주간 반려동물 행동 분석 리포트 - 쫑긋</title>
-    <!-- 🌟 정적 CSS 경로 타임리프 적용 -->
+
     <link rel="stylesheet" th:href="@{/css/dashboardStyle.css}">
+
     <style>
         body {
             background-color: #f4f7f6;
@@ -23,7 +25,7 @@
             gap: 20px;
         }
 
-        /* 1. 리포트 메인 헤더 & 프로필 카드 */
+        /* 리포트 메인 헤더 */
         .report-top-bar {
             display: flex;
             justify-content: space-between;
@@ -60,6 +62,7 @@
             border-radius: 24px;
             padding: 28px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+
             display: grid;
             grid-template-columns: 280px 1fr;
             gap: 24px;
@@ -79,10 +82,13 @@
             height: 80px;
             border-radius: 50%;
             background-color: #eef7f6;
+
             display: flex;
             justify-content: center;
             align-items: center;
+
             font-size: 40px;
+
             border: 3px solid #e0f2f1;
             overflow: hidden;
         }
@@ -115,7 +121,7 @@
             line-height: 1.6;
         }
 
-        /* 헤더 오른쪽 메인 메시지 상자 */
+        /* 헤더 오른쪽 메인 메시지 */
         .summary-main-msg {
             background: #f0fdfa;
             border-radius: 18px;
@@ -127,9 +133,11 @@
             display: flex;
             align-items: center;
             gap: 8px;
+
             font-size: 17px;
             font-weight: 700;
             color: #0f766e;
+
             margin-bottom: 8px;
         }
 
@@ -139,7 +147,7 @@
             line-height: 1.65;
         }
 
-        /* 2. 카드 공통 스타일 */
+        /* 카드 공통 */
         .report-card {
             background: #ffffff;
             border-radius: 24px;
@@ -151,13 +159,15 @@
             display: flex;
             align-items: center;
             gap: 8px;
+
             font-size: 17px;
             font-weight: 700;
             color: #1e293b;
+
             margin-bottom: 18px;
         }
 
-        /* 3. 파스텔톤 요약 지표 그리드 (4개 카드) */
+        /* 요약 카드 */
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -167,17 +177,30 @@
         .mini-card {
             border-radius: 18px;
             padding: 16px;
+
             text-align: center;
+
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
         }
 
-        .mini-card.bg-mint { background-color: #eef7f6; }
-        .mini-card.bg-rose { background-color: #fff1f2; }
-        .mini-card.bg-amber { background-color: #fffbeb; }
-        .mini-card.bg-blue { background-color: #f0f9ff; }
+        .mini-card.bg-mint {
+            background-color: #eef7f6;
+        }
+
+        .mini-card.bg-rose {
+            background-color: #fff1f2;
+        }
+
+        .mini-card.bg-amber {
+            background-color: #fffbeb;
+        }
+
+        .mini-card.bg-blue {
+            background-color: #f0f9ff;
+        }
 
         .mini-card .icon {
             font-size: 22px;
@@ -212,7 +235,7 @@
             font-weight: 700;
         }
 
-        /* 🌟 [NEW] 오늘의 행동 지표 & 공간별 활동(ROI) CSS */
+        /* 행동 지표 & ROI */
         .behavior-roi-section {
             display: grid;
             grid-template-columns: 1.8fr 1fr;
@@ -223,9 +246,11 @@
             display: flex;
             align-items: center;
             gap: 6px;
+
             font-size: 17px;
             font-weight: 800;
             color: #1e293b;
+
             margin-bottom: 16px;
         }
 
@@ -233,27 +258,33 @@
             display: inline-flex;
             justify-content: center;
             align-items: center;
+
             width: 18px;
             height: 18px;
+
             border-radius: 50%;
             border: 1.5px solid #94a3b8;
+
             color: #94a3b8;
             font-size: 11px;
             font-weight: 700;
+
             cursor: pointer;
         }
 
         .beta-badge {
             background-color: #fef3c7;
             color: #d97706;
+
             font-size: 11px;
             font-weight: 700;
+
             padding: 2px 8px;
             border-radius: 12px;
             margin-left: 4px;
         }
 
-        /* 오늘의 행동 지표 4개 그리드 카키/파스텔 박스 */
+        /* 행동지표 4개 */
         .behavior-cards-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -263,21 +294,36 @@
         .cute-metric-card {
             border-radius: 20px;
             padding: 16px 10px;
+
             display: flex;
             flex-direction: column;
             align-items: center;
+
             text-align: center;
         }
 
-        .cute-metric-card.bg-blue { background-color: #f0f7ff; }
-        .cute-metric-card.bg-pink { background-color: #fff0f3; }
-        .cute-metric-card.bg-green { background-color: #f0fbf5; }
-        .cute-metric-card.bg-yellow { background-color: #fffdf0; }
+        .cute-metric-card.bg-blue {
+            background-color: #f0f7ff;
+        }
+
+        .cute-metric-card.bg-pink {
+            background-color: #fff0f3;
+        }
+
+        .cute-metric-card.bg-green {
+            background-color: #f0fbf5;
+        }
+
+        .cute-metric-card.bg-yellow {
+            background-color: #fffdf0;
+        }
 
         .cute-metric-card .icon-img {
             font-size: 28px;
             margin-bottom: 8px;
+
             height: 36px;
+
             display: flex;
             align-items: center;
             justify-content: center;
@@ -299,13 +345,18 @@
 
         .status-pill {
             background-color: #ffffff;
+
             border: 1px solid #e2e8f0;
             border-radius: 8px;
+
             padding: 4px 10px;
+
             font-size: 11px;
             font-weight: 700;
             color: #10b981;
+
             box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+
             margin-bottom: 10px;
             white-space: nowrap;
         }
@@ -317,11 +368,12 @@
             word-break: keep-all;
         }
 
-        /* 공간별 활동 (ROI) 리스트 */
+        /* ROI 리스트 */
         .roi-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
+
             margin-bottom: 16px;
         }
 
@@ -329,6 +381,7 @@
             background-color: #f8fafc;
             border-radius: 16px;
             padding: 12px 16px;
+
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -343,12 +396,16 @@
         .roi-icon-box {
             width: 36px;
             height: 36px;
+
             border-radius: 50%;
             border: 1.5px solid #e2e8f0;
+
             background: #ffffff;
+
             display: flex;
             align-items: center;
             justify-content: center;
+
             font-size: 18px;
         }
 
@@ -360,40 +417,54 @@
 
         .roi-data {
             text-align: right;
+
             font-size: 12px;
             font-weight: 700;
             color: #1e293b;
+
             line-height: 1.4;
         }
 
         .roi-footer-desc {
             font-size: 11px;
             color: #94a3b8;
+
             display: flex;
             align-items: center;
             gap: 4px;
+
             line-height: 1.4;
         }
 
-        /* 5. 아기자기한 테이블 스타일 */
+        /* 테이블 */
         .report-table {
             width: 100%;
+
             border-collapse: separate;
             border-spacing: 0;
+
             font-size: 13px;
         }
 
         .report-table th {
             background-color: #f8fafc;
             color: #64748b;
+
             font-weight: 700;
+
             padding: 12px;
             text-align: left;
+
             border-bottom: 2px solid #e2e8f0;
         }
 
-        .report-table th:first-child { border-top-left-radius: 12px; }
-        .report-table th:last-child { border-top-right-radius: 12px; }
+        .report-table th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        .report-table th:last-child {
+            border-top-right-radius: 12px;
+        }
 
         .report-table td {
             padding: 12px;
@@ -404,16 +475,29 @@
         .tag-pill {
             padding: 4px 10px;
             border-radius: 20px;
+
             font-size: 11px;
             font-weight: 700;
+
             display: inline-block;
         }
 
-        .tag-act { background-color: #e0f2fe; color: #0284c7; }
-        .tag-rest { background-color: #fef3c7; color: #d97706; }
-        .tag-done { background-color: #f1f5f9; color: #64748b; }
+        .tag-act {
+            background-color: #e0f2fe;
+            color: #0284c7;
+        }
 
-        /* 6. 보호자 가이드 리스트 */
+        .tag-rest {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+
+        .tag-done {
+            background-color: #f1f5f9;
+            color: #64748b;
+        }
+
+        /* 보호자 가이드 */
         .guide-cards {
             display: flex;
             flex-direction: column;
@@ -422,35 +506,45 @@
 
         .guide-card-item {
             background: #f8fafc;
+
             border-left: 4px solid #0b8484;
             border-radius: 0 14px 14px 0;
+
             padding: 14px 16px;
+
             font-size: 13.5px;
             color: #334155;
             line-height: 1.6;
         }
 
-        /* 푸터 영역 */
+        /* 리포트 푸터 */
         .report-footer {
             margin-top: 10px;
             padding: 16px 0;
+
             display: flex;
             justify-content: space-between;
             align-items: center;
+
             font-size: 12px;
             color: #94a3b8;
         }
 
-        /* '내 반려동물' 버튼 디자인 */
+        /* 내 반려동물 버튼 */
         .pet-btn {
             padding: 8px 16px;
+
             border-radius: 8px;
+
             background-color: #0b8484;
             color: #fff;
+
             font-weight: bold;
             font-size: 14px;
+
             text-decoration: none;
             display: inline-block;
+
             transition: background-color 0.2s;
         }
 
@@ -458,14 +552,28 @@
             background-color: #086868;
         }
 
-        /* 인쇄 시 스타일 조정 */
+        /* 인쇄 */
         @media print {
-            .navbar, .footer, .no-print {
+            .navbar,
+            .footer,
+            .no-print {
                 display: none !important;
             }
-            body { background: #fff; }
-            .report-wrapper { padding: 0; max-width: 100%; }
-            .report-card, .profile-summary-card { box-shadow: none; border: 1px solid #e2e8f0; }
+
+            body {
+                background: #fff;
+            }
+
+            .report-wrapper {
+                padding: 0;
+                max-width: 100%;
+            }
+
+            .report-card,
+            .profile-summary-card {
+                box-shadow: none;
+                border: 1px solid #e2e8f0;
+            }
         }
     </style>
 </head>
@@ -474,302 +582,1667 @@
 
     <!-- 상단 네비게이션 바 -->
     <header class="navbar">
+
         <div class="logo">
             <a th:href="@{/main}">
-                <img th:src="@{/assets/logo.png}" alt="쫑긋 로고" class="logo-img">
+                <img
+                    th:src="@{/assets/logo.png}"
+                    alt="쫑긋 로고"
+                    class="logo-img"
+                >
             </a>
         </div>
+
         <nav class="nav-links">
-            <a th:href="@{/dashboard}">대시보드</a>
-            <a th:href="@{/report}" class="active">리포트</a>
+            <a th:href="@{/dashboard}">
+                대시보드
+            </a>
+
+            <a
+                th:href="@{/report}"
+                class="active"
+            >
+                리포트
+            </a>
         </nav>
+
         <div class="nav-utils">
-            <button class="icon-btn" id="alarmBtn">🔔</button>
-            <a th:href="@{/mypage}" class="icon-btn" id="profileBtn" style="text-decoration: none;">👤</a>
-            <a th:href="@{/pet-management}" class="pet-btn">내 반려동물</a>
+
+            <button
+                class="icon-btn"
+                id="alarmBtn"
+            >
+                🔔
+            </button>
+
+            <a
+                th:href="@{/mypage}"
+                class="icon-btn"
+                id="profileBtn"
+                style="text-decoration: none;"
+            >
+                👤
+            </a>
+
+            <a
+                th:href="@{/pet-management}"
+                class="pet-btn"
+            >
+                내 반려동물
+            </a>
+
         </div>
+
     </header>
+
 
     <!-- 메인 컨테이너 -->
     <main class="dashboard-container">
-        
-        <!-- 상단 액션 버튼 (인쇄/다운로드) -->
-        <div class="no-print" style="max-width: 960px; margin: 0 auto 16px; display: flex; justify-content: flex-end; gap: 10px;">
-            <button class="btn outline-btn" onclick="window.print();">🖨️ 리포트 인쇄 / PDF 저장</button>
+
+
+        <!--
+            로그인 사용자의 실제 반려동물 목록.
+            화면에는 표시하지 않고
+            최신 분석의 pet_id와 PET_INFO를 연결할 때 사용.
+        -->
+        <div
+            id="reportPetMap"
+            style="display: none;"
+        >
+
+            <span
+                th:each="pet : ${petList}"
+                class="report-pet-data"
+                th:data-id="${pet.seq}"
+                th:data-name="${pet.pName}"
+                th:data-species="${pet.pSpecies}"
+            >
+            </span>
+
         </div>
+
+
+        <!-- 인쇄/PDF -->
+        <div
+            class="no-print"
+            style="
+                max-width: 960px;
+                margin: 0 auto 16px;
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+            "
+        >
+
+            <button
+                class="btn outline-btn"
+                onclick="window.print();"
+            >
+                🖨️ 리포트 인쇄 / PDF 저장
+            </button>
+
+        </div>
+
 
         <div class="report-wrapper">
 
-            <!-- 리포트 상단 타이틀 영역 -->
+
+            <!-- 리포트 상단 타이틀 -->
             <div class="report-top-bar">
+
                 <div class="report-title-group">
-                    <h1>🐾 최근 행동 분석 리포트</h1>
-                    <p>최근 AI 분석 결과를 보호자가 이해하기 쉽게 정리했어요.</p>
+
+                    <h1>
+                        🐾 최근 행동 분석 리포트
+                    </h1>
+
+                    <p>
+                        최근 AI 분석 결과를 보호자가 이해하기 쉽게 정리했어요.
+                    </p>
+
                 </div>
-                <div class="date-badge" id="reportDate">📅 최근 분석 불러오는 중</div>
+
+                <div
+                    class="date-badge"
+                    id="reportDate"
+                >
+                    📅 최근 분석 불러오는 중
+                </div>
+
             </div>
 
-            <!-- 프로필 & 메인 소견 카드 -->
+
+            <!-- 프로필 & 메인 소견 -->
             <div class="profile-summary-card">
+
+
+                <!-- 반려동물 정보 -->
                 <div class="pet-profile-box">
-                    <div class="pet-avatar" id="reportPetAvatar">🐾</div>
+
+                    <div
+                        class="pet-avatar"
+                        id="reportPetAvatar"
+                    >
+                        🐾
+                    </div>
+
+
                     <div class="pet-info">
+
                         <div class="pet-name-tag">
-                            <span class="pet-name" id="reportPetName">반려동물 분석</span>
-                            <span class="breed-badge" id="reportSpecies">-</span>
+
+                            <span
+                                class="pet-name"
+                                id="reportPetName"
+                            >
+                                반려동물 분석
+                            </span>
+
+                            <span
+                                class="breed-badge"
+                                id="reportSpecies"
+                            >
+                                -
+                            </span>
+
                         </div>
+
+
                         <div class="meta-text">
-                            <strong>분석 ID:</strong> <span id="reportAnalysisId">-</span><br>
-                            <strong>분석 상태:</strong> <span id="reportAnalysisStatus">불러오는 중</span>
+
+                            <strong>
+                                최근 분석:
+                            </strong>
+
+                            <span id="reportAnalysisDate">
+                                -
+                            </span>
+
+                            <br>
+
+                            <strong>
+                                분석 상태:
+                            </strong>
+
+                            <span id="reportAnalysisStatus">
+                                불러오는 중
+                            </span>
+
                         </div>
+
                     </div>
+
                 </div>
+
+
+                <!-- 메인 메시지 -->
                 <div class="summary-main-msg">
-                    <div class="msg-header" id="reportSummaryTitle">🔎 최근 행동 데이터를 확인하고 있어요</div>
-                    <div class="msg-content" id="reportSummaryText">최신 AI 분석 결과를 불러오는 중입니다.</div>
+
+                    <div
+                        class="msg-header"
+                        id="reportSummaryTitle"
+                    >
+                        🔎 최근 행동 데이터를 확인하고 있어요
+                    </div>
+
+                    <div
+                        class="msg-content"
+                        id="reportSummaryText"
+                    >
+                        최신 AI 분석 결과를 불러오는 중입니다.
+                    </div>
+
                 </div>
+
             </div>
 
-<!-- 1. 최근 분석 상태 요약 -->
+
+            <!-- 최근 분석 상태 요약 -->
             <div class="report-card">
-                <div class="card-header-cute">📊 최근 분석 한눈에 보기</div>
+
+                <div class="card-header-cute">
+                    📊 최근 분석 한눈에 보기
+                </div>
+
+
                 <div class="summary-grid">
+
+
                     <div class="mini-card bg-mint">
-                        <div class="icon">✅</div><div class="label">최근 분석</div>
-                        <div class="value" id="summaryAnalysis" style="color:#0b8484;">-</div>
-                        <div class="subtext" id="summaryAnalysisSub">결과 확인 중</div>
+
+                        <div class="icon">
+                            ✅
+                        </div>
+
+                        <div class="label">
+                            최근 분석
+                        </div>
+
+                        <div
+                            class="value"
+                            id="summaryAnalysis"
+                            style="color:#0b8484;"
+                        >
+                            -
+                        </div>
+
+                        <div
+                            class="subtext"
+                            id="summaryAnalysisSub"
+                        >
+                            결과 확인 중
+                        </div>
+
                     </div>
+
+
                     <div class="mini-card bg-rose">
-                        <div class="icon">🧠</div><div class="label">기준 패턴</div>
-                        <div class="value" id="summaryBaseline" style="color:#e11d48;">-</div>
-                        <div class="subtext" id="summaryBaselineSub">상태 확인 중</div>
+
+                        <div class="icon">
+                            🧠
+                        </div>
+
+                        <div class="label">
+                            기준 패턴
+                        </div>
+
+                        <div
+                            class="value"
+                            id="summaryBaseline"
+                            style="color:#e11d48;"
+                        >
+                            -
+                        </div>
+
+                        <div
+                            class="subtext"
+                            id="summaryBaselineSub"
+                        >
+                            상태 확인 중
+                        </div>
+
                     </div>
+
+
                     <div class="mini-card bg-amber">
-                        <div class="icon">🔔</div><div class="label">변화 평가</div>
-                        <div class="value" id="summaryChange" style="color:#d97706;">-</div>
-                        <div class="subtext" id="summaryChangeSub">상태 확인 중</div>
+
+                        <div class="icon">
+                            🔔
+                        </div>
+
+                        <div class="label">
+                            변화 평가
+                        </div>
+
+                        <div
+                            class="value"
+                            id="summaryChange"
+                            style="color:#d97706;"
+                        >
+                            -
+                        </div>
+
+                        <div
+                            class="subtext"
+                            id="summaryChangeSub"
+                        >
+                            상태 확인 중
+                        </div>
+
                     </div>
+
+
                     <div class="mini-card bg-blue">
-                        <div class="icon">🏠</div><div class="label">오늘 주요 체류 공간</div>
-                        <div class="value" id="summaryTopRoi" style="color:#0284c7;">-</div>
-                        <div class="subtext" id="summaryTopRoiSub">ROI 데이터 확인 중</div>
+
+                        <div class="icon">
+                            🏠
+                        </div>
+
+                        <div class="label">
+                            오늘 주요 체류 공간
+                        </div>
+
+                        <div
+                            class="value"
+                            id="summaryTopRoi"
+                            style="color:#0284c7;"
+                        >
+                            -
+                        </div>
+
+                        <div
+                            class="subtext"
+                            id="summaryTopRoiSub"
+                        >
+                            ROI 데이터 확인 중
+                        </div>
+
                     </div>
+
+
                 </div>
+
             </div>
 
-<!-- 2. 실제 행동 지표 & 공간별 활동(ROI) -->
+
+            <!-- 행동 지표 & ROI -->
             <div class="behavior-roi-section">
+
+
+                <!-- 행동 지표 -->
                 <div class="report-card">
-                    <div class="card-title-group"><span>📊 최근 행동 지표</span><span class="info-circle" title="최근 AI 분석에서 계산된 실제 행동 지표입니다.">?</span></div>
+
+                    <div class="card-title-group">
+
+                        <span>
+                            📊 최근 행동 지표
+                        </span>
+
+                        <span
+                            class="info-circle"
+                            title="최근 AI 분석에서 계산된 실제 행동 지표입니다."
+                        >
+                            ?
+                        </span>
+
+                    </div>
+
+
                     <div class="behavior-cards-grid">
-                        <div class="cute-metric-card bg-blue"><div class="icon-img">🐕</div><div class="metric-title">활동량</div><div class="metric-value" id="reportActivity">-</div><div class="status-pill">최근 분석값</div><div class="metric-desc">영상에서 계산한 움직임 정도예요.</div></div>
-                        <div class="cute-metric-card bg-pink"><div class="icon-img">🐶</div><div class="metric-title">정지 비율</div><div class="metric-value" id="reportStationary">-</div><div class="status-pill">최근 분석값</div><div class="metric-desc">분석 시간 중 머물러 있던 비율이에요.</div></div>
-                        <div class="cute-metric-card bg-green"><div class="icon-img">📍</div><div class="metric-title">이동 거리</div><div class="metric-value" id="reportDistance">-</div><div class="status-pill">최근 분석값</div><div class="metric-desc">영상 크기를 기준으로 정규화한 이동량이에요.</div></div>
-                        <div class="cute-metric-card bg-yellow"><div class="icon-img">🧭</div><div class="metric-title">이동 속도</div><div class="metric-value" id="reportSpeed">-</div><div class="status-pill">최근 분석값</div><div class="metric-desc">이동 중 계산된 정규화 속도예요.</div></div>
+
+
+                        <div class="cute-metric-card bg-blue">
+
+                            <div class="icon-img">
+                                🐕
+                            </div>
+
+                            <div class="metric-title">
+                                활동량
+                            </div>
+
+                            <div
+                                class="metric-value"
+                                id="reportActivity"
+                            >
+                                -
+                            </div>
+
+                            <div class="status-pill">
+                                최근 분석값
+                            </div>
+
+                            <div class="metric-desc">
+                                영상에서 계산한 움직임 정도예요.
+                            </div>
+
+                        </div>
+
+
+                        <div class="cute-metric-card bg-pink">
+
+                            <div class="icon-img">
+                                🐶
+                            </div>
+
+                            <div class="metric-title">
+                                정지 비율
+                            </div>
+
+                            <div
+                                class="metric-value"
+                                id="reportStationary"
+                            >
+                                -
+                            </div>
+
+                            <div class="status-pill">
+                                최근 분석값
+                            </div>
+
+                            <div class="metric-desc">
+                                분석 시간 중 머물러 있던 비율이에요.
+                            </div>
+
+                        </div>
+
+
+                        <div class="cute-metric-card bg-green">
+
+                            <div class="icon-img">
+                                📍
+                            </div>
+
+                            <div class="metric-title">
+                                이동 거리
+                            </div>
+
+                            <div
+                                class="metric-value"
+                                id="reportDistance"
+                            >
+                                -
+                            </div>
+
+                            <div class="status-pill">
+                                최근 분석값
+                            </div>
+
+                            <div class="metric-desc">
+                                영상 크기를 기준으로 정규화한 이동량이에요.
+                            </div>
+
+                        </div>
+
+
+                        <div class="cute-metric-card bg-yellow">
+
+                            <div class="icon-img">
+                                🧭
+                            </div>
+
+                            <div class="metric-title">
+                                이동 속도
+                            </div>
+
+                            <div
+                                class="metric-value"
+                                id="reportSpeed"
+                            >
+                                -
+                            </div>
+
+                            <div class="status-pill">
+                                최근 분석값
+                            </div>
+
+                            <div class="metric-desc">
+                                이동 중 계산된 정규화 속도예요.
+                            </div>
+
+                        </div>
+
+
                     </div>
+
                 </div>
+
+
+                <!-- ROI -->
                 <div class="report-card">
-                    <div class="card-title-group"><span>📍 오늘의 공간별 체류 (ROI)</span><span class="beta-badge">실데이터</span></div>
-                    <div class="roi-list" id="reportRoiList">
-                        <div class="roi-item"><div class="roi-info-group"><div class="roi-icon-box">⏳</div><div class="roi-name">ROI 데이터 불러오는 중</div></div></div>
+
+                    <div class="card-title-group">
+
+                        <span>
+                            📍 오늘의 공간별 체류 (ROI)
+                        </span>
+
+                        <span class="beta-badge">
+                            공간 분석
+                        </span>
+
                     </div>
-                    <div class="roi-footer-desc"><span>ℹ️</span> 오늘 저장된 ROI 체류 기록을 기준으로 보여드려요.</div>
+
+
+                    <div
+                        class="roi-list"
+                        id="reportRoiList"
+                    >
+
+                        <div class="roi-item">
+
+                            <div class="roi-info-group">
+
+                                <div class="roi-icon-box">
+                                    ⏳
+                                </div>
+
+                                <div class="roi-name">
+                                    ROI 데이터 불러오는 중
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="roi-footer-desc">
+
+                        <span>
+                            ℹ️
+                        </span>
+
+                        오늘 저장된 ROI 체류 기록을 기준으로 보여드려요.
+
+                    </div>
+
                 </div>
+
+
             </div>
 
-<!-- 3. 최근 변화 평가 -->
+
+            <!-- 최근 변화 평가 -->
             <div class="report-card">
-                <div class="card-header-cute">🚨 최근 변화 평가</div>
-                <table class="report-table"><thead><tr><th>분석 일시</th><th>기준 패턴</th><th>변화 평가</th><th>상태</th></tr></thead>
-                    <tbody id="reportChangeTableBody"><tr><td colspan="4">최근 분석 상태를 불러오는 중입니다.</td></tr></tbody>
+
+                <div class="card-header-cute">
+                    🚨 최근 변화 평가
+                </div>
+
+
+                <table class="report-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>
+                                분석 일시
+                            </th>
+
+                            <th>
+                                기준 패턴
+                            </th>
+
+                            <th>
+                                변화 평가
+                            </th>
+
+                            <th>
+                                상태
+                            </th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="reportChangeTableBody">
+
+                        <tr>
+                            <td colspan="4">
+                                최근 분석 상태를 불러오는 중입니다.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
                 </table>
+
             </div>
 
-<!-- 4. 보호자 안내 -->
+
+            <!-- 보호자 안내 -->
             <div class="report-card">
-                <div class="card-header-cute">💡 보호자를 위한 안내</div>
-                <div class="guide-cards" id="reportGuideCards"><div class="guide-card-item">최신 분석 상태를 확인하고 있어요.</div></div>
+
+                <div class="card-header-cute">
+                    💡 보호자를 위한 안내
+                </div>
+
+                <div
+                    class="guide-cards"
+                    id="reportGuideCards"
+                >
+
+                    <div class="guide-card-item">
+                        최신 분석 상태를 확인하고 있어요.
+                    </div>
+
+                </div>
+
             </div>
 
-<!-- 푸터 영역 -->
+
+            <!-- 리포트 내부 푸터 -->
             <footer class="report-footer">
-                <div>발행기관: 쫑긋 AI 펫케어 센터</div>
-                <div>© 2026 쫑긋. All rights reserved.</div>
+
+                <div>
+                    발행기관: 쫑긋 AI 펫케어 센터
+                </div>
+
+                <div>
+                    © 2026 쫑긋. All rights reserved.
+                </div>
+
             </footer>
+
 
         </div>
 
     </main>
 
-    <!-- 하단 푸터 -->
+
+    <!-- 페이지 하단 푸터 -->
     <footer class="footer">
+
         <div class="footer-bottom">
-            <p>© 2026 쫑긋. All rights reserved.</p>
+
+            <p>
+                © 2026 쫑긋. All rights reserved.
+            </p>
+
         </div>
+
     </footer>
 
-\n
 
     <script>
-    (() => {
-      const $ = (id) => document.getElementById(id);
-      const pick = (obj, ...keys) => {
-        if (!obj) return null;
-        for (const key of keys) {
-          if (obj[key] !== undefined && obj[key] !== null) return obj[key];
-        }
-        return null;
-      };
-      const num = (v) => {
-        const n = Number(v);
-        return Number.isFinite(n) ? n : null;
-      };
-      const fmt3 = (v) => {
-        const n = num(v);
-        return n === null ? '-' : n.toFixed(3);
-      };
-      const pct01 = (v) => {
-        const n = num(v);
-        return n === null ? '-' : (n * 100).toFixed(1) + '%';
-      };
-      const fmtDateTime = (v) => {
-        if (!v) return '-';
-        const d = new Date(v);
-        if (Number.isNaN(d.getTime())) return String(v);
-        return new Intl.DateTimeFormat('ko-KR', {
-          year: 'numeric', month: '2-digit', day: '2-digit',
-          hour: '2-digit', minute: '2-digit'
-        }).format(d);
-      };
-      const fmtSeconds = (v) => {
-        const s = Math.max(0, Math.round(Number(v) || 0));
-        const m = Math.floor(s / 60);
-        const r = s % 60;
-        return m > 0 ? `${m}\uBD84 ${r}\uCD08` : `${r}\uCD08`;
-      };
-      const analysisText = (status) => {
-        const s = String(status || '').toUpperCase();
-        if (s === 'COMPLETED' || s === 'COMPLETED_WITH_WARNING') return '\uBD84\uC11D \uC644\uB8CC';
-        if (s === 'FAILED') return '\uBD84\uC11D \uC2E4\uD328';
-        return status || '\uB370\uC774\uD130 \uC5C6\uC74C';
-      };
-      const baselineText = (status) => {
-        const s = String(status || '').toUpperCase();
-        if (s === 'NOT_READY') return '\uD559\uC2B5 \uC911';
-        if (s === 'READY') return '\uC900\uBE44 \uC644\uB8CC';
-        return status || '\uD655\uC778 \uC911';
-      };
-      const changeText = (status) => {
-        const s = String(status || '').toUpperCase();
-        if (s === 'NOT_EVALUATED') return '\uD3C9\uAC00 \uB300\uAE30';
-        if (s === 'NO_CHANGE' || s === 'NORMAL') return '\uD070 \uBCC0\uD654 \uC5C6\uC74C';
-        if (s === 'CHANGED' || s === 'CHANGE_DETECTED') return '\uBCC0\uD654 \uAC10\uC9C0';
-        return status || '\uD655\uC778 \uC911';
-      };
-      const roiLabel = (name) => ({
-        FOOD_BOWL: '\uBC25\uADF8\uB987',
-        WATER_BOWL: '\uBB3C\uADF8\uB987',
-        BED: '\uCE68\uB300',
-        ETC: '\uAE30\uD0C0 \uACF5\uAC04'
-      })[name] || name || 'ROI';
-      const roiIcon = (name) => ({
-        FOOD_BOWL: '\uD83E\uDD63',
-        WATER_BOWL: '\uD83D\uDCA7',
-        BED: '\uD83D\uDECF\uFE0F',
-        ETC: '\uD83D\uDCCD'
-      })[name] || '\uD83D\uDCCD';
+        (() => {
 
-      async function loadLatest() {
-        try {
-          const r = await fetch('/api/pet/analysis/latest', {headers:{Accept:'application/json'}});
-          if (r.status === 204) throw new Error('no latest analysis');
-          if (!r.ok) throw new Error('latest ' + r.status);
-          const d = await r.json();
+            const $ =
+                (id) =>
+                    document.getElementById(id);
 
-          const analysisStatus = pick(d,'analysis_status','analysisStatus','ANALYSIS_STATUS');
-          const baselineStatus = pick(d,'baseline_status','baselineStatus','BASELINE_STATUS');
-          const changeStatus = pick(d,'change_status','changeStatus','CHANGE_STATUS');
-          const recordedAt = pick(d,'recorded_at','recordedAt','RECORDED_AT');
-          const analysisId = pick(d,'analysis_id','analysisId','ANALYSIS_ID');
-          const petId = pick(d,'pet_id','petId','PET_ID');
-          const species = String(pick(d,'species','SPECIES') || '').toUpperCase();
-          const activity = pick(d,'activity_level','activityLevel','ACTIVITY_LEVEL');
-          const stationary = pick(d,'stationary_ratio','stationaryRatio','STATIONARY_RATIO');
-          const distance = pick(d,'normalized_travel_distance','normalizedTravelDistance','NORMALIZED_TRAVEL_DISTANCE');
-          const speed = pick(d,'normalized_moving_speed','normalizedMovingSpeed','NORMALIZED_MOVING_SPEED');
 
-          $('reportDate').textContent = '\uD83D\uDCC5 ' + fmtDateTime(recordedAt);
-          $('reportPetAvatar').textContent = species === 'CAT' ? '\uD83D\uDC31' : species === 'DOG' ? '\uD83D\uDC36' : '\uD83D\uDC3E';
-          $('reportPetName').textContent = petId ? `\uBC18\uB824\uB3D9\uBB3C #${petId}` : '\uBC18\uB824\uB3D9\uBB3C \uBD84\uC11D';
-          $('reportSpecies').textContent = species || '-';
-          $('reportAnalysisId').textContent = analysisId || '-';
-          $('reportAnalysisStatus').textContent = analysisText(analysisStatus);
-          $('reportActivity').textContent = fmt3(activity);
-          $('reportStationary').textContent = pct01(stationary);
-          $('reportDistance').textContent = fmt3(distance);
-          $('reportSpeed').textContent = fmt3(speed);
-          $('summaryAnalysis').textContent = analysisText(analysisStatus);
-          $('summaryAnalysisSub').textContent = recordedAt ? fmtDateTime(recordedAt) : '\uCD5C\uADFC \uBD84\uC11D \uACB0\uACFC';
-          $('summaryBaseline').textContent = baselineText(baselineStatus);
-          $('summaryBaselineSub').textContent = String(baselineStatus||'').toUpperCase()==='NOT_READY' ? '\uD589\uB3D9 \uB370\uC774\uD130 \uB204\uC801 \uC911' : '\uD3C9\uC18C \uD328\uD134 \uBE44\uAD50 \uAC00\uB2A5';
-          $('summaryChange').textContent = changeText(changeStatus);
-          $('summaryChangeSub').textContent = String(changeStatus||'').toUpperCase()==='NOT_EVALUATED' ? '\uAE30\uC900 \uD328\uD134 \uC900\uBE44 \uD6C4 \uD3C9\uAC00' : '\uCD5C\uADFC \uBD84\uC11D \uAE30\uC900';
+            const pick =
+                (obj, ...keys) => {
 
-          if (String(baselineStatus||'').toUpperCase()==='NOT_READY') {
-            $('reportSummaryTitle').textContent='\uD83E\uDDE0 \uC9C0\uAE08\uC740 \uD3C9\uC18C \uD589\uB3D9 \uD328\uD134\uC744 \uD559\uC2B5\uD558\uACE0 \uC788\uC5B4\uC694';
-            $('reportSummaryText').innerHTML=`\uCD5C\uADFC \uBD84\uC11D\uC740 \uC815\uC0C1\uC801\uC73C\uB85C \uC644\uB8CC\uB410\uC5B4\uC694. \uC774\uBC88 \uC601\uC0C1\uC5D0\uC11C \uD65C\uB3D9\uB7C9 <strong>${fmt3(activity)}</strong>, \uC815\uC9C0 \uBE44\uC728 <strong>${pct01(stationary)}</strong>\uAC00 \uAE30\uB85D\uB410\uC2B5\uB2C8\uB2E4. \uD589\uB3D9 \uB370\uC774\uD130\uAC00 \uCD94\uAC00\uB85C \uC313\uC774\uBA74 \uD3C9\uC18C\uC640 \uB2E4\uB978 \uBCC0\uD654\uB97C \uD568\uAED8 \uC54C\uB824\uB4DC\uB9B4\uAC8C\uC694.`;
-          } else {
-            $('reportSummaryTitle').textContent='\uD83D\uDD0E \uCD5C\uADFC \uD589\uB3D9 \uBD84\uC11D\uC774 \uC644\uB8CC\uB410\uC5B4\uC694';
-            $('reportSummaryText').innerHTML=`\uCD5C\uADFC \uBD84\uC11D \uACB0\uACFC\uB97C \uAE30\uC900 \uD328\uD134\uACFC \uBE44\uAD50\uD55C \uC0C1\uD0DC\uB294 <strong>${changeText(changeStatus)}</strong>\uC785\uB2C8\uB2E4.`;
-          }
+                    if (!obj) {
+                        return null;
+                    }
 
-          $('reportChangeTableBody').innerHTML=`<tr><td>${fmtDateTime(recordedAt)}</td><td>${baselineText(baselineStatus)}</td><td>${changeText(changeStatus)}</td><td><span class="tag-pill tag-done">${analysisText(analysisStatus)}</span></td></tr>`;
+                    for (const key of keys) {
 
-          if (String(baselineStatus||'').toUpperCase()==='NOT_READY') {
-            $('reportGuideCards').innerHTML='<div class="guide-card-item"><strong>\uAE30\uC900 \uD328\uD134 \uD559\uC2B5 \uC911:</strong> \uD604\uC7AC\uB294 \uBC18\uB824\uB3D9\uBB3C\uC758 \uD3C9\uC18C \uD589\uB3D9\uC744 \uC54C\uC544\uAC00\uAE30 \uC704\uD55C \uB370\uC774\uD130\uB97C \uB204\uC801\uD558\uACE0 \uC788\uC5B4\uC694.</div><div class="guide-card-item"><strong>\uBD84\uC11D \uACB0\uACFC \uD65C\uC6A9:</strong> \uCAD1\uAE0B\uC740 \uAC74\uAC15 \uC0C1\uD0DC\uB97C \uC9C4\uB2E8\uD558\uB294 \uC11C\uBE44\uC2A4\uAC00 \uC544\uB2C8\uB77C, \uD3C9\uC18C\uC640 \uB2E4\uB978 \uD589\uB3D9 \uBCC0\uD654\uB97C \uC54C\uC544\uCC28\uB9AC\uB294 \uB370 \uB3C4\uC6C0\uC744 \uC8FC\uAE30 \uC704\uD55C \uC11C\uBE44\uC2A4\uC608\uC694.</div>';
-          } else {
-            $('reportGuideCards').innerHTML=`<div class="guide-card-item"><strong>\uCD5C\uADFC \uBCC0\uD654 \uD3C9\uAC00:</strong> \uD604\uC7AC \uC0C1\uD0DC\uB294 <strong>${changeText(changeStatus)}</strong>\uC785\uB2C8\uB2E4.</div><div class="guide-card-item"><strong>\uBD84\uC11D \uACB0\uACFC \uD65C\uC6A9:</strong> \uD589\uB3D9 \uBD84\uC11D \uACB0\uACFC\uB294 \uBCF4\uD638\uC790\uC758 \uAD00\uCC30\uC744 \uB3D5\uAE30 \uC704\uD55C \uC815\uBCF4\uC785\uB2C8\uB2E4.</div>`;
-          }
-        } catch (e) {
-          console.error('[REPORT] latest analysis load failed',e);
-          $('reportSummaryTitle').textContent='\uD83D\uDCEC \uC544\uC9C1 \uD45C\uC2DC\uD560 \uBD84\uC11D \uACB0\uACFC\uAC00 \uC5C6\uC5B4\uC694';
-          $('reportSummaryText').textContent='\uB300\uC2DC\uBCF4\uB4DC\uC5D0\uC11C \uC601\uC0C1\uC744 \uBD84\uC11D\uD558\uBA74 \uCD5C\uADFC \uACB0\uACFC\uAC00 \uC774 \uB9AC\uD3EC\uD2B8\uC5D0 \uD45C\uC2DC\uB429\uB2C8\uB2E4.';
-          $('reportAnalysisStatus').textContent='\uB370\uC774\uD130 \uC5C6\uC74C';
-          $('summaryAnalysis').textContent='\uB370\uC774\uD130 \uC5C6\uC74C';
-          $('summaryBaseline').textContent='-';
-          $('summaryChange').textContent='-';
-          $('reportChangeTableBody').innerHTML='<tr><td colspan="4">\uC544\uC9C1 \uC800\uC7A5\uB41C \uBD84\uC11D \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.</td></tr>';
-        }
-      }
+                        if (
+                            obj[key] !== undefined
+                            && obj[key] !== null
+                        ) {
+                            return obj[key];
+                        }
 
-      async function loadRoi() {
-        try {
-          const r=await fetch('/api/monitoring/today-stay-ratio',{headers:{Accept:'application/json'}});
-          if(!r.ok) throw new Error('roi '+r.status);
-          const d=await r.json();
-          const rs=Array.isArray(d.ratios)?d.ratios:[];
-          if(!rs.length){
-            $('summaryTopRoi').textContent='\uB370\uC774\uD130 \uC5C6\uC74C';
-            $('summaryTopRoiSub').textContent='\uC624\uB298 \uC800\uC7A5\uB41C ROI \uCCB4\uB958 \uAE30\uB85D \uC5C6\uC74C';
-            $('reportRoiList').innerHTML='<div class="roi-item"><div class="roi-info-group"><div class="roi-icon-box">\uD83D\uDCEC</div><div class="roi-name">\uC624\uB298 \uC800\uC7A5\uB41C \uACF5\uAC04 \uCCB4\uB958 \uB370\uC774\uD130\uAC00 \uC5C6\uC5B4\uC694</div></div></div>';
-            return;
-          }
-          const top=rs[0];
-          $('summaryTopRoi').textContent=`${roiLabel(top.roiName)} ${Number(top.percent||0)}%`;
-          $('summaryTopRoiSub').textContent=`${fmtSeconds(top.stayTime)} \uCCB4\uB958`;
-          $('reportRoiList').innerHTML=rs.slice(0,4).map(x=>`<div class="roi-item"><div class="roi-info-group"><div class="roi-icon-box">${roiIcon(x.roiName)}</div><div class="roi-name">${roiLabel(x.roiName)}</div></div><div class="roi-data">${fmtSeconds(x.stayTime)} \uCCB4\uB958<br>\uC624\uB298 \uCCB4\uB958\uC758 ${Number(x.percent||0)}%</div></div>`).join('');
-        } catch(e){
-          console.error('[REPORT] roi summary load failed',e);
-          $('summaryTopRoi').textContent='\uC870\uD68C \uC2E4\uD328';
-          $('summaryTopRoiSub').textContent='ROI \uB370\uC774\uD130\uB97C \uD655\uC778\uD574 \uC8FC\uC138\uC694';
-          $('reportRoiList').innerHTML='<div class="roi-item"><div class="roi-info-group"><div class="roi-icon-box">\u26A0\uFE0F</div><div class="roi-name">ROI \uB370\uC774\uD130\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC5B4\uC694</div></div></div>';
-        }
-      }
+                    }
 
-      document.addEventListener('DOMContentLoaded',()=>{ loadLatest(); loadRoi(); });
-    })();
+                    return null;
+                };
+
+
+            const num =
+                (value) => {
+
+                    const n =
+                        Number(value);
+
+                    return Number.isFinite(n)
+                        ? n
+                        : null;
+                };
+
+
+            const fmt3 =
+                (value) => {
+
+                    const n =
+                        num(value);
+
+                    return n === null
+                        ? '-'
+                        : n.toFixed(3);
+                };
+
+
+            const pct01 =
+                (value) => {
+
+                    const n =
+                        num(value);
+
+                    return n === null
+                        ? '-'
+                        : (n * 100).toFixed(1) + '%';
+                };
+
+
+            const fmtDateTime =
+                (value) => {
+
+                    if (!value) {
+                        return '-';
+                    }
+
+                    const date =
+                        new Date(value);
+
+                    if (
+                        Number.isNaN(
+                            date.getTime()
+                        )
+                    ) {
+                        return String(value);
+                    }
+
+                    return new Intl.DateTimeFormat(
+                        'ko-KR',
+                        {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }
+                    ).format(date);
+
+                };
+
+
+            const fmtSeconds =
+                (value) => {
+
+                    const seconds =
+                        Math.max(
+                            0,
+                            Math.round(
+                                Number(value) || 0
+                            )
+                        );
+
+                    const minutes =
+                        Math.floor(
+                            seconds / 60
+                        );
+
+                    const remains =
+                        seconds % 60;
+
+                    return minutes > 0
+                        ? `${minutes}분 ${remains}초`
+                        : `${remains}초`;
+                };
+
+
+            const analysisText =
+                (status) => {
+
+                    const value =
+                        String(
+                            status || ''
+                        ).toUpperCase();
+
+                    if (
+                        value === 'COMPLETED'
+                        || value === 'COMPLETED_WITH_WARNING'
+                    ) {
+                        return '분석 완료';
+                    }
+
+                    if (
+                        value === 'FAILED'
+                    ) {
+                        return '분석 실패';
+                    }
+
+                    return status
+                        || '데이터 없음';
+                };
+
+
+            const baselineText =
+                (status) => {
+
+                    const value =
+                        String(
+                            status || ''
+                        ).toUpperCase();
+
+                    if (
+                        value === 'NOT_READY'
+                    ) {
+                        return '학습 중';
+                    }
+
+                    if (
+                        value === 'READY'
+                    ) {
+                        return '준비 완료';
+                    }
+
+                    return status
+                        || '확인 중';
+                };
+
+
+            const changeText =
+                (status) => {
+
+                    const value =
+                        String(
+                            status || ''
+                        ).toUpperCase();
+
+                    if (
+                        value === 'NOT_EVALUATED'
+                    ) {
+                        return '평가 대기';
+                    }
+
+                    if (
+                        value === 'NO_CHANGE'
+                        || value === 'NORMAL'
+                    ) {
+                        return '큰 변화 없음';
+                    }
+
+                    if (
+                        value === 'CHANGED'
+                        || value === 'CHANGE_DETECTED'
+                    ) {
+                        return '변화 감지';
+                    }
+
+                    return status
+                        || '확인 중';
+                };
+
+
+            const roiLabel =
+                (name) => ({
+
+                    FOOD_BOWL:
+                        '밥그릇',
+
+                    WATER_BOWL:
+                        '물그릇',
+
+                    BED:
+                        '침대',
+
+                    ETC:
+                        '기타 공간'
+
+                })[name]
+                    || name
+                    || 'ROI';
+
+
+            const roiIcon =
+                (name) => ({
+
+                    FOOD_BOWL:
+                        '🥣',
+
+                    WATER_BOWL:
+                        '💧',
+
+                    BED:
+                        '🛏️',
+
+                    ETC:
+                        '📍'
+
+                })[name]
+                    || '📍';
+
+
+            /* ==========================================
+               최신 AI 분석 결과
+               ========================================== */
+            async function loadLatest() {
+
+                try {
+
+                    const response =
+                        await fetch(
+                            '/api/pet/analysis/latest',
+                            {
+                                headers: {
+                                    Accept:
+                                        'application/json'
+                                },
+
+                                cache:
+                                    'no-store'
+                            }
+                        );
+
+
+                    if (
+                        response.status === 204
+                    ) {
+                        throw new Error(
+                            'no latest analysis'
+                        );
+                    }
+
+
+                    if (
+                        !response.ok
+                    ) {
+                        throw new Error(
+                            'latest '
+                            + response.status
+                        );
+                    }
+
+
+                    const data =
+                        await response.json();
+
+
+                    const analysisStatus =
+                        pick(
+                            data,
+                            'analysis_status',
+                            'analysisStatus',
+                            'ANALYSIS_STATUS'
+                        );
+
+
+                    const baselineStatus =
+                        pick(
+                            data,
+                            'baseline_status',
+                            'baselineStatus',
+                            'BASELINE_STATUS'
+                        );
+
+
+                    const changeStatus =
+                        pick(
+                            data,
+                            'change_status',
+                            'changeStatus',
+                            'CHANGE_STATUS'
+                        );
+
+
+                    const recordedAt =
+                        pick(
+                            data,
+                            'recorded_at',
+                            'recordedAt',
+                            'RECORDED_AT'
+                        );
+
+
+                    const petId =
+                        pick(
+                            data,
+                            'pet_id',
+                            'petId',
+                            'PET_ID'
+                        );
+
+
+                    const species =
+                        String(
+                            pick(
+                                data,
+                                'species',
+                                'SPECIES'
+                            ) || ''
+                        )
+                        .trim()
+                        .toUpperCase();
+
+
+                    const activity =
+                        pick(
+                            data,
+                            'activity_level',
+                            'activityLevel',
+                            'ACTIVITY_LEVEL'
+                        );
+
+
+                    const stationary =
+                        pick(
+                            data,
+                            'stationary_ratio',
+                            'stationaryRatio',
+                            'STATIONARY_RATIO'
+                        );
+
+
+                    const distance =
+                        pick(
+                            data,
+                            'normalized_travel_distance',
+                            'normalizedTravelDistance',
+                            'NORMALIZED_TRAVEL_DISTANCE'
+                        );
+
+
+                    const speed =
+                        pick(
+                            data,
+                            'normalized_moving_speed',
+                            'normalizedMovingSpeed',
+                            'NORMALIZED_MOVING_SPEED'
+                        );
+
+
+                    /* ==========================
+                       상단 날짜
+                       ========================== */
+                    $('reportDate')
+                        .textContent =
+                            '📅 '
+                            + fmtDateTime(
+                                recordedAt
+                            );
+
+
+                    /* ==========================
+                       PET_INFO 실제 이름 매핑
+                       ========================== */
+                    const petData =
+                        Array.from(
+                            document.querySelectorAll(
+                                '.report-pet-data'
+                            )
+                        )
+                        .find(
+                            (item) =>
+                                String(
+                                    item.dataset.id
+                                )
+                                ===
+                                String(
+                                    petId
+                                )
+                        );
+
+
+                    const actualPetName =
+                        petData?.dataset?.name
+                        || (
+                            petId
+                                ? `반려동물 #${petId}`
+                                : '반려동물'
+                        );
+
+
+                    const actualSpecies =
+                        String(
+                            petData
+                                ?.dataset
+                                ?.species
+                            || species
+                            || ''
+                        )
+                        .trim()
+                        .toUpperCase();
+
+
+                    let speciesLabel =
+                        '-';
+
+                    let petEmoji =
+                        '🐾';
+
+
+                    if (
+                        actualSpecies === 'DOG'
+                        || actualSpecies === '개'
+                        || actualSpecies === '강아지'
+                    ) {
+
+                        speciesLabel =
+                            '강아지';
+
+                        petEmoji =
+                            '🐶';
+
+                    } else if (
+                        actualSpecies === 'CAT'
+                        || actualSpecies === '고양이'
+                    ) {
+
+                        speciesLabel =
+                            '고양이';
+
+                        petEmoji =
+                            '🐱';
+
+                    }
+
+
+                    $('reportPetAvatar')
+                        .textContent =
+                            petEmoji;
+
+
+                    $('reportPetName')
+                        .textContent =
+                            actualPetName;
+
+
+                    $('reportSpecies')
+                        .textContent =
+                            speciesLabel;
+
+
+                    $('reportAnalysisDate')
+                        .textContent =
+                            fmtDateTime(
+                                recordedAt
+                            );
+
+
+                    $('reportAnalysisStatus')
+                        .textContent =
+                            analysisText(
+                                analysisStatus
+                            );
+
+
+                    /* ==========================
+                       행동 지표
+                       ========================== */
+                    $('reportActivity')
+                        .textContent =
+                            fmt3(
+                                activity
+                            );
+
+
+                    $('reportStationary')
+                        .textContent =
+                            pct01(
+                                stationary
+                            );
+
+
+                    $('reportDistance')
+                        .textContent =
+                            fmt3(
+                                distance
+                            );
+
+
+                    $('reportSpeed')
+                        .textContent =
+                            fmt3(
+                                speed
+                            );
+
+
+                    /* ==========================
+                       요약 카드
+                       ========================== */
+                    $('summaryAnalysis')
+                        .textContent =
+                            analysisText(
+                                analysisStatus
+                            );
+
+
+                    $('summaryAnalysisSub')
+                        .textContent =
+                            recordedAt
+                                ? fmtDateTime(
+                                    recordedAt
+                                )
+                                : '최근 분석 결과';
+
+
+                    $('summaryBaseline')
+                        .textContent =
+                            baselineText(
+                                baselineStatus
+                            );
+
+
+                    $('summaryBaselineSub')
+                        .textContent =
+                            String(
+                                baselineStatus
+                                || ''
+                            )
+                            .toUpperCase()
+                            === 'NOT_READY'
+
+                                ? '행동 데이터 누적 중'
+
+                                : '평소 패턴 비교 가능';
+
+
+                    $('summaryChange')
+                        .textContent =
+                            changeText(
+                                changeStatus
+                            );
+
+
+                    $('summaryChangeSub')
+                        .textContent =
+                            String(
+                                changeStatus
+                                || ''
+                            )
+                            .toUpperCase()
+                            === 'NOT_EVALUATED'
+
+                                ? '기준 패턴 준비 후 평가'
+
+                                : '최근 분석 기준';
+
+
+                    /* ==========================
+                       메인 설명
+                       ========================== */
+                    if (
+                        String(
+                            baselineStatus
+                            || ''
+                        )
+                        .toUpperCase()
+                        === 'NOT_READY'
+                    ) {
+
+                        $('reportSummaryTitle')
+                            .textContent =
+                                '🧠 지금은 평소 행동 패턴을 학습하고 있어요';
+
+
+                        $('reportSummaryText')
+                            .innerHTML =
+                                `최근 분석은 정상적으로 완료됐어요. `
+                                + `이번 영상에서 활동량 `
+                                + `<strong>${fmt3(activity)}</strong>, `
+                                + `정지 비율 `
+                                + `<strong>${pct01(stationary)}</strong>`
+                                + `가 기록됐습니다. `
+                                + `행동 데이터가 추가로 쌓이면 `
+                                + `평소와 다른 변화를 함께 알려드릴게요.`;
+
+                    } else {
+
+                        $('reportSummaryTitle')
+                            .textContent =
+                                '🔎 최근 행동 분석이 완료됐어요';
+
+
+                        $('reportSummaryText')
+                            .innerHTML =
+                                `최근 분석 결과를 `
+                                + `기준 패턴과 비교한 상태는 `
+                                + `<strong>${changeText(changeStatus)}</strong>`
+                                + `입니다.`;
+
+                    }
+
+
+                    /* ==========================
+                       변화 평가 표
+                       ========================== */
+                    $('reportChangeTableBody')
+                        .innerHTML =
+                            `
+                            <tr>
+
+                                <td>
+                                    ${fmtDateTime(recordedAt)}
+                                </td>
+
+                                <td>
+                                    ${baselineText(baselineStatus)}
+                                </td>
+
+                                <td>
+                                    ${changeText(changeStatus)}
+                                </td>
+
+                                <td>
+
+                                    <span class="tag-pill tag-done">
+
+                                        ${analysisText(analysisStatus)}
+
+                                    </span>
+
+                                </td>
+
+                            </tr>
+                            `;
+
+
+                    /* ==========================
+                       보호자 안내
+                       ========================== */
+                    if (
+                        String(
+                            baselineStatus
+                            || ''
+                        )
+                        .toUpperCase()
+                        === 'NOT_READY'
+                    ) {
+
+                        $('reportGuideCards')
+                            .innerHTML =
+                                `
+                                <div class="guide-card-item">
+
+                                    <strong>
+                                        기준 패턴 학습 중:
+                                    </strong>
+
+                                    현재는 반려동물의
+                                    평소 행동을 알아가기 위한
+                                    데이터를 누적하고 있어요.
+
+                                </div>
+
+
+                                <div class="guide-card-item">
+
+                                    <strong>
+                                        분석 결과 활용:
+                                    </strong>
+
+                                    쫑긋은 건강 상태를
+                                    진단하는 서비스가 아니라,
+                                    평소와 다른 행동 변화를
+                                    알아차리는 데 도움을 주기 위한
+                                    서비스예요.
+
+                                </div>
+                                `;
+
+                    } else {
+
+                        $('reportGuideCards')
+                            .innerHTML =
+                                `
+                                <div class="guide-card-item">
+
+                                    <strong>
+                                        최근 변화 평가:
+                                    </strong>
+
+                                    현재 상태는
+
+                                    <strong>
+                                        ${changeText(changeStatus)}
+                                    </strong>
+
+                                    입니다.
+
+                                </div>
+
+
+                                <div class="guide-card-item">
+
+                                    <strong>
+                                        분석 결과 활용:
+                                    </strong>
+
+                                    행동 분석 결과는
+                                    보호자의 관찰을 돕기 위한
+                                    정보입니다.
+
+                                </div>
+                                `;
+
+                    }
+
+
+                } catch (
+                    error
+                ) {
+
+                    console.error(
+                        '[REPORT] latest analysis load failed',
+                        error
+                    );
+
+
+                    $('reportSummaryTitle')
+                        .textContent =
+                            '📬 아직 표시할 분석 결과가 없어요';
+
+
+                    $('reportSummaryText')
+                        .textContent =
+                            '대시보드에서 영상을 분석하면 '
+                            + '최근 결과가 이 리포트에 표시됩니다.';
+
+
+                    $('reportAnalysisStatus')
+                        .textContent =
+                            '데이터 없음';
+
+
+                    $('summaryAnalysis')
+                        .textContent =
+                            '데이터 없음';
+
+
+                    $('summaryBaseline')
+                        .textContent =
+                            '-';
+
+
+                    $('summaryChange')
+                        .textContent =
+                            '-';
+
+
+                    $('reportChangeTableBody')
+                        .innerHTML =
+                            `
+                            <tr>
+
+                                <td colspan="4">
+                                    아직 저장된 분석 결과가 없습니다.
+                                </td>
+
+                            </tr>
+                            `;
+
+                }
+
+            }
+
+
+            /* ==========================================
+               ROI 오늘 체류 비율
+               ========================================== */
+            async function loadRoi() {
+
+                try {
+
+                    const response =
+                        await fetch(
+                            '/api/monitoring/today-stay-ratio',
+                            {
+                                headers: {
+                                    Accept:
+                                        'application/json'
+                                },
+
+                                cache:
+                                    'no-store'
+                            }
+                        );
+
+
+                    if (
+                        !response.ok
+                    ) {
+                        throw new Error(
+                            'roi '
+                            + response.status
+                        );
+                    }
+
+
+                    const data =
+                        await response.json();
+
+
+                    const ratios =
+                        Array.isArray(
+                            data.ratios
+                        )
+                            ? data.ratios
+                            : [];
+
+
+                    /* 데이터 없음 */
+                    if (
+                        ratios.length === 0
+                    ) {
+
+                        $('summaryTopRoi')
+                            .textContent =
+                                '데이터 없음';
+
+
+                        $('summaryTopRoiSub')
+                            .textContent =
+                                '오늘 저장된 ROI 체류 기록 없음';
+
+
+                        $('reportRoiList')
+                            .innerHTML =
+                                `
+                                <div class="roi-item">
+
+                                    <div class="roi-info-group">
+
+                                        <div class="roi-icon-box">
+                                            📬
+                                        </div>
+
+                                        <div class="roi-name">
+                                            오늘 저장된 공간 체류 데이터가 없어요
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                `;
+
+                        return;
+                    }
+
+
+                    /* 가장 많이 체류한 공간 */
+                    const top =
+                        ratios[0];
+
+
+                    $('summaryTopRoi')
+                        .textContent =
+                            `${roiLabel(top.roiName)} `
+                            + `${Number(top.percent || 0)}%`;
+
+
+                    $('summaryTopRoiSub')
+                        .textContent =
+                            `${fmtSeconds(top.stayTime)} 체류`;
+
+
+                    /* ROI 리스트 */
+                    $('reportRoiList')
+                        .innerHTML =
+                            ratios
+                            .slice(
+                                0,
+                                4
+                            )
+                            .map(
+                                (item) => {
+
+                                    return `
+                                    <div class="roi-item">
+
+                                        <div class="roi-info-group">
+
+                                            <div class="roi-icon-box">
+                                                ${roiIcon(item.roiName)}
+                                            </div>
+
+                                            <div class="roi-name">
+                                                ${roiLabel(item.roiName)}
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="roi-data">
+
+                                            ${fmtSeconds(item.stayTime)}
+                                            체류
+
+                                            <br>
+
+                                            오늘 체류의
+                                            ${Number(item.percent || 0)}%
+
+                                        </div>
+
+                                    </div>
+                                    `;
+
+                                }
+                            )
+                            .join('');
+
+
+                } catch (
+                    error
+                ) {
+
+                    console.error(
+                        '[REPORT] roi summary load failed',
+                        error
+                    );
+
+
+                    $('summaryTopRoi')
+                        .textContent =
+                            '조회 실패';
+
+
+                    $('summaryTopRoiSub')
+                        .textContent =
+                            'ROI 데이터를 확인해 주세요';
+
+
+                    $('reportRoiList')
+                        .innerHTML =
+                            `
+                            <div class="roi-item">
+
+                                <div class="roi-info-group">
+
+                                    <div class="roi-icon-box">
+                                        ⚠️
+                                    </div>
+
+                                    <div class="roi-name">
+                                        ROI 데이터를 불러오지 못했어요
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            `;
+
+                }
+
+            }
+
+
+            /* ==========================================
+               페이지 시작
+               ========================================== */
+            document.addEventListener(
+                'DOMContentLoaded',
+                () => {
+
+                    loadLatest();
+
+                    loadRoi();
+
+                }
+            );
+
+
+        })();
     </script>
 
 </body>
-
 </html>

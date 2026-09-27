@@ -24,7 +24,8 @@ public class MemberController {
 
     // --- 1. 일반 페이지 매핑 ---
 
-// 로그인 전 메인 화면으로 들어갔을 때 로그인 여부를 판단해서 로그인 전이면 before, 후면 after를 띄움
+    // 로그인 전 메인 화면으로 들어갔을 때 로그인 여부를 판단해서
+    // 로그인 전이면 before, 로그인 후면 main으로 이동
     @GetMapping("/")
     public String main(HttpSession session) {
 
@@ -39,24 +40,36 @@ public class MemberController {
     }
 
     @GetMapping("/serviceIntro")
-    public String serviceIntro(HttpSession session, Model model) {
+    public String serviceIntro(
+            HttpSession session,
+            Model model) {
+
         UserEntity loginUser =
                 (UserEntity) session.getAttribute("loginUser");
 
         if (loginUser != null) {
-            model.addAttribute("loginUser", loginUser);
+            model.addAttribute(
+                    "loginUser",
+                    loginUser
+            );
         }
 
         return "html/serviceIntro";
     }
 
     @GetMapping("/servicePrice")
-    public String servicePrice(HttpSession session, Model model) {
+    public String servicePrice(
+            HttpSession session,
+            Model model) {
+
         UserEntity loginUser =
                 (UserEntity) session.getAttribute("loginUser");
 
         if (loginUser != null) {
-            model.addAttribute("loginUser", loginUser);
+            model.addAttribute(
+                    "loginUser",
+                    loginUser
+            );
         }
 
         return "html/servicePrice";
@@ -323,6 +336,10 @@ public class MemberController {
         return "html/privacy";
     }
 
+    // ==========================================
+    // Report
+    // 로그인 사용자 + 해당 사용자의 PET 목록 전달
+    // ==========================================
     @GetMapping("/report")
     public String reportPage(
             HttpSession session,
@@ -335,16 +352,28 @@ public class MemberController {
             return "redirect:/login";
         }
 
+        List<PetEntity> petList =
+                petRepository.findByUser_seq(
+                        loginUser.getId()
+                );
+
         model.addAttribute(
                 "loginUser",
                 loginUser
+        );
+
+        model.addAttribute(
+                "petList",
+                petList
         );
 
         return "html/report";
     }
 
     @GetMapping({"/roiselect", "/roi-select"})
-    public String roiSelectPage(HttpSession session, Model model) {
+    public String roiSelectPage(
+            HttpSession session,
+            Model model) {
 
         UserEntity loginUser =
                 (UserEntity) session.getAttribute("loginUser");
@@ -354,10 +383,19 @@ public class MemberController {
         }
 
         List<PetEntity> petList =
-                petRepository.findByUser_seq(loginUser.getId());
+                petRepository.findByUser_seq(
+                        loginUser.getId()
+                );
 
-        model.addAttribute("loginUser", loginUser);
-        model.addAttribute("petList", petList);
+        model.addAttribute(
+                "loginUser",
+                loginUser
+        );
+
+        model.addAttribute(
+                "petList",
+                petList
+        );
 
         return "html/roiSelect";
     }

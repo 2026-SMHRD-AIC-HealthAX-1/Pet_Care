@@ -1,10 +1,15 @@
 package com.smhrd.myapp.controller;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,15 +22,11 @@ import com.smhrd.myapp.repository.RoiInfoRepository;
 @Controller
 public class RoiInfoController {
 
-    /*
-     * 현재 CAMERA_INFO와 로그인 USER 연결 구조가 아직 확정되지 않았으므로
-     * 시연용 단일 카메라 CAM_SEQ = 0을 사용한다.
-     *
-     * 중요:
-     * 기존처럼 CAMERA_ROI_INFO 전체를 삭제하지 않고,
-     * CAM_SEQ = 0 데이터만 조회/삭제/교체한다.
-     */
     private static final Integer DEMO_CAM_SEQ = 0;
+    private static final float ROI_EDGE_EPSILON = 0.001f;
+
+    private static final Set<String> ALLOWED_ROI_NAMES =
+            Set.of("FOOD_BOWL", "WATER_BOWL", "BED", "ETC");
 
     private final RoiInfoRepository repo;
 
@@ -33,89 +34,235 @@ public class RoiInfoController {
         this.repo = repo;
     }
 
-    // =========================================================
-    // 현재 시연 카메라 ROI 전체 삭제
-    // =========================================================
     @PostMapping("/roidelete")
     @ResponseBody
     public ResponseEntity<String> roidelete() {
-
         int deletedCount = repo.deleteAllByCamSeq(DEMO_CAM_SEQ);
-
         return ResponseEntity.ok(
-            "SUCCESS - CAM_SEQ=" + DEMO_CAM_SEQ
-            + ", deleted=" + deletedCount
+                "SUCCESS - CAM_SEQ=" + DEMO_CAM_SEQ
+                        + ", deleted=" + deletedCount
         );
     }
 
-    // =========================================================
-    // 현재 시연 카메라 ROI 조회
-    // =========================================================
     @GetMapping("/roiget")
     @ResponseBody
-    public List<Camera_Roi_Info> roiget() {
+    public List<Map<String, Object>> roiget() {
+        List<Camera_Roi_Info> saved =
+                repo.findAllByCamSeq(DEMO_CAM_SEQ);
 
-        return repo.findAllByCamSeq(DEMO_CAM_SEQ);
+        List<Map<String, Object>> safe =
+                new ArrayList<>();
+
+        for (Camera_Roi_Info roi : saved) {
+            try {
+                NormalizedRoi normalized =
+                        normalizeRoi(
+                                roi.getSeq(),
+                                roi.getRoi_name(),
+                                roi.getX_start(),
+                                roi.getY_start(),
+                                roi.getWidth(),
+                                roi.getHeight()
+                        );
+
+                Map<String, Object> row =
+                        new LinkedHashMap<>();
+
+                row.put("seq", normalized.id());
+                row.put("cam_seq", DEMO_CAM_SEQ);
+                row.put("roi_name", normalized.name());
+                row.put("x_start", normalized.x());
+                row.put("width", normalized.width());
+                row.put("y_start", normalized.y());
+                row.put("height", normalized.height());
+
+                safe.add(row);
+
+            } catch (IllegalArgumentException e) {
+                System.err.println(
+                        "[ROI 조회 제외] seq="
+                                + roi.getSeq()
+                                + ", reason="
+                                + e.getMessage()
+                );
+            }
+        }
+
+        return safe;
     }
 
-    // =========================================================
-    // 현재 시연 카메라 ROI 저장
-    // 기존 CAM_SEQ=0 ROI만 교체
-    // 다른 카메라 ROI는 건드리지 않음
-    // =========================================================
     @PostMapping("/roiinsert")
     @ResponseBody
+    @Transactional
     public ResponseEntity<String> roiinsert(
             @RequestBody RoiRequestDto dto) {
 
-        try {
-
-            if (dto.getRois() == null || dto.getRois().isEmpty()) {
-                return ResponseEntity
-                        .badRequest()
-                        .body("저장할 ROI 데이터가 없습니다.");
-            }
-
-            // -------------------------------------------------
-            // 기존 방식:
-            // repo.deleteAllInBatch();
-            //
-            // 변경 방식:
-            // 현재 시연 카메라 CAM_SEQ=0 데이터만 삭제
-            // -------------------------------------------------
-            repo.deleteAllByCamSeq(DEMO_CAM_SEQ);
-
-            List<Camera_Roi_Info> entityList = new ArrayList<>();
-
-            for (RoiRequestDto.RoiItemDto item : dto.getRois()) {
-
-                Camera_Roi_Info entity = new Camera_Roi_Info(
-                    item.getId(),
-                    DEMO_CAM_SEQ,
-                    item.getName(),
-                    item.getX(),
-                    item.getWidth(),
-                    item.getY(),
-                    item.getHeight()
-                );
-
-                entityList.add(entity);
-            }
-
-            repo.saveAll(entityList);
-
-            return ResponseEntity.ok(
-                "SUCCESS - CAM_SEQ=" + DEMO_CAM_SEQ
-                + ", saved=" + entityList.size()
-            );
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
+        if (dto == null
+                || dto.getRois() == null
+                || dto.getRois().isEmpty()) {
             return ResponseEntity
-                    .status(500)
-                    .body("서버 에러: " + e.getMessage());
+                    .badRequest()
+                    .body("저장할 ROI 데이터가 없습니다.");
         }
+
+        List<Camera_Roi_Info> entityList =
+                new ArrayList<>();
+
+        try {
+            for (RoiRequestDto.RoiItemDto item : dto.getRois()) {
+                NormalizedRoi roi =
+                        normalizeRoi(
+                                item.getId(),
+                                item.getName(),
+                                item.getX(),
+                                item.getY(),
+                                item.getWidth(),
+                                item.getHeight()
+                        );
+
+                entityList.add(
+                        new Camera_Roi_Info(
+                                roi.id(),
+                                DEMO_CAM_SEQ,
+                                roi.name(),
+                                roi.x(),
+                                roi.width(),
+                                roi.y(),
+                                roi.height()
+                        )
+                );
+            }
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("ROI 좌표 오류: " + e.getMessage());
+        }
+
+        repo.deleteAllByCamSeq(DEMO_CAM_SEQ);
+        repo.saveAll(entityList);
+
+        return ResponseEntity.ok(
+                "SUCCESS - CAM_SEQ=" + DEMO_CAM_SEQ
+                        + ", saved=" + entityList.size()
+        );
+    }
+
+    private NormalizedRoi normalizeRoi(
+            String id,
+            String rawName,
+            Float rawX,
+            Float rawY,
+            Float rawWidth,
+            Float rawHeight) {
+
+        if (id == null || id.isBlank()) {
+            throw new IllegalArgumentException(
+                    "ROI id가 비어 있습니다."
+            );
+        }
+
+        if (rawName == null || rawName.isBlank()) {
+            throw new IllegalArgumentException(
+                    "ROI name이 비어 있습니다."
+            );
+        }
+
+        String name =
+                rawName.trim().toUpperCase(Locale.ROOT);
+
+        if (!ALLOWED_ROI_NAMES.contains(name)) {
+            throw new IllegalArgumentException(
+                    "허용되지 않은 ROI name: " + name
+            );
+        }
+
+        validateFinite("x", rawX);
+        validateFinite("y", rawY);
+        validateFinite("width", rawWidth);
+        validateFinite("height", rawHeight);
+
+        float x = rawX;
+        float y = rawY;
+        float width = rawWidth;
+        float height = rawHeight;
+
+        if (width <= 0f || height <= 0f) {
+            throw new IllegalArgumentException(
+                    "width와 height는 0보다 커야 합니다."
+            );
+        }
+
+        if (x < -ROI_EDGE_EPSILON
+                || y < -ROI_EDGE_EPSILON
+                || x > 1f + ROI_EDGE_EPSILON
+                || y > 1f + ROI_EDGE_EPSILON) {
+            throw new IllegalArgumentException(
+                    "x/y가 허용 범위를 벗어났습니다."
+            );
+        }
+
+        float right = x + width;
+        float bottom = y + height;
+
+        if (right < -ROI_EDGE_EPSILON
+                || bottom < -ROI_EDGE_EPSILON
+                || right > 1f + ROI_EDGE_EPSILON
+                || bottom > 1f + ROI_EDGE_EPSILON) {
+            throw new IllegalArgumentException(
+                    "ROI 영역이 화면 범위를 벗어났습니다."
+            );
+        }
+
+        float safeLeft = clamp01(x);
+        float safeTop = clamp01(y);
+        float safeRight = clamp01(right);
+        float safeBottom = clamp01(bottom);
+
+        float safeWidth = safeRight - safeLeft;
+        float safeHeight = safeBottom - safeTop;
+
+        if (safeWidth <= 0f || safeHeight <= 0f) {
+            throw new IllegalArgumentException(
+                    "보정 후 ROI 크기가 0이 되었습니다."
+            );
+        }
+
+        return new NormalizedRoi(
+                id.trim(),
+                name,
+                round6(safeLeft),
+                round6(safeTop),
+                round6(safeWidth),
+                round6(safeHeight)
+        );
+    }
+
+    private void validateFinite(
+            String field,
+            Float value) {
+        if (value == null || !Float.isFinite(value)) {
+            throw new IllegalArgumentException(
+                    field + " 값이 유효한 숫자가 아닙니다."
+            );
+        }
+    }
+
+    private float clamp01(float value) {
+        return Math.max(0f, Math.min(1f, value));
+    }
+
+    private float round6(float value) {
+        return Math.round(value * 1_000_000f)
+                / 1_000_000f;
+    }
+
+    private record NormalizedRoi(
+            String id,
+            String name,
+            float x,
+            float y,
+            float width,
+            float height) {
     }
 }

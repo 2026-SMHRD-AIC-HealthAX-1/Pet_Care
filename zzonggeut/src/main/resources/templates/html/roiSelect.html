@@ -747,6 +747,33 @@
   // 마우스 좌표 계산
   // ==========================================
 
+  function clamp(
+    value,
+    min,
+    max
+  ) {
+
+    return Math.min(
+      max,
+      Math.max(
+        min,
+        value
+      )
+    );
+  }
+
+
+  function round6(
+    value
+  ) {
+
+    return Number(
+      Number(value)
+        .toFixed(6)
+    );
+  }
+
+
   function getMousePosition(
     event
   ) {
@@ -754,23 +781,37 @@
     const rect =
       canvas.getBoundingClientRect();
 
+    const rawX =
+      (
+        event.clientX
+        - rect.left
+      )
+      * canvas.width
+      / rect.width;
+
+    const rawY =
+      (
+        event.clientY
+        - rect.top
+      )
+      * canvas.height
+      / rect.height;
+
     return {
 
       x:
-        (
-          event.clientX
-          - rect.left
-        )
-        * canvas.width
-        / rect.width,
+        clamp(
+          rawX,
+          0,
+          canvas.width
+        ),
 
       y:
-        (
-          event.clientY
-          - rect.top
+        clamp(
+          rawY,
+          0,
+          canvas.height
         )
-        * canvas.height
-        / rect.height
     };
   }
 
@@ -1185,38 +1226,108 @@
     roi
   ) {
 
+    if (
+      !canvas.width
+      || !canvas.height
+    ) {
+
+      throw new Error(
+        "ROI 캔버스 크기가 준비되지 않았습니다."
+      );
+    }
+
+    const rawLeft =
+      roi.x
+      / canvas.width;
+
+    const rawTop =
+      roi.y
+      / canvas.height;
+
+    const rawRight =
+      (
+        roi.x
+        + roi.width
+      )
+      / canvas.width;
+
+    const rawBottom =
+      (
+        roi.y
+        + roi.height
+      )
+      / canvas.height;
+
+    const left =
+      round6(
+        clamp(
+          Math.min(
+            rawLeft,
+            rawRight
+          ),
+          0,
+          1
+        )
+      );
+
+    const top =
+      round6(
+        clamp(
+          Math.min(
+            rawTop,
+            rawBottom
+          ),
+          0,
+          1
+        )
+      );
+
+    const right =
+      round6(
+        clamp(
+          Math.max(
+            rawLeft,
+            rawRight
+          ),
+          0,
+          1
+        )
+      );
+
+    const bottom =
+      round6(
+        clamp(
+          Math.max(
+            rawTop,
+            rawBottom
+          ),
+          0,
+          1
+        )
+      );
+
     return {
 
       x:
-        Number(
-          (
-            roi.x
-            / canvas.width
-          ).toFixed(6)
-        ),
+        left,
 
       y:
-        Number(
-          (
-            roi.y
-            / canvas.height
-          ).toFixed(6)
-        ),
+        top,
 
       width:
-        Number(
-          (
-            roi.width
-            / canvas.width
-          ).toFixed(6)
+        round6(
+          Math.max(
+            0,
+            right - left
+          )
         ),
 
       height:
-        Number(
-          (
-            roi.height
-            / canvas.height
-          ).toFixed(6)
+        round6(
+          Math.max(
+            0,
+            bottom - top
+          )
         )
     };
   }
@@ -1260,6 +1371,68 @@
     cHeight
   ) {
 
+    const rawX =
+      Number(
+        dbRoi.x_start
+        ?? dbRoi.x
+        ?? 0
+      );
+
+    const rawY =
+      Number(
+        dbRoi.y_start
+        ?? dbRoi.y
+        ?? 0
+      );
+
+    const rawWidth =
+      Number(
+        dbRoi.width
+        ?? 0
+      );
+
+    const rawHeight =
+      Number(
+        dbRoi.height
+        ?? 0
+      );
+
+    const left =
+      clamp(
+        rawX,
+        0,
+        1
+      );
+
+    const top =
+      clamp(
+        rawY,
+        0,
+        1
+      );
+
+    const right =
+      clamp(
+        rawX
+        + Math.max(
+            0,
+            rawWidth
+          ),
+        0,
+        1
+      );
+
+    const bottom =
+      clamp(
+        rawY
+        + Math.max(
+            0,
+            rawHeight
+          ),
+        0,
+        1
+      );
+
     return {
 
       id:
@@ -1276,19 +1449,25 @@
         ),
 
       x:
-        dbRoi.x_start
+        left
         * cWidth,
 
       y:
-        dbRoi.y_start
+        top
         * cHeight,
 
       width:
-        dbRoi.width
+        Math.max(
+          0,
+          right - left
+        )
         * cWidth,
 
       height:
-        dbRoi.height
+        Math.max(
+          0,
+          bottom - top
+        )
         * cHeight
     };
   }
@@ -1441,6 +1620,80 @@
     const petInfo =
       getSelectedPetInfo();
 
+    const normalizedRois =
+      rois.map(
+        function (
+          roi,
+          index
+        ) {
+
+          const ratio =
+            convertToRatio(
+              roi
+            );
+
+          const values = [
+            ratio.x,
+            ratio.y,
+            ratio.width,
+            ratio.height
+          ];
+
+          if (
+            values.some(
+              value =>
+                !Number.isFinite(
+                  value
+                )
+            )
+          ) {
+
+            throw new Error(
+              `ROI ${index + 1} 좌표에 숫자가 아닌 값이 있습니다.`
+            );
+          }
+
+          if (
+            ratio.x < 0
+            || ratio.y < 0
+            || ratio.width <= 0
+            || ratio.height <= 0
+            || ratio.x > 1
+            || ratio.y > 1
+            || ratio.x + ratio.width > 1.000001
+            || ratio.y + ratio.height > 1.000001
+          ) {
+
+            throw new Error(
+              `ROI ${index + 1} 좌표 범위가 올바르지 않습니다.`
+            );
+          }
+
+          return {
+
+            id:
+              String(
+                roi.id
+              ),
+
+            name:
+              roi.name,
+
+            x:
+              ratio.x,
+
+            y:
+              ratio.y,
+
+            width:
+              ratio.width,
+
+            height:
+              ratio.height
+          };
+        }
+      );
+
 
     return {
 
@@ -1468,39 +1721,7 @@
           : null,
 
       rois:
-        rois.map(
-          function (roi) {
-
-            const ratio =
-              convertToRatio(
-                roi
-              );
-
-
-            return {
-
-              id:
-                String(
-                  roi.id
-                ),
-
-              name:
-                roi.name,
-
-              x:
-                ratio.x,
-
-              y:
-                ratio.y,
-
-              width:
-                ratio.width,
-
-              height:
-                ratio.height
-            };
-          }
-        )
+        normalizedRois
     };
   }
 

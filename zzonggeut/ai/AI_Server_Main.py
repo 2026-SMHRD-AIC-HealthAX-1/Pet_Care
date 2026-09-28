@@ -1401,6 +1401,10 @@ class CameraStreamTrack(
 
         self._analysis_index = 0
 
+        # LIVE 분석 프레임은 analysis_fps 슬롯 단위의 고정 시간축을 사용한다.
+        # WebRTC/파일 재생 지연으로 같은 3 FPS 슬롯이 두 번 들어가는 것을 막는다.
+        self._last_analysis_slot = -1
+
 
 
         self._analysis_queue = (
@@ -1757,8 +1761,8 @@ class CameraStreamTrack(
 
             ):
 
-
-
+                # 분석기에 전달하는 timestamp는 analysis_fps 슬롯에 정확히 맞춘다.
+                # 파일 영상은 원본 영상 시간축을, 카메라는 세션 경과 시간을 기준으로 한다.
                 if (
 
                     self.source_type == "video"
@@ -1767,7 +1771,7 @@ class CameraStreamTrack(
 
                 ):
 
-                    timestamp_sec = (
+                    timeline_position_sec = (
 
                         self._source_frame_index
 
@@ -1777,7 +1781,7 @@ class CameraStreamTrack(
 
                 else:
 
-                    timestamp_sec = (
+                    timeline_position_sec = (
 
                         now
 
@@ -1787,45 +1791,40 @@ class CameraStreamTrack(
 
 
 
-                item = (
+                analysis_slot = round(
 
-                    frame.copy(),
+                    timeline_position_sec
 
-                    timestamp_sec,
+                    * self.analysis_fps
 
                 )
 
 
 
-                try:
+                # 같은 expected_fps 슬롯에 해당하는 프레임은 중복 투입하지 않는다.
+                if analysis_slot > self._last_analysis_slot:
 
-                    self._analysis_queue.put_nowait(
+                    timestamp_sec = (
 
-                        item
+                        analysis_slot
+
+                        / self.analysis_fps
 
                     )
 
 
 
-                    self._analysis_index += 1
+                    item = (
+
+                        frame.copy(),
+
+                        timestamp_sec,
+
+                    )
 
 
 
-                except asyncio.QueueFull:
-
-                    # 긴 backlog를 쌓아 오래된 프레임을 뒤늦게 분석하지 않고,
-
-                    # 가장 오래된 대기 프레임 1개를 버린 뒤 최신 프레임을 넣는다.
-
-                    # timestamp는 실제 영상 시간을 유지하므로 시간축이 압축되지 않는다.
-
-                    try:
-
-                        self._analysis_queue.get_nowait()
-
-                    except asyncio.QueueEmpty:
-
-                        pass
+                    queued = False
 
 
 
@@ -1837,37 +1836,77 @@ class CameraStreamTrack(
 
                         )
 
-                        self._analysis_dropped_count += 1
+                        queued = True
+
+
 
                     except asyncio.QueueFull:
 
-                        self._analysis_dropped_count += 1
+                        # 긴 backlog를 쌓아 오래된 프레임을 뒤늦게 분석하지 않고,
+
+                        # 가장 오래된 대기 프레임 1개를 버린 뒤 최신 프레임을 넣는다.
+
+                        # timestamp는 고정 analysis_fps 슬롯을 유지한다.
+
+                        try:
+
+                            self._analysis_queue.get_nowait()
+
+                        except asyncio.QueueEmpty:
+
+                            pass
 
 
 
-                    if (
+                        try:
 
-                        self._analysis_dropped_count == 1
+                            self._analysis_queue.put_nowait(
 
-                        or self._analysis_dropped_count % 10 == 0
+                                item
 
-                    ):
+                            )
 
-                        print(
+                            queued = True
 
-                            "[LIVE 경고] "
+                            self._analysis_dropped_count += 1
 
-                            "분석 처리 지연으로 오래된 샘플 프레임 교체 "
+                        except asyncio.QueueFull:
 
-                            f"- dropped="
+                            self._analysis_dropped_count += 1
 
-                            f"{self._analysis_dropped_count}, "
 
-                            f"analysis_fps="
 
-                            f"{self.analysis_fps}"
+                        if (
 
-                        )
+                            self._analysis_dropped_count == 1
+
+                            or self._analysis_dropped_count % 10 == 0
+
+                        ):
+
+                            print(
+
+                                "[LIVE 경고] "
+
+                                "분석 처리 지연으로 오래된 샘플 프레임 교체 "
+
+                                f"- dropped="
+
+                                f"{self._analysis_dropped_count}, "
+
+                                f"analysis_fps="
+
+                                f"{self.analysis_fps}"
+
+                            )
+
+
+
+                    if queued:
+
+                        self._analysis_index += 1
+
+                        self._last_analysis_slot = analysis_slot
 
 
 

@@ -266,6 +266,11 @@ class PetBehaviorAnalyzer:
                     errors="replace",
                     check=False,
                 )
+
+                if completed.returncode != 0:
+                    print("\n[PIPELINE RAW OUTPUT]")
+                    print(completed.stdout)
+                    
             except OSError as error:
                 raise PipelineExecutionError(f"Cannot start pipeline process: {error}") from error
             if not result_path.is_file():
